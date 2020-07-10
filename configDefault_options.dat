@@ -1,0 +1,95 @@
+#This file should have the same name as config file, followed by _options.dat
+#E.g. if your config file is named
+#These are the Default values, separated by tabs
+#Anything after a '#' is ignored by the program
+
+#General
+particleTypes	[5,10] 	#Particle Diameters
+dilate	0	#Size of outer rim in nm
+onlyParticlesWithin	true   #Only particles within area of interest should be taken into account
+
+BackgroundBrightness	0.7 	#How much darker the non demarcated area should be
+
+#Analysis
+nrsim	50      #Default number of simulations
+allName	'All'
+SimOptions.mindistance	10
+SimOptions.simOnDilation	0
+SimOptions.twoStep	0
+SimOptions.minReceptorDistance	6
+SimOptions.ReceptorParticleDistance	[0, -1]  #-1 means same as dilate
+SimOptions.indivsave	true
+SimOptions.bounds	{6, 0.1; 6, 1}       #Simulations fit Kolmogorov-Smirnov p-Value of comparison of all pairwise Distances to be between 0.1 and 1
+SimOptions.fitdisttype	'all Distances'
+SimOptions.exclZones	false
+SimOptions.partExcl	{'random','random','random'}
+SimOptions.zoneNr	{3,0}
+SimOptions.zoneDiameter	50
+SimOptions.zoneDistance	40
+ClusterOptions.Clustering	2
+ClusterOptions.ClusterDistanceMethod	3
+minpointscluster	3
+maxDist	{'SD', 2}
+advNames	{}
+doColocalization	false
+keepColocIm	false
+keepSimColocIm	false
+limitEdgeIndex	false	#If true, maximum normalized distance from center is 1
+
+
+#ParticleLabeling
+particleColor	{[0,0,0],[0,0,1],[1,0.0706,0.1098],[0.6,1,0.6],[0.4353,0,1],[0,0.8667,0.8667],[1,0.8431,0],[1,0.55,0],[1,0,0.5647],[1,1,1]}
+#Colors are: black, blue, red, green, indigo, cyan, yellow, orange, magenta, white
+fillParticle	zeros(10,1)	#First number should be same as number of colors
+sensitivity	0.75
+marginNm	2
+zoomImageSizeNm	500
+
+#Visualize
+showScalebar	false
+scalePos	'southwest'
+scaleOrientation	'horizontal'
+scaleLength	100
+scaleColor	'white'
+scaleWidth	1.5
+maskFromAnalysis	true
+DemarcationStyle	'Color'
+RimStyle	'Line'
+ExclStyle	'None'
+showCenter	false
+showParticles	true
+lineDemStyle	'solid'
+lineRimStyle	'dashed'
+lineDemColor	'black'
+lineRimColor	'black'
+lineDemWidth	1.2
+lineRimWidth	1.2
+lineExclStyle	'dashed'
+lineExclColor	'black'
+lineExclWidth	1.2
+colorDemColor	[0,1,0]	#green
+transparencyDem	0.85
+colorRimColor	[1,0,0]	#red
+transparencyRim	0.85
+
+
+#DemarcateImage
+closeRadius	7.5	#Radius (in Nm) for close Structure
+gw_cutoff	0.25
+gw_sigma	2
+showFilters	false
+
+#DeepLearning
+imageSize	[512,512] 	#Size to which images are converted before training/prediction
+classifierPath	'partlabeling/classifierTraining/classifiers/'
+defaultClassifier	'Forest'
+backgroundColor	[50,50,50]	#All 3 values have to be same
+foregroundColor	[128,128,128]	#All 3 values have to be same
+train_val_test_ratios	[0.75,0.2,0.05]  # probabilities for train, val, test. Have to add up to 1
+epochs	200
+batchSize	1
+learnRate	0.0001
+
+#Internal Stuff. Don't change unless you know what you're doing
+chosenGroups	[1]
+SimOptions.removeExtreme	'random'      #Alternative is NNDs, but this is more biased and may not work with other Options, therefore this value should not be changed by the user

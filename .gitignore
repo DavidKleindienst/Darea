@@ -1,0 +1,6 @@
+*.DS_Store
+*.m~
+processing/util/dist.m
+*__pycache__*
+*.ckpt.*
+*handbook/screenshots/Screenshot*

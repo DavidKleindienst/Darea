@@ -1,0 +1,41 @@
+function python=setPath()
+addpath('./Menus/');
+addpath('./Menus/advancedMenus/');
+addpath('./util/');
+addpath('./plot/');
+addpath('./guiutils/');
+addpath('./python/');
+addpath('./preembedding/');
+addpath('./partlabeling/');
+addpath('./partlabeling/classifierTraining/');
+addpath('./demarcation/');
+addpath('./processing/');
+addpath('./processing/simulations');
+addpath('./processing/clustering');
+addpath('./processing/distances');
+addpath('./processing/counting');
+addpath('./processing/colocalization');
+addpath('./processing/util');
+addpath('./analysis/');
+addpath('./analysis/util/');
+addpath('./3rdParty/');
+addpath('./3rdParty/findjobj');
+addpath('./3rdParty/serialization');
+addpath('./3rdParty/myBinomTest');
+addpath('./3rdParty/p_poly_dist');
+addpath('./3rdParty/reverse_eval');
+addpath('./3rdParty/export_fig');
+addpath('./3rdParty/Douglas Peucker');
+addpath('./deepLearning/');
+addpath('./deepLearning/utils/');
+
+try
+    P=py.sys.path;
+    append(P,'./python/');
+    append(P,'./python/SemanticSegmentationSuite/');
+    append(P,'./python/custom_modules/');
+    python=true;
+catch
+    python=false;
+end
+end

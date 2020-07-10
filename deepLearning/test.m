@@ -1,0 +1,117 @@
+function test(imDataset,feature,network,outfolder,savePredictions,hProgress)
+%UNTITLED Summary of this function goes here
+%   Detailed explanation goes here
+delTmp=1;
+
+if isfile(imDataset)
+    settings=readDefaults(imDataset);
+    %datFile
+    %->Convert and then test
+    set(hProgress, 'String', 'Preparing dataset for test');
+    drawnow();
+    path='tmp';
+    settings.train_val_test_ratios=[0,0,1]; %All images used for testing
+    prepareFolderForTrainDataset(path,feature,settings);
+    routes=readConfig(imDataset);
+    fid=fopen('tmp/info.csv','w');
+    fprintf(fid,'OriginalRoute;Name;ImageSize;Type');
+
+    [pa, fil, ext]=fileparts(imDataset);
+        
+    copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),fid,NaN,settings);
+    fclose(fid);
+    imSizes=getImSizesFromCSV('tmp/info.csv');
+elseif isfolder(imDataset)
+    %Folder with prepared images
+    if isfolder(fullfile(imDataset,feature))
+        path=imDataset;
+    else
+        [folder, subfolder]=fileparts(imDataset);
+        if strcmp(subfolder,feature) && isfolder(imDataset)
+            path=folder;
+        else
+            hProgress.String='Selected folder does not contain dataset for that feature. Aborted.';
+            return
+        end
+    end
+    %% Define routes here!!
+    info=tdfread(fullfile(path,feature,'configs.csv'),';');
+    configs=cellstr(info.Name);
+    imSizes={};
+    routes={};
+    for c=1:numel(configs)
+        info=tdfread(fullfile(path,feature,[configs{c}(1:end-4) '.csv']),';');
+        types=cellstr(info.Type);
+        oroutes=cellstr(info.OriginalRoute);
+        sizes=cellstr(info.ImageSize);
+        sizes=sizes(strcmp(types,'test'));
+        sizes=cellfun(@eval,sizes, 'UniformOutput', false);
+        oroutes=oroutes(strcmp(types,'test'));
+        routes=[routes;oroutes];
+        imSizes=[imSizes;sizes];
+    end
+        
+else
+    %not recognized
+    set(hProgress,'String', 'Unexpected format of dataset. Aborted');
+    return;
+end
+savePath='tmpResults';
+
+safeMkdir(savePath);
+
+args=[... 
+        ' --dataset ', convPath(fullfile(path,feature)) ...
+        ' --checkpoint_path ', convPath(['deepLearning/checkpoints/' network '.ckpt']) ...
+        ' --output_path ', convPath(savePath) ... 
+        ' --darea_call ', '1'];
+set(hProgress, 'String', 'Performing Test');
+drawnow();
+[~,pyExe]=pyversion; 
+cmd=[pyExe ' python/SemanticSegmentationSuite/test.py' args];
+retVal=system(cmd);
+if retVal~=0
+    %Python failed
+    set(hProgress, 'String', 'Python ended with error, aborting prediction');
+    fprintf('Python ended with error, aborting prediction\n')
+    fprintf('The python command executed was:\n%s',cmd')
+    drawnow();
+    return;
+end
+%Test successful
+set(hProgress, 'String', 'Saving results.');
+drawnow();
+    
+
+safeMkdir(outfolder)
+outfolder=fullfile(outfolder,feature);
+safeMkdir(outfolder);
+copyfile('tmpResults/test.csv', fullfile(outfolder,'test_results.csv'));
+
+if savePredictions
+    routes=cellfun(@(x) [x '.tif'],routes, 'UniformOutput', false);
+    routes=cellfun(@(x) fullfile(outfolder,x),routes, 'UniformOutput',false);
+    subfolders=unique(cellfun(@(x)fileparts(x), routes, 'UniformOutput', false));
+    for i=1:numel(subfolders)
+        safeMkdir(subfolders{i});
+    end
+
+    convertPredictionsToMod('tmpResults/', routes, imSizes, 1);
+end
+
+rmdir('tmpResults', 's');
+if delTmp
+    rmdir('tmp','s');
+end
+%Reset pythons working directory to DareIt main folder (gets changed when making predictions)
+py.os.chdir(pwd);
+set(hProgress, 'String', 'Testing finished!');
+
+    function sizes=getImSizesFromCSV(csv)
+        iminfo=tdfread(csv,';');
+        sizes=cellstr(iminfo.ImageSize);
+        sizes=cellfun(@(x) eval(x),sizes,'UniformOutput',false);
+    end
+
+end
+
