@@ -36,7 +36,7 @@ for i=1:numel(routes)
     try
         if ~isstruct(particleColors)
             %Demarcation prediction
-            [mask, image] = getBaseImages(imageFullName,imageSelFullName);
+            [mask, image] = getBaseImages(imageFullName,imageSelFullName,0,settings.noROI_is_Background);
         else
             %Particle prediction
             [mask, image] = getBaseImages(imageFullName,imageSelFullName, round((settings.dilate+5)/scales(i)));
