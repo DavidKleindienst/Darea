@@ -50,6 +50,7 @@ for s=0:numel(Data.simnames)
                 end
             end
         end
+        fclose(fid);
     end
 end
 

@@ -89,6 +89,7 @@ train_val_test_ratios	[0.75,0.2,0.05]  # probabilities for train, val, test. Hav
 epochs	200
 batchSize	1
 learnRate	0.0001
+noROI_is_Background	0
 
 #Internal Stuff. Don't change unless you know what you're doing
 chosenGroups	[1]

@@ -247,23 +247,6 @@ function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId
         set(handleImage,'ButtonDownFcn',@imageClickCallBack);
     end
 
-    function overlaidImage=overlayImage(im,overlayColor,transparency)
-        %Make rgb image matrix of same size as image with each element
-        %px being overlayColor
-        overlay=reshape(repelem(overlayColor,size(im,1),size(im,2)),size(im));
-        overlay=im2uint16(overlay);
-        %Devide image and color by 2 to avoid capping problem later
-        im=im./2;
-        overlay=overlay./2;
-        %Overlaid image is the weighted mean (weight=transparency) of
-        %Original Color and overlay at each px
-        weightImage=2*transparency;
-        weightColor=2*(1-transparency);
-        
-        overlaidImage=mean(cat(4,im.*weightImage,overlay.*weightColor),4);
-        overlaidImage=overlaidImage.*2;   %Multiply with 2 to get back to original colors
-        overlaidImage=round(overlaidImage);     %Image pxs are integers
-    end
 
     function changeMask()
         showMaskedImage();
@@ -365,6 +348,7 @@ function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId
                     markI =[markI, drawCircle(centers(i,1), centers(i,2), radius, '-', 2, settings.particleColor{c}, settings.fillParticle(c), axesImage)];
                     markZ = [markZ, drawCircle(centers(i,1), centers(i,2), radius, '-', 2, settings.particleColor{c}, settings.fillParticle(c), axesZoom)];
                 end
+                
                 set(markZ, 'ButtonDownFcn', @zoomClickCallback);
             end
             if isstruct(simI)       %Display simulated points
