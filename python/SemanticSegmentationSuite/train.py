@@ -102,7 +102,7 @@ def main(args=None):
     
     network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
     
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=net_output))
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=net_output))
     
     opt = tf.train.RMSPropOptimizer(learning_rate=args.learn_rate, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
     
@@ -213,30 +213,66 @@ def main(args=None):
     
                 with tf.device('/cpu:0'):
                     input_image, output_image = data_augmentation(input_image, output_image, args)
-    
-    
+                    if 1:
+                        #Debugging: 
+                        try:
+                            os.mkdir('imagesinTrain')
+                            'kj'
+                        except:
+                            pass
+                        try:
+                            os.mkdir('imagesinTrain/%04d'%(epoch))
+                        except:
+                            pass
+                        file_name = utils.filepath_to_name(train_input_names[id])
+                        file_name = os.path.splitext(file_name)[0]
+                        cv2.imwrite("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(input_image), cv2.COLOR_RGB2BGR))
+                        cv2.imwrite("%s/%04d/%s_gt.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(output_image), cv2.COLOR_RGB2BGR))
                     # Prep the data. Make sure the labels are in one-hot format
                     input_image = np.float32(input_image) / 255.0
                     output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
-    
+                    if 0:
+                        #Debugging: 
+                        try:
+                            os.mkdir('imagesinTrain')
+                        except:
+                            pass
+                        try:
+                            os.mkdir('imagesinTrain/%04d'%(epoch))
+                        except:
+                            pass
+                        file_name = utils.filepath_to_name(train_input_names[id])
+                        file_name = os.path.splitext(file_name)[0]
+                        print("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name))
+                        cv2.imwrite("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(input_image), cv2.COLOR_RGB2BGR))
+                        #cv2.imwrite("%s/%04d/%s_gt.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(output_image), cv2.COLOR_RGB2BGR))
                     input_image_batch.append(np.expand_dims(input_image, axis=0))
                     output_image_batch.append(np.expand_dims(output_image, axis=0))
     
             if args.batch_size == 1:
                 input_image_batch = input_image_batch[0]
                 output_image_batch = output_image_batch[0]
+                
             else:
                 input_image_batch = np.squeeze(np.stack(input_image_batch, axis=1))
                 output_image_batch = np.squeeze(np.stack(output_image_batch, axis=1))
-    
+
             # Do the training
-            _,current=sess.run([opt,loss],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
+            _,current,output_image=sess.run([opt,loss,network],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
             current_losses.append(current)
             cnt = cnt + args.batch_size
-            if cnt % 60 == 0:
+            if cnt % 25 == 0:
                 string_print = "Epoch = %d Count = %d Current_Loss = %.4f Time = %.2f"%(epoch,cnt,current,time.time()-st)
                 utils.LOG(string_print)
                 st = time.time()
+            
+            if 0:
+                #For Debugging
+                output_image = np.array(output_image[0,:,:,:])
+                output_image = helpers.reverse_one_hot(output_image)
+                out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
+                cv2.imwrite("%s/%04d/%s_pred.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+
     
         mean_loss = np.mean(current_losses)
         avg_loss_per_epoch.append(mean_loss)
@@ -273,20 +309,43 @@ def main(args=None):
     
             # Do the validation on a small set of validation images
             for ind in val_indices:
-    
-                input_image = np.expand_dims(np.float32(utils.load_image(val_input_names[ind])[:args.crop_height, :args.crop_width]),axis=0)/255.0
-                gt = utils.load_image(val_output_names[ind])[:args.crop_height, :args.crop_width]
+
+                input_image = utils.load_image(val_input_names[ind])
+                gt = utils.load_image(val_output_names[ind])
+                #input_image, gt = data_augmentation(input_image, gt, args)
+                    
+                    
                 gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
+                
+                crop_height=args.crop_height
+                crop_width=args.crop_width
+                
+                if input_image.shape[0]>crop_height or input_image.shape[1]>crop_width:
+                    #rectangle in bottom right corner smaller than cropped im will not be used
+                    nrCroppingsY=input_image.shape[0]//crop_height
+                    nrCroppingsX=input_image.shape[1]//crop_width
+                    output_image=np.zeros([nrCroppingsY*crop_height,nrCroppingsX*crop_width])
+                    gt=gt[0:nrCroppingsY*crop_height,0:nrCroppingsX*crop_width]
+                    for yi in range(nrCroppingsY):
+                        row=np.zeros([crop_height,nrCroppingsX*crop_width])
+                        for xi in range(nrCroppingsX):
+                            inputIm=input_image[yi*crop_height:(1+yi)*crop_height,xi*crop_width:(1+xi)*crop_width,:]
+                            inputIm=np.expand_dims(np.float32(inputIm)/255.0,axis=0)
+                            out=sess.run(network,feed_dict={net_input:inputIm})
+                            out = np.array(out[0,:,:,:])
+                            out=helpers.reverse_one_hot(out)
+                            row[:,xi*crop_width:(1+xi)*crop_width]=out
+                        output_image[yi*crop_height:(1+yi)*crop_height,:]=row
+                # st = time.time()                    
+                    
+                else:
+                    input_image=np.expand_dims(np.float32(input_image)/255.0,axis=0)
+                    output_image = sess.run(network,feed_dict={net_input:input_image})
+                    output_image = np.array(output_image[0,:,:,:])
+                    output_image = helpers.reverse_one_hot(output_image)
     
-                # st = time.time()
-    
-                output_image = sess.run(network,feed_dict={net_input:input_image})
-    
-    
-                output_image = np.array(output_image[0,:,:,:])
-                output_image = helpers.reverse_one_hot(output_image)
+                
                 out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
-    
                 accuracy, class_accuracies, prec, rec, f1, iou, class_iou = utils.evaluate_segmentation(pred=output_image, label=gt, num_classes=num_classes)
     
                 file_name = utils.filepath_to_name(val_input_names[ind])

@@ -54,7 +54,7 @@ def prepare_data(dataset_dir):
     cwd = os.getcwd()
     for x,name_list in zip(imtypes, name_lists):
         for file in os.listdir(os.path.join(dataset_dir,x)):
-            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.'):
+            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.') and not os.path.isdir(file):
                 name_list.append(os.path.join(cwd, dataset_dir, x, file))
     train_input_names.sort(),train_output_names.sort(), val_input_names.sort(), val_output_names.sort(), test_input_names.sort(), test_output_names.sort()
     return train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names
@@ -207,11 +207,13 @@ def random_crop(image, label, crop_height, crop_width):
     if (crop_width <= image.shape[1]) and (crop_height <= image.shape[0]):
         x = random.randint(0, image.shape[1]-crop_width)
         y = random.randint(0, image.shape[0]-crop_height)
-        
+    
         if len(label.shape) == 3:
-            return image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
+            cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
         else:
-            return image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width]
+            cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width]
+        return cropped_im
+            
     else:
         raise Exception('Crop shape (%d, %d) exceeds image dimensions (%d, %d)!' % (crop_height, crop_width, image.shape[0], image.shape[1]))
 
@@ -364,3 +366,27 @@ def memory():
     memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
     print('Memory usage in GBs:', memoryUse)
 
+def getCoordsFromPrediction(image):
+    _, bw=cv2.threshold(image,100,1,cv2.THRESH_BINARY)
+    
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((3,3),np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones((60,60),np.uint8))
+    
+    nr_labels,labels,stats,centroids=cv2.connectedComponentsWithStats(bw)
+    
+    targets=[list(c) for c,s in zip(centroids,stats) if s[0]!=0 and s[1]!=0]
+    return targets
+
+def dict2file(filename,dic,delimiter=',',emptySpace=''):
+    '''Writes dictionary dic to file.
+    Dictionary keys will serve as fileheader
+    delimiter: seperates different keys from each other
+    emptySpace: if one of the dictionary field is shorter, this will be written for missing values'''
+    
+    with open(filename,'w') as f:
+        f.write(delimiter.join(dic.keys()))
+        lengths=[len(dic[k]) for k in dic]
+        for i in range(max(lengths)):
+            f.write('\n')
+            vals=[dic[k][i] if lengths[ki]>i else emptySpace for ki,k in enumerate(dic.keys())]
+            f.write(delimiter.join(str(vals)))
