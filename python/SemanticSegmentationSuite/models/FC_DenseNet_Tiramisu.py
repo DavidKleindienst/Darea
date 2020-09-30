@@ -63,7 +63,7 @@ def TransitionUp(block_to_upsample, skip_connection, n_filters_keep, scope=None)
     l = tf.concat([l, skip_connection], axis=-1)
     return l
 
-def build_fc_densenet(inputs, num_classes, preset_model='FC-DenseNet56', n_filters_first_conv=48, n_pool=5, growth_rate=12, n_layers_per_block=4, dropout_p=0.2, scope=None):
+def build_fc_densenet(inputs, num_classes, preset_model='FC-DenseNet56', n_filters_first_conv=48, n_pool=5, growth_rate=12, n_layers_per_block=4, dropout_p=0.2, scope=None, is_training=True):
     """
     Builds the FC-DenseNet model
 
@@ -80,7 +80,9 @@ def build_fc_densenet(inputs, num_classes, preset_model='FC-DenseNet56', n_filte
     Returns:
       Fc-DenseNet model
     """
-
+    if not is_training:
+        #No dropout when predicting
+        dropout_p=0
     if preset_model == 'FC-DenseNet56':
       n_pool=5
       growth_rate=12
