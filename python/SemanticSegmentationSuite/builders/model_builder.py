@@ -55,7 +55,7 @@ def build_model(model_name, net_input, num_classes, crop_width, crop_height, fro
 	network = None
 	init_fn = None
 	if model_name == "FC-DenseNet56" or model_name == "FC-DenseNet67" or model_name == "FC-DenseNet103":
-	    network = build_fc_densenet(net_input, preset_model = model_name, num_classes=num_classes)
+	    network = build_fc_densenet(net_input, preset_model = model_name, num_classes=num_classes,is_training=is_training)
 	elif model_name == "RefineNet":
 	    # RefineNet requires pre-trained ResNet weights
 	    network, init_fn = build_refinenet(net_input, preset_model = model_name, frontend=frontend, num_classes=num_classes, is_training=is_training)
