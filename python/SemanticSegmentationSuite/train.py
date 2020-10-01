@@ -24,7 +24,13 @@ def ttest():
     return 'yes'
 
 def data_augmentation(input_image, output_image,args):
-    # Data augmentation
+    if args.downscale_factor and args.downscale_factor!=1:
+        #Downscale image
+        dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+        input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
+        output_image=cv2.resize(output_image,dim,interpolation=cv2.INTER_NEAREST)
+        #These interpolations are same as used by Darea in matlab when preparing for prediction
+    
     input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width)
 
     if args.h_flip and random.randint(0,1):
@@ -61,8 +67,10 @@ def main(args=None):
     parser.add_argument('--continue_from', type=str, default='', help='From which checkpoint to continue. Only relevant with darea_call.')
     parser.add_argument('--dataset', type=str, default="CamVid", help='Dataset you are using.')
     parser.add_argument('--dataset_path', type=str, default="", help='Path to Dataset folder.')
+    parser.add_argument('--image_suffix', type=str, default='', required=False, help='Only files with this extension should be included. You should specify it if some non-image files will be in the same folder') 
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
+    parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
     parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
     parser.add_argument('--num_val_images', type=int, default=20, help='The number of images to used for validations. If -1 -> use all')
     parser.add_argument('--h_flip', type=utils.str2bool, default=False, help='Whether to randomly flip the image horizontally for data augmentation')
@@ -100,7 +108,13 @@ def main(args=None):
     net_input = tf.placeholder(tf.float32,shape=[None,None,None,3])     #Try setting to 1 for grayscale, think theres no other changes needed.
     net_output = tf.placeholder(tf.float32,shape=[None,None,None,num_classes])
     
-    network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
+    network, init_fn = model_builder.build_model(model_name=args.model,
+                                                frontend=args.frontend,
+                                                net_input=net_input,
+                                                num_classes=num_classes,
+                                                crop_width=args.crop_width,
+                                                crop_height=args.crop_height,
+                                                is_training=True)
     
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=net_output))
     
@@ -147,13 +161,15 @@ def main(args=None):
     # Load the data
     print("Loading the data ...")
     train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names = \
-                                    utils.prepare_data(dataset_dir=os.path.join(args.dataset_path,args.dataset))
+                                    utils.prepare_data(dataset_dir=os.path.join(args.dataset_path,args.dataset),image_suffix=args.image_suffix)
     
     
     
     print("\n***** Begin training *****")
     print("Dataset -->", args.dataset)
     print("Model -->", args.model)
+    if args.downscale_factor:
+        print("Downscale Factor -->", args.downscale_factor)
     print("Crop Height -->", args.crop_height)
     print("Crop Width -->", args.crop_width)
     print("Num Epochs -->", args.num_epochs)
@@ -312,6 +328,11 @@ def main(args=None):
 
                 input_image = utils.load_image(val_input_names[ind])
                 gt = utils.load_image(val_output_names[ind])
+                if args.downscale_factor and args.downscale_factor !=1:
+                    dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+                    input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
+                    gt=cv2.resize(gt,dim,interpolation=cv2.INTER_NEAREST)
+                
                 #input_image, gt = data_augmentation(input_image, gt, args)
                     
                     

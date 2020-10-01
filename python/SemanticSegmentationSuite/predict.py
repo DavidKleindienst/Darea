@@ -1,4 +1,4 @@
-import os,time,cv2
+import os,time,cv2,json
 import tensorflow as tf
 import argparse
 import numpy as np
@@ -19,13 +19,16 @@ def main(args=None):
     parser.add_argument('--checkpoint_path', type=str, default=None, required=False, help='The path to the latest checkpoint weights for your model. Will guess based on model and dataset if not specified')
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
+    parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
     parser.add_argument('--model', type=str, default="FC-DenseNet103", required=False, help='The model you are using')
     parser.add_argument('--dataset', type=str, default="CamVid", required=False, help='The dataset you are using')
+    parser.add_argument('--image_suffix', type=str, default='', required=False, help='Only files with this extension should be included. You should specify it if some non-image files will be in the same folder') 
     parser.add_argument('--outpath', type=str, default='./', required=False, help='Folder where predicted images should be saved to')
     parser.add_argument('--file_suffix', type=str, default='_pred.png', required=False, help='Suffix appended to input image name for output image')
     parser.add_argument('--darea_call', type=utils.str2bool, default=False, required=False, help='Set to true when you call it from Darea software')
     parser.add_argument('--save_predictionImage', type=utils.str2bool, default=True, required=False, help='Whether predictions should be saved as images')
     parser.add_argument('--save_coordinates', type=utils.str2bool, default=False, required=False, help='Whether coordinates of predicted structures should be saved')
+    
     if args is None:
         args=parser.parse_args()
     else:
@@ -69,8 +72,8 @@ def main(args=None):
     
     if os.path.isdir(args.image):
         folder=args.image
-        not_allowed_filenames=['.DS_Store']
-        images=[os.path.join(folder,file) for file in os.listdir(folder) if file not in not_allowed_filenames and not file.startswith('.')]
+        #Get list of all images in the folder, ignore hidden files, subfolders and files not ending with correct suffix
+        images=[os.path.join(folder,file) for file in os.listdir(folder) if not file.startswith('.') and not os.path.isdir(file) and file.endswith(args.image_suffix)]
     else:
         images=[args.image]
     
@@ -85,7 +88,9 @@ def main(args=None):
             print("Testing image {}".format(image))
         
         input_image = utils.load_image(image)
-        
+        if args.downscale_factor and args.downscale_factor !=1:
+            dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+            input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
         
         st = time.time()
         crop_height=args.crop_height
@@ -140,15 +145,15 @@ def main(args=None):
             cv2.imwrite(os.path.join(args.outpath,file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
         
         if args.save_coordinates:
-            coordinates[utils.filepath_to_name(image)]=utils.getCoordsFromPrediction(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2GRAY));
+            coordinates[utils.filepath_to_name(image)]=utils.getCoordsFromPrediction(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2GRAY),args.downscale_factor);
             
         
         if not args.darea_call:
             print("Wrote image {}".format(file_name))
             print("")
     if args.save_coordinates:
-        utils.dict2file(os.path.join(args.outpath,'centroids.csv'),coordinates)
-        #Save to file here!
+        with open(os.path.join(args.outpath,'centroids.json'), 'w') as f:
+            json.dump(coordinates,f)
         
     if not args.darea_call:
         print("Finished!")

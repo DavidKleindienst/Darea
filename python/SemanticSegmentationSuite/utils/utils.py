@@ -42,7 +42,7 @@ def prepare_class_data(dataset_dir,classes):
                         val_labels.append(i)
     return train_images, train_labels, val_images, val_labels
 
-def prepare_data(dataset_dir):
+def prepare_data(dataset_dir,image_suffix):
     train_input_names=[]
     train_output_names=[]
     val_input_names=[]
@@ -54,7 +54,7 @@ def prepare_data(dataset_dir):
     cwd = os.getcwd()
     for x,name_list in zip(imtypes, name_lists):
         for file in os.listdir(os.path.join(dataset_dir,x)):
-            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.') and not os.path.isdir(file):
+            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.') and not os.path.isdir(file) and file.endswith(image_suffix):
                 name_list.append(os.path.join(cwd, dataset_dir, x, file))
     train_input_names.sort(),train_output_names.sort(), val_input_names.sort(), val_output_names.sort(), test_input_names.sort(), test_output_names.sort()
     return train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names
@@ -66,10 +66,14 @@ def load_image(path):
     assert os.path.exists(path)
     try:
         image = cv2.cvtColor(cv2.imread(path,-1), cv2.COLOR_BGR2RGB)
+        if image.dtype=='uint16':
+            image=(image/256).astype('uint8')
+        
     except:
         print(path)
         raise
-        
+    assert (image.dtype=='uint8'), "Image needs to be of type uint8 or uint16"
+    
     return image
 
 # Takes an absolute file path and returns the name of the file without th extension
@@ -366,13 +370,22 @@ def memory():
     memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
     print('Memory usage in GBs:', memoryUse)
 
-def getCoordsFromPrediction(image):
+def getCoordsFromPrediction(image,downscale_factor):
     _, bw=cv2.threshold(image,100,1,cv2.THRESH_BINARY)
-    
-    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((3,3),np.uint8))
-    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones((60,60),np.uint8))
+    open_dim=(6,6)  #Predictions smaller than this will be removed
+    close_dim=(512,512)   #Predictions closer than this will be fused
+    open2_dim=(32,32) #Predictions smaller than this after fusing nearby ones will be removed
+    if downscale_factor:
+        open_dim=[round(x*downscale_factor) for x in open_dim]
+        close_dim=[round(x*downscale_factor) for x in close_dim]
+        open2_dim=[round(x*downscale_factor) for x in open2_dim]
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones(open_dim,np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones(close_dim,np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones(open2_dim,np.uint8))
     
     nr_labels,labels,stats,centroids=cv2.connectedComponentsWithStats(bw)
+    if downscale_factor:
+        centroids=[[x/downscale_factor for x in c] for c in centroids]
     
     targets=[list(c) for c,s in zip(centroids,stats) if s[0]!=0 and s[1]!=0]
     return targets
