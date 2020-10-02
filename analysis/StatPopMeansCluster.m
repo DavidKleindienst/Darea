@@ -43,7 +43,7 @@ Groups=Data.Groups;
 Orig=Data.Orig;
 nrsim=Data.nrsim;
 nrImg=numel(Orig.Images);
-header=['Original;Simulation;realmean;realstd;realsem;simmean;simstd;simsem;pValue;N;totalImages\n'];
+header=['Original;Simulation;realmean;realstd;realsem;simmean;simstd;simsem;pValue;t-Statistic;N;totalImages\n'];
 Grplabels=[settings.allGroupsname; Groups.names];
 fields=fieldnames(Orig.ClusterInteraction{1});
 for f=3:numel(fields)       %For all fields containing Data
@@ -74,8 +74,11 @@ for f=3:numel(fields)       %For all fields containing Data
                         realmeans=realmeans(toKeep);      %Remove flagged images
                         simmeans=simmeans(toKeep);
 
-                        [~,p]=test(realmeans, simmeans);    %test if real Data is signficantly different from simulation
-                        fprintf(file, [Grplabels{g+1} '-' getName(Data, methodA{a}) ';' simnames{s} getName(Data,methodA{sims}) ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ';' num2str(sem(realmeans)) ';' num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';' num2str(p) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
+                        [~,p,~,t]=test(realmeans, simmeans);    %test if real Data is signficantly different from simulation
+                        fprintf(file, [Grplabels{g+1} '-' getName(Data, methodA{a}) ';' simnames{s} getName(Data,methodA{sims}) ...
+                            ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ';' num2str(sem(realmeans)) ';' ...
+                            num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';' num2str(p) ...
+                            ';t(' num2str(t.df) ')=' num2str(abs(t.tstat)) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
                     end
                 else        %Cluster paramters of form from particle type A to particle type B (Overlap and intercluster Distance)
                     for a=1:numel(methodA)
@@ -96,8 +99,11 @@ for f=3:numel(fields)       %For all fields containing Data
                                 realmeans=realmeans(toKeep);
                                 simmeans=simmeans(toKeep);
 
-                                [~,p]=test(realmeans, simmeans);
-                                fprintf(file, [Grplabels{g+1} '-' getName(Data, methodA{a}) '_' getName(Data, methodA{b})  ';' simnames{s} getName(Data,methodA{sims}) ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ';' num2str(sem(realmeans)) ';' num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';' num2str(p) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
+                                [~,p,~,t]=test(realmeans, simmeans);
+                                fprintf(file, [Grplabels{g+1} '-' getName(Data, methodA{a}) '_' getName(Data, methodA{b})  ';' ...
+                                    simnames{s} getName(Data,methodA{sims}) ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ...
+                                    ';' num2str(sem(realmeans)) ';' num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';' num2str(p) ...
+                                    ';t(' num2str(t.df) ')=' num2str(abs(t.tstat)) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
                             end
                         end
                     end

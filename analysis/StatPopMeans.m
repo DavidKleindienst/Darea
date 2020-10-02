@@ -45,7 +45,7 @@ Orig=Data.Orig;
 nrsim=Data.nrsim;
 nrImg=numel(Orig.Images);
 
-header=['Original;Simulation;realmean;realstd;realsem;simmean;simstd;simsem;pValue;N;totalImages\n'];
+header=['Original;Simulation;realmean;realstd;realsem;simmean;simstd;simsem;pValue;t-Statistic;N;totalImages\n'];
 Grplabels=[settings.allGroupsname; Groups.names];
 
 for mode=1:numel(Data.distfields)
@@ -78,8 +78,11 @@ for mode=1:numel(Data.distfields)
                         realmeans=realmeans(toKeep); 
                         simmeans=simmeans(toKeep);
 
-                        [~,p]=test(realmeans, simmeans);
-                        fprintf(file, [Grplabels{g+1} '-' getName(Data, methodB{b}) ';' simnames{s} getName(Data,methodA{a}) ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ';' num2str(sem(realmeans)) ';' num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';' num2str(p) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
+                        [~,p,~,t]=test(realmeans, simmeans);
+                        fprintf(file, [Grplabels{g+1} '-' getName(Data, methodB{b}) ';' simnames{s} getName(Data,methodA{a}) ...
+                            ';' num2str(mean(realmeans)) ';' num2str(std(realmeans)) ';' num2str(sem(realmeans)) ';' ...
+                            num2str(mean(simmeans)) ';' num2str(std(simmeans)) ';' num2str(sem(simmeans)) ';'  num2str(p) ...
+                            ';t(' num2str(t.df) ')=' num2str(abs(t.tstat)) ';' num2str(numel(realmeans)) ';' num2str(numel(indeces)) '\n']);
                     end
                 end
             end
