@@ -59,7 +59,8 @@ set(mainFigure, 'KeyPressFcn', @keyPress);
 figureColor = get(mainFigure, 'color'); % Gets the color.
 hImageList = uicontrol('Style','listbox', 'String', ' ', 'Position', [50 60 300 500]);
 hClose = uicontrol('Style', 'pushbutton', 'String', 'Close','Position', [280 10 70 25], 'Callback', @close); 
-
+hAutoContrast = uicontrol('Style', 'checkbox', 'String', 'Auto-contrast', 'Position', [50 30 100 25], ... 
+                'Tooltipstring', 'Automatically adjust brightness and contrast of the image');
 
 %To Allow for Rightclicks in hImage list here:
 % (Taken from https://undocumentedmatlab.com/blog/setting-listbox-mouse-actions )
@@ -173,7 +174,7 @@ waitfor(mainFigure);
             return;
         end
         openedFigure = true;
-        [defaults, data, Position]=downstreamFunction(path, route, scale, imgIndex, defaults, datFile, data, Position);
+        [defaults, data, Position]=downstreamFunction(path, route, scale, imgIndex, hAutoContrast.Value, defaults, datFile, data, Position);
         openedFigure = false;
         %Update GUI to show modified files
         currName=imNames{imgIndex};

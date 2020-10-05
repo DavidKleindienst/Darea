@@ -1,5 +1,5 @@
 
-function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, defaults, ~, useless, position)
+function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, autocontrast, defaults, ~, useless, position)
 %DEMARCATE Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -12,7 +12,9 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, d
         msgbox('This image is not 16 bit and cannot be processed');
         return
     end
-    
+    if autocontrast
+        image=imadjust(image);
+    end
     imR=imref2d(size(image),scale,scale);
     if isfile(modImageName)
         modImage=imread(modImageName);

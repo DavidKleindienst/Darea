@@ -25,11 +25,14 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId, settings, datFile, Data, position)
+function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId, autocontrast, settings, datFile, Data, position)
    
     fullImageName=[fullfile(pathImage,imageName) '.tif'];
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
     image = imread(fullImageName);
+    if autocontrast
+        image=imadjust(image);
+    end
     zoomLimit=min(size(image))*scale;
     if size(image,3)==1
         image = cat(3,image,image,image);   %Convert image to rgb
