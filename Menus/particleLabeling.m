@@ -24,7 +24,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageName, scale, ~, defaults,~, useless,positionFigure)
+function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageName, scale, ~, autocontrast, defaults,~, useless,positionFigure)
 %% Carries out manual labeling of the dots. The results are written into a file 
 % It requires 'imageName'.tif and 'imageName'_mod.tif. The first one must contain
 % the original image, whereas the second contains a mask with the discarded area.
@@ -68,6 +68,9 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
     if ~isa(image, 'uint16')
         msgbox('This image is not 16 bit and cannot be processed');
         return
+    end
+    if autocontrast
+        image=imadjust(image);
     end
     imR=imref2d(size(image),scale,scale);
     maskSection = ~maskSection;
