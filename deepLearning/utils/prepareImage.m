@@ -1,20 +1,22 @@
-function [image, label] = prepareImage(image, targetSize, mask, targetColor, backgroundColor,rgb, dots)
+function [image, label] = prepareImage(image, targetSize, mask, targetColor, backgroundColor,rgb,groups)
 %% If mask is specified it will be processed along; otherwise only image
 if nargin<3
     mask=NaN;
 end
-if isnan(mask)
+if ~iscell(mask) & isnan(mask)
     label=NaN;
 end
 if nargin<6
     rgb=1;
 end
-if nargin<7
-    dots=NaN;
+if nargin<7 | isnan(groups)
+    groups=1;  
 end
 
 if ~isnan(image)
     imsize=size(image);
+elseif iscell(mask)
+    imsize=size(mask{1});
 else
     imsize=size(mask);
 end
@@ -37,68 +39,60 @@ if imsize(1)~=imsize(2)
 end
 
 if ~isnan(image)
-if imsize(1)~=imsize(2)
-    image=imcrop(image,rect);
-end
-assert(size(image,1)==size(image,2));
-
-%Convert to 8bit grayscale
-image=uint8(image/256);
-%resize to target size
-image=imresize(image,targetSize);
-
-if isstruct(dots) && isstruct(targetColor)
-   %Image will be prepared for particle prediction
-   resizeFactor=size(image,1)/size(mask,1);
-   mask=imresize(mask,targetSize, 'nearest');
-   image(mask==1)=256;
-   dotImage=ones(size(image)).*backgroundColor;
-   [imColumns, imRows] = meshgrid(1:size(image,2), 1:size(image,1));
-   for p=1:numel(dots.r)
-      color=targetColor.(['nm' num2str(2*dots.r(p))]);
-      circlePx=logicalCircle(imColumns,imRows,round(dots.c(p,1)*resizeFactor),round(dots.c(p,2)*resizeFactor),dots.r(p)*resizeFactor/dots.scale);
-      
-      dotImage(circlePx)=color;
-   end
-   
-   dotImage(mask==1)=backgroundColor;
-   dotImage=uint8(dotImage);
-   %convert to RGB
-    if rgb
-        dotImage=cat(3,dotImage,dotImage,dotImage);
-    end
-   mask=NaN;    %Do not process mask, because this is for particle Detection
-   label=dotImage;
-end
-if rgb
-    %Convert to rgb
-    image=cat(3,image,image,image);
-end
-end
-
-
-if ~isnan(mask)
     if imsize(1)~=imsize(2)
-        mask=imcrop(mask,rect);
+        image=imcrop(image,rect);
     end
-    assert(size(mask,1)==size(mask,2));
-    label=ones(size(mask)).*backgroundColor;
-    
-    %give appropriate forground color for the label
-    label(mask==0)=targetColor;
-    label=uint8(label);
-    
+    assert(size(image,1)==size(image,2));
+
+    %Convert to 8bit grayscale
+    image=uint8(image/256);
     %resize to target size
-    label=imresize(label,targetSize, 'nearest');
-    %convert to RGB
+    image=imresize(image,targetSize);
+
+
     if rgb
-        label=cat(3,label,label,label);
+        %Convert to rgb
+        image=cat(3,image,image,image);
     end
 end
 
-    function circlePx=logicalCircle(imColumns,imRows,centerX,centerY,r)
-        circlePx = (imRows - centerY).^2 + (imColumns - centerX).^2 <= r.^2;
+if ~iscell(mask) & isnan(mask)
+    return;
+end
+
+if ~iscell(mask)
+    mask={mask};
+elseif numel(groups)>1
+    assert(numel(mask)==numel(groups))
+end
+for i=1:numel(mask)
+    if imsize(1)~=imsize(2)
+        mask{i}=imcrop(mask{i},rect);
     end
+    assert(size(mask{i},1)==size(mask{i},2));
+end
+label=ones(size(mask{i})).*backgroundColor;
+
+for i=1:numel(mask)
+    %give appropriate forground color for the label
+
+    if numel(groups)==1
+        label(mask{i}==0)=targetColor(groups);
+    else
+        label(mask{i}==0)=targetColor(groups(i));
+    end
+
+end
+label=uint8(label);
+%resize to target size
+label=imresize(label,targetSize, 'nearest');
+%convert to RGB
+if rgb
+    label=cat(3,label,label,label);
+end
+
+
+
 
 end
 
