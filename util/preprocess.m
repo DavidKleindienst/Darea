@@ -26,8 +26,11 @@ for imgIndex=1:numel(routes)
             image=rgb2gray(image);
             flag=1;
         end
-        if isa(image, 'uint8') || isa(image, 'int8') || isa(image, 'int16')      %If image is 8bit
+        if isa(image, 'uint8') || isa(image, 'int8')      %If image is 8bit
             image=im2uint16(image);     %Convert to 16 bit
+            flag=1;
+        elseif isa(image, 'int16')
+            image=im2uint16(image)-32768;
             flag=1;
         elseif ~isa(image, 'uint16')
             fprintf('Image is of type %s, no conversion has been implemented for this type', class(image));
