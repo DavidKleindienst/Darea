@@ -91,9 +91,9 @@ function [centerNm, actRadiusNm, metric] = getMainCircle(image, imR, radiusNm, s
         %First discard circles whoze size is to different
         %If particles of the correct size exist keep only those
         if ~any(radii>lowerMargin & radii<upperMargin)
-            %Otherwise keep particles of radius+-1.75 Margin
-            upperMargin=radiusPx+1.5*marginPx;
-            lowerMargin=radiusPx-1.5*marginPx;
+            %Otherwise keep particles of radius+-1.3 Margin
+            upperMargin=radiusPx+1.3*marginPx;
+            lowerMargin=radiusPx-1.3*marginPx;
         end
         centers=centers(radii<=upperMargin,:);
         metrics=metrics(radii<=upperMargin);

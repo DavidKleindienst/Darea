@@ -2,6 +2,12 @@ function getParticlesAllImages(datFile,useDemarcation, overwrite, useClassifier,
 
 [routes, scales]=readConfig(datFile);
 routes=getFullRoutes(routes,datFile);
+
+%Avoid broadcasting all settings array
+dilate=settings.dilate;
+particleTypes=settings.particleTypes;
+sensitivity=settings.sensitivity;
+marginNm=settings.marginNm;
 parfor (i=1:numel(routes), getCurrentPoolSize())
     imName=[routes{i} '.tif'];
     dotFile=[routes{i} 'dots.csv'];
@@ -10,7 +16,7 @@ parfor (i=1:numel(routes), getCurrentPoolSize())
     end
     if useDemarcation
         maskName=[routes{i} '_mod.tif'];
-        [mask, image]=getBaseImages(imName, maskName, round(settings.dilate/scales(i)));
+        [mask, image]=getBaseImages(imName, maskName, round(dilate/scales(i)));
         mask = ~mask;
     else
         image=imread(imName);
@@ -18,10 +24,10 @@ parfor (i=1:numel(routes), getCurrentPoolSize())
     end
     imR=imref2d(size(image),scales(i),scales(i));
     fid=fopen(dotFile,'w');
-    for p=1:numel(settings.particleTypes)
+    for p=1:numel(particleTypes)
         
-        radius=settings.particleTypes(p)/2;
-        [c, r]=detectParticles(image,mask,imR,scales(i),settings.sensitivity,radius,settings.marginNm,false,useClassifier);
+        radius=particleTypes(p)/2;
+        [c, r]=detectParticles(image,mask,imR,scales(i),sensitivity,radius,marginNm,false,useClassifier);
         %print to file!
         sprintf('Found %f %f particles', numel(r), radius);
         for part=1:numel(r)
