@@ -1,13 +1,9 @@
 from __future__ import print_function
-import os,time,cv2, sys, math
+import os,time,datetime,cv2, sys, math,shutil
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
 import numpy as np
-import time, datetime
 import argparse
 import random
-import os, sys
-import subprocess
 
 
 # use 'Agg' on matplotlib so that plots could be generated even without Xserver
@@ -201,6 +197,9 @@ def main(args=None):
         random.seed(16)
         val_indices=random.sample(range(0,len(val_input_names)),num_vals)
     
+    #Copy class file with same name as checkpoint
+    shutil.copyfile(os.path.join(args.dataset_path,args.dataset, "class_dict.csv"), 
+                    os.path.splitext(model_checkpoint_name)[0]+'.classes')
     # Do the training here
     for epoch in range(args.epoch_start_i, args.num_epochs):
     

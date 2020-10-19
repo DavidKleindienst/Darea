@@ -42,7 +42,7 @@ def prepare_class_data(dataset_dir,classes):
                         val_labels.append(i)
     return train_images, train_labels, val_images, val_labels
 
-def prepare_data(dataset_dir,image_suffix):
+def prepare_data(dataset_dir,image_suffix=''):
     train_input_names=[]
     train_output_names=[]
     val_input_names=[]
@@ -361,27 +361,23 @@ def compute_class_weights(labels_dir, label_values):
 
     return class_weights
 
-# Compute the memory usage, for debugging
-def memory():
-    import os
-    import psutil
-    pid = os.getpid()
-    py = psutil.Process(pid)
-    memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
-    print('Memory usage in GBs:', memoryUse)
-
-def getCoordsFromPrediction(image,downscale_factor):
-    _, bw=cv2.threshold(image,100,1,cv2.THRESH_BINARY)
-    open_dim=(6,6)  #Predictions smaller than this will be removed
-    close_dim=(512,512)   #Predictions closer than this will be fused
-    open2_dim=(32,32) #Predictions smaller than this after fusing nearby ones will be removed
+def getCoordsFromPrediction(image,foregroundcolors,downscale_factor=False):
+    #_, bw=cv2.threshold(image,150,1,cv2.THRESH_BINARY)
+    
+    bw=np.zeros(image.shape,dtype=image.dtype)
+    for c in foregroundcolors:
+        bw[image==c]=1
+    open_dim=8  #Predictions smaller than this will be removed
+    close_dim=512   #Predictions closer than this will be fused
+    open2_dim=32 #Predictions smaller than this after fusing nearby ones will be removed
     if downscale_factor:
-        open_dim=[round(x*downscale_factor) for x in open_dim]
-        close_dim=[round(x*downscale_factor) for x in close_dim]
-        open2_dim=[round(x*downscale_factor) for x in open2_dim]
-    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones(open_dim,np.uint8))
-    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones(close_dim,np.uint8))
-    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones(open2_dim,np.uint8))
+        #If image was downscaled, also reduce number of pixels for morph operations
+        open_dim=round(open_dim*downscale_factor)
+        close_dim=round(close_dim*downscale_factor)
+        open2_dim=round(open2_dim*downscale_factor)
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((open_dim,open_dim),np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones((close_dim,close_dim),np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((open2_dim,open2_dim),np.uint8))
     
     nr_labels,labels,stats,centroids=cv2.connectedComponentsWithStats(bw)
     if downscale_factor:
@@ -390,16 +386,11 @@ def getCoordsFromPrediction(image,downscale_factor):
     targets=[list(c) for c,s in zip(centroids,stats) if s[0]!=0 and s[1]!=0]
     return targets
 
-def dict2file(filename,dic,delimiter=',',emptySpace=''):
-    '''Writes dictionary dic to file.
-    Dictionary keys will serve as fileheader
-    delimiter: seperates different keys from each other
-    emptySpace: if one of the dictionary field is shorter, this will be written for missing values'''
-    
-    with open(filename,'w') as f:
-        f.write(delimiter.join(dic.keys()))
-        lengths=[len(dic[k]) for k in dic]
-        for i in range(max(lengths)):
-            f.write('\n')
-            vals=[dic[k][i] if lengths[ki]>i else emptySpace for ki,k in enumerate(dic.keys())]
-            f.write(delimiter.join(str(vals)))
+# Compute the memory usage, for debugging
+def memory():
+    import os
+    import psutil
+    pid = os.getpid()
+    py = psutil.Process(pid)
+    memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
+    print('Memory usage in GBs:', memoryUse)
