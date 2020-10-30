@@ -28,8 +28,8 @@ def main(args=None):
     # ['--image', 'imageFolder', '--model', 'FC-DenseNet103'] 
     parser = argparse.ArgumentParser()
     parser.add_argument('--image', type=str, default=None, required=True, help='The image or folder with images you want to predict on. ')
-    parser.add_argument('--classes', type=str, required=True, help='Path to class_dict.csv')
-    parser.add_argument('--checkpoint_path', type=str, default=None, required=False, help='The path to the latest checkpoint weights for your model. Will guess based on model and dataset if not specified')
+    parser.add_argument('--classes', type=str, required=False, default=None, help='Path to class_dict.csv. If None, expects it to be same as .ckpt but with .classes extension')
+    parser.add_argument('--checkpoint_path', type=str, required=True, help='The path to the latest checkpoint weights for your model.')
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
     parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
@@ -40,14 +40,18 @@ def main(args=None):
     parser.add_argument('--save_predictionImage', type=utils.str2bool, default=True, required=False, help='Whether predictions should be saved as images')
     parser.add_argument('--save_coordinates', type=utils.str2bool, default=True, required=False, help='Whether coordinates of predicted structures should be saved')
     parser.add_argument('--coords_filename', type=str, default='coordinates',required=False, help='Filename of the coordinates file (without filextension).')
-    parser.add_argument('--coords_class'), type=str, default=None, required=False, help='Specify class to generate coordinates from. (Default is all classes). Separate multiple classes by comma to pool them.'
+    parser.add_argument('--coords_class', type=str, default=None, required=False, help='Specify class to generate coordinates from. (Default is all classes). Separate multiple classes by comma to pool them.')
     parser.add_argument('--wait_time', type=float, default=1, required=False, help='Time (in s) to wait for new images to appear in folder')
     
     if args is None:
         args=parser.parse_args()
     else:
         args=parser.parse_args(args)
-    class_names_list, label_values = helpers.get_label_info(os.path.join(args.classes))
+    
+    if args.classes is None:
+        args.classes=os.path.splitext(args.checkpoint_path)[0]+'.classes'
+    print(args.classes)
+    class_names_list, label_values = helpers.get_label_info(args.classes)
     
     num_classes = len(label_values)
     assert os.path.isdir(args.image), "Argument image needs to be a folder"

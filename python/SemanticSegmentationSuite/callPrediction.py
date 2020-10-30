@@ -12,10 +12,9 @@ nav=sys.argv[1]
 folder=os.path.split(nav)[0]
 navname=os.path.split(os.path.splitext(nav)[0])[1]
 checkpoints='C:/Users/tvips.000.001/Documents/SerialEM/py-EM/scripts/checkpoints/'
-predict_while.main(['--classes', os.path.join(checkpoints,'PreparedPSD.csv'),
-                    '--image', folder,
-                    '--checkpoint_path', os.path.join(checkpoints,'1024_Prepared_PSD.ckpt'),
-                    '--downscale_factor', '0.25', 
+predict_while.main(['--image', folder,
+                    '--checkpoint_path', os.path.join(checkpoints,'SpineFinder_2048.ckpt'),
+                    '--downscale_factor', '0.5', 
                     '--image_suffix', '.tif',
                     '--file_suffix', '.tif',
                     '--outpath', os.path.join(folder,'predictions'),
