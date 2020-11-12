@@ -37,7 +37,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     %% Gui measures and points
     title='Darea - Area demarcation';
     [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos);
-    hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate [r]', 'Callback', @rotateImg, 'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], ...
+    hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate', 'Callback', @rotateImg, 'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], ...
                     'Tooltipstring', 'Rotate image 90° clockwise');
        
     set(mainFigure, 'CloseRequestFcn', @closeCallBack);% Manages figure closing.
@@ -69,7 +69,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
         set(jButton,'Enabled',false);
     end
     hAdd=uicontrol('Style','togglebutton', 'String', 'Add [a]', 'Tooltipstring', 'Activate this to draw a polygon to add to component', 'Position', [gridXPx(2)-100 105 40 25], 'Callback', @buttonActivation);
-    hRemove=uicontrol('Style','togglebutton', 'String', 'Remove', 'Tooltipstring', 'Activate this to draw a polygon to remove from the component', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @buttonActivation);
+    hRemove=uicontrol('Style','togglebutton', 'String', 'Remove [r]', 'Tooltipstring', 'Activate this to draw a polygon to remove from the component', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @buttonActivation);
     hTrim=uicontrol('Style','togglebutton', 'String', 'Trim', 'Tooltipstring', 'Activate this to Trim away unneccessary parts of the connected components', 'Position', [gridXPx(2)-100 80 40 25], 'Callback', @buttonActivation);
     hConnect=uicontrol('Style','togglebutton', 'String', 'Connect', 'Tooltipstring', 'Activate this to connect several connected components', 'Position', [gridXPx(2)-55 80 60 25], 'Callback', @buttonActivation);
     
@@ -91,10 +91,10 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
 
     
     %%Visibility of things depending on displayed Filter
-    visibleOnPolygon=[hdelLastPoint, hNewComponent];
-    visibleOnSelect=[hTrim,hConnect,hAdd,hRemove,hdelLastPoint,hBrightnessText,hBrightness];
+    visibleOnPolygon=[hdelLastPoint, hNewComponent,hFreehand];
+    visibleOnSelect=[hTrim,hConnect,hAdd,hRemove,hdelLastPoint,hBrightnessText,hBrightness,hFreehand];
     visibleOnFinalize=[hHoles,hClose,hBrightnessText,hBrightness, hNewComponent];
-    allowHotkeys=[hFilterDropdown,hHoles,hClose,hdelLastPoint,hNewComponent,hBrightness,hTrim,hConnect,hAdd,hRemove,saveButton,hMeasure,hFreehand,hChangeOriginal];
+    allowHotkeys=[hFilterDropdown,hHoles,hClose,hdelLastPoint,hNewComponent,hBrightness,hTrim,hConnect,hAdd,hRemove,saveButton,hFreehand,hMeasure,hChangeOriginal];
     for i=1:numel(allowHotkeys)
         set(allowHotkeys(i),'KeyReleaseFcn', @keyRelease);
     end
@@ -541,14 +541,19 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
             case 'backspace'
                 deleteLastPoint();
             case 'f'
-                set(hFreehand, 'Value', abs(get(hFreehand, 'Value')-1));
-                freehand();
+                if hFreehand.Visible
+                    hFreehand.Value=abs(hFreehand.Value-1);
+                    freehand();
+                end
             case 's'
                 save();
             case 'c'
                 closeCallBack();
             case 'r'
-                rotateImg(0,0);
+                if strcmp(filteredImages{currentImage}.fct, 'select')
+                    hRemove.Value=abs(hRemove.Value-1);
+                    buttonActivation(hRemove,0)
+                end
             case 'n'
                 if strcmp(filteredImages{currentImage}.fct, 'finalize') || strcmp(filteredImages{currentImage}.fct, 'polygon')
                     makeNewComp(0,0);
