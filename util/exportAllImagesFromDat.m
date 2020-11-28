@@ -12,7 +12,7 @@ for i=1:numel(routes)
     
     fullImageName=[fullfile(pathImage,imageName) '.tif'];
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
-    image = imread(fullImageName);
+    image = readAndConvertImage(fullImageName);
 
     if size(image,3)==1
         image = cat(3,image,image,image);   %Convert image to rgb

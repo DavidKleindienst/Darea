@@ -12,7 +12,7 @@ mods=cellfun(@(x)[x(1:end-8) '.tif'], mods, 'UniformOutput', false);
 missing=missing(~ismember(missing,mods));
 
 missing=cellfun(@(x)fullfile(folder,x), missing, 'UniformOutput', false);
-im=imread(missing{1});
+im=readAndConvertImage(missing{1});
 s=size(im);
 modImg=ones(s)*65535;
 

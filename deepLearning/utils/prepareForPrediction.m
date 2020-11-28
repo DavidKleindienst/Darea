@@ -11,7 +11,7 @@ safeMkdir(outputFolder);
 sizes=cell(1,numel(images));
 parfor (img=1:numel(images),getCurrentPoolSize())
     imName=images{img};
-    image=imread(imName);
+    image=readAndConvertImage(imName);
     if ~isa(image, 'uint16')
         msgbox(sprintf('Not all images are 16 bit!\nPlease run the conversion then try again.'));
         error('Not all images are 16 bit! Please run the conversion then try again.');

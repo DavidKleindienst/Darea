@@ -29,7 +29,7 @@ function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId
    
     fullImageName=[fullfile(pathImage,imageName) '.tif'];
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
-    image = imread(fullImageName);
+    image = readAndConvertImage(fullImageName);
     if autocontrast
         image=imadjust(image);
     end

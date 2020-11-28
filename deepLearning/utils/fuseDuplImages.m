@@ -11,14 +11,14 @@ images=unique(cellfun(@(x) erase(x, '_dupl'), all_dupls, 'UniformOutput', false)
 for i=1:numel(images)
     dupls=all_dupls(startsWith(all_dupls, images{i}));
     mod_img_path=getFullRoutes(images(i),datFile,'_mod.tif');
-    mod=imread(mod_img_path{1});
+    mod=readAndConvertImage(mod_img_path{1});
     d_mod_paths=getFullRoutes(dupls,datFile,'_mod.tif');
     d_mod_paths=d_mod_paths(isfile(d_mod_paths));
     d_orig_paths=getFullRoutes(dupls,datFile,'.tif');
     d_orig_paths=d_orig_paths(isfile(d_mod_paths));
 
     for j=1:numel(d_mod_paths)
-        mod2=imread(d_mod_paths{j});
+        mod2=readAndConvertImage(d_mod_paths{j});
         mod(mod2<65535)=mod2(mod2<65535);
         
         % Delete now unneccessary images

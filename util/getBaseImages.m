@@ -42,7 +42,7 @@ function [discardedAreas, image] = getBaseImages(imageName, imageSelName, dilate
 
 %% Reads the images
 if nargout>1
-    image = imread(imageName);
+    image = readAndConvertImage(imageName);
 end
 if nargin<3
     dilatePx=0;
@@ -52,7 +52,7 @@ if nargin<4
 end
 
 if nargin>1 && exist(imageSelName,'file')==2
-    imageSel = imread(imageSelName);
+    imageSel = readAndConvertImage(imageSelName);
     discardedAreas=zeros(size(imageSel));
     if ~isa(imageSel, 'uint16')
         fprintf('Image is not 16bit, please convert images to 16 bit');
@@ -72,7 +72,7 @@ if nargin>1 && exist(imageSelName,'file')==2
 else
     if nargout<=1
         %Image has not been read, but is needed now
-        image = imread(imageName);
+        image = readAndConvertImage(imageName);
     end
     if defaultSelIsBackground
         discardedAreas=ones(size(image));

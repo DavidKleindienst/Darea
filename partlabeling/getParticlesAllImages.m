@@ -19,7 +19,7 @@ parfor (i=1:numel(routes), getCurrentPoolSize())
         [mask, image]=getBaseImages(imName, maskName, round(dilate/scales(i)));
         mask = ~mask;
     else
-        image=imread(imName);
+        image=readAndConvertImage(imName);
         mask=NaN;
     end
     imR=imref2d(size(image),scales(i),scales(i));
