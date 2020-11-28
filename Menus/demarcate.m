@@ -6,7 +6,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     fullimageName=[fullfile(pathImage,imageName) '.tif'];
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
     modImage=NaN;
-    image = imread(fullimageName);
+    image = readAndConvertImage(fullimageName);
     
     if ~isa(image, 'uint16')
         msgbox('This image is not 16 bit and cannot be processed');
@@ -17,7 +17,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     end
     imR=imref2d(size(image),scale,scale);
     if isfile(modImageName)
-        modImage=imread(modImageName);
+        modImage=readAndConvertImage(modImageName);
     end
     filteredImages = applyFilters(image,scale,defaults,{},modImage);
     currentImage=1;

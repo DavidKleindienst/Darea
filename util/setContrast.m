@@ -7,15 +7,8 @@ if nargin<2
     minmax=NaN;
 end
     function performContrast(imageName,minmax)
-        im=imread(imageName);
+        im=readAndConvertImage(imageName);
         
-        %If image is rgb convert to grayscale
-        if size(im,3)==3
-            rgbflag=true;
-            im=rgb2gray(im);
-        else
-            rgbflag=false;
-        end
         if isnan(minmax)
             im=imadjust(im);
         else

@@ -9,7 +9,7 @@ for imgIndex=1:numImages
     route=fullfile(folder,routes{imgIndex});
     scale=scales(imgIndex);
     imageName = [route '.tif'];
-    image=imread(imageName);
+    image=readAndConvertImage(imageName);
     imageSelName = [route '_mod.tif'];
     discardedAreas = getBaseImages(imageName, imageSelName);
     if dilate && sum(discardedAreas,'all')>0
