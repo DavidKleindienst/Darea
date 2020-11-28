@@ -70,7 +70,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     end
     hAdd=uicontrol('Style','togglebutton', 'String', 'Add [a]', 'Tooltipstring', 'Activate this to draw a polygon to add to component', 'Position', [gridXPx(2)-100 105 40 25], 'Callback', @buttonActivation);
     hRemove=uicontrol('Style','togglebutton', 'String', 'Remove [r]', 'Tooltipstring', 'Activate this to draw a polygon to remove from the component', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @buttonActivation);
-    hTrim=uicontrol('Style','togglebutton', 'String', 'Trim', 'Tooltipstring', 'Activate this to Trim away unneccessary parts of the connected components', 'Position', [gridXPx(2)-100 80 40 25], 'Callback', @buttonActivation);
+    hTrim=uicontrol('Style','togglebutton', 'String', 'Trim [t]', 'Tooltipstring', 'Activate this to Trim away unneccessary parts of the connected components', 'Position', [gridXPx(2)-100 80 40 25], 'Callback', @buttonActivation);
     hConnect=uicontrol('Style','togglebutton', 'String', 'Connect', 'Tooltipstring', 'Activate this to connect several connected components', 'Position', [gridXPx(2)-55 80 60 25], 'Callback', @buttonActivation);
     
     hNewComponent=uicontrol('Style', 'pushbutton', 'String', 'New Component from Selection [n]', 'Position', [gridXPx(2)-310 20 190 25], ...
@@ -356,14 +356,15 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
             %Let user do freehand draw
             handdraw=drawfreehand(axesZoom);
         elseif isa(handdraw, 'images.roi.Freehand')
-            %Now accept polygon selection
+            
             handdraw.Visible='off';
             if strcmp(filteredImages{currentImage}.fct,'polygon')
                 polygonPoints=DouglasPeucker(handdraw.Position,scale);
-            elseif strcmp(filteredImages{currentImage}.fct,'select') ... 
-                        && (get(hTrim,'Value')==1 || get(hAdd,'Value')==1 || get(hRemove,'Value')==1)
+            elseif strcmp(filteredImages{currentImage}.fct,'select')                     
                 modifyPoly=DouglasPeucker(handdraw.Position,scale);
             end
+            %Now accept polygon selection
+            
             drawPolygon();
             delete(handdraw);
             handdraw=NaN;
@@ -458,7 +459,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
         if strcmp(filteredImages{currentImage}.fct,'polygon')
             polygon=polygonPoints;
             color='blue';
-        elseif strcmp(filteredImages{currentImage}.fct,'select') && (get(hTrim,'Value')==1 || get(hAdd,'Value')==1 || get(hRemove,'Value')==1)
+        elseif strcmp(filteredImages{currentImage}.fct,'select') %&& (get(hTrim,'Value')==1 || get(hAdd,'Value')==1 || get(hRemove,'Value')==1)
             polygon=modifyPoly;
             color='white';
         else
@@ -541,7 +542,7 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
             case 'backspace'
                 deleteLastPoint();
             case 'f'
-                if hFreehand.Visible
+                if strcmp(filteredImages{currentImage}.fct, 'select') || strcmp(filteredImages{currentImage}.fct, 'polygon')
                     hFreehand.Value=abs(hFreehand.Value-1);
                     freehand();
                 end
@@ -562,6 +563,11 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
                 if strcmp(filteredImages{currentImage}.fct, 'select')
                     hAdd.Value=abs(hAdd.Value-1);
                     buttonActivation(hAdd,0)
+                end
+            case 't'
+                if strcmp(filteredImages{currentImage}.fct, 'select')
+                    hTrim.Value=abs(hTrim.Value-1);
+                    buttonActivation(hTrim,0)
                 end
         end
     end
