@@ -18,37 +18,52 @@ for imgIndex=1:numel(routes)
         hProgress.String=sprintf('Processing image %g of %g', imgIndex, numel(routes));
         drawnow();
     end
-    flag=0;
-    route = fullfile(path,[routes{imgIndex} '.tif']);
-    image=imread(route);
-    if convert
-        if size(image,3)==3         %If image is RGB, convert to grayscale
-            image=rgb2gray(image);
-            flag=1;
-        end
-        if isa(image, 'uint8') || isa(image, 'int8')      %If image is 8bit
-            image=im2uint16(image);     %Convert to 16 bit
-            flag=1;
-        elseif isa(image, 'int16')
-            image=im2uint16(image)-32768;
-            flag=1;
-        elseif ~isa(image, 'uint16')
-            fprintf('Image is of type %s, no conversion has been implemented for this type', class(image));
-        end
-    end
-    
-    if invert
-        image=imcomplement(image);
-        flag=1;
-    end
+    for type=1:2
+        %Type 1 - Original image; type 2 - demarcation
         
-    if contrast
-        image=imadjust(image);
-        flag=1;
-    end
-     
-    if flag         %Save if anything was changed
-        imwrite(image,route);  
+        flag=0;
+        if type==1
+            route = fullfile(path,[routes{imgIndex} '.tif']);
+        else
+            route = fullfile(path,[routes{imgIndex} '_mod.tif']);
+        end
+        try
+            image=imread(route);
+        catch
+            if type==1
+                fprintf('Image %s could not be opened', route);
+            end
+            continue;
+        end
+        if convert
+            if size(image,3)==3         %If image is RGB, convert to grayscale
+                image=rgb2gray(image);
+                flag=1;
+            end
+            if isa(image, 'uint8') || isa(image, 'int8') || isa(image, 'double')     %If image is 8bit
+                image=im2uint16(image);     %Convert to 16 bit
+                flag=1;
+            elseif isa(image, 'int16')
+                image=im2uint16(image)-32768;
+                flag=1;
+            elseif ~isa(image, 'uint16')
+                fprintf('Image is of type %s, no conversion has been implemented for this type', class(image));
+            end
+        end
+
+        if invert && type==1
+            image=imcomplement(image);
+            flag=1;
+        end
+
+        if contrast && type==1
+            image=imadjust(image);
+            flag=1;
+        end
+
+        if flag         %Save if anything was changed
+            imwrite(image,route);  
+        end
     end
         
     if nargin<5 && mod(imgIndex,5)==1
