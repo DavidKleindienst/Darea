@@ -15,8 +15,13 @@ i=1;
 %image=rgb2gray(image);
 
 if ~isnan(modImage)
-    modComponents=imbinarize(modImage,0.97); 
-    modComponents=abs(bwareaopen(modComponents,100)-1); %Abs -1 because of dark foreground
+    modComponents=zeros(size(modImage));
+    modComponents(modImage==65535)=1;
+    modComponents = bwareaopen(modComponents,20);
+    modComponents = imopen(modComponents, strel('diamond',2));
+    modComponents = abs(modComponents-1); %Invert binary image
+%     modComponents=imbinarize(modImage,0.97); 
+%     modComponents=abs(bwareaopen(modComponents,100)-1); %Abs -1 because of dark foreground
     demarc=image;
     demarc(modComponents==0)=image(modComponents==0)*defaults.BackgroundBrightness;
     
