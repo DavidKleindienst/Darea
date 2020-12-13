@@ -164,7 +164,7 @@ waitfor(mainFigure);
         end
         route = routes{imgIndex};
         scale = scales(imgIndex);
-        if ~isfile(fullfile(path,[route '.tif']))
+        if ~isfile(fullfile(path,[route '.tif'])) && ~endsWith(route, '_dupl')
             answer=questdlg(sprintf(['This image does not exist, perhaps it has been moved or renamed.\n',...
                         'Should it be removed from this project?']), ...
                         'Image not found', 'yes','no','no');
