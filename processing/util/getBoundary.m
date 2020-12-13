@@ -4,7 +4,7 @@ function boundary = getBoundary(area,scale,fuseBoundaries,imgIndex,imageName)
 %                   matrix will be returned
 %                   If false a cell array of point matrices will be
 %                   returned
-if nargin<3
+if nargin<4
     %These are for troubleshooting during Analysis only,
     %So can be ignored if not supplied
     imgIndex='';
@@ -17,6 +17,15 @@ end
 if sum(area,'all')>0 && sum(~area,'all')>10
     boundaries=bwboundaries(area');    % Gives coordinates of 0s on edge of area
     boundaries(1)=[];
+    if isempty(boundaries)
+        %Maybe demarcation is at image border
+        %Try expanding area by 4 px each side and redoing boundary computation
+        area=[ones(4,size(area,2));area;ones(4,size(area,2))];
+        area=[ones(size(area,1),4) area ones(size(area,1),4)];
+        boundaries=bwboundaries(area');    % Gives coordinates of 0s on edge of area
+        boundaries(1)=[];
+        boundaries=cellfun(@(x)x-4,boundaries, 'UniformOutput',false); % Compensate for the 4 additional pixels
+    end
     boundaries(cellfun('length',boundaries)<=10)=[]; %Delete all regions smaller than 10 px, because they are likely false detections
     boundary=[];
     %Douglas Peucker reduces the number of points in the boundary outline,
