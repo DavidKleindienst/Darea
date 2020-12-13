@@ -160,7 +160,7 @@ def duplicateImage(configFile,index,copyMod=False, duplicate_suffix='_dupl'):
         #Also duplicat dots file
         copyfile(imbasepath+'dots.csv',cppath+'dots.csv')
     
-    copyfile(impath,cppath+'.tif') #copy image
+    #copyfile(impath,cppath+'.tif') #don't copy image to save space
     for k in images:
         lst=images[k][0:index+1]
         if k=='ROUTE':

@@ -8,7 +8,7 @@ if ~angle
     return;
 end
 
-image=imread([route '.tif']);
+image=readAndConvertImage([route '.tif']);
 imwrite(imrotate(image,-angle),[route '.tif']);
 
 if rotateDots && isfile([route 'dots.csv'])
@@ -29,7 +29,7 @@ if rotateDots && isfile([route 'dots.csv'])
 end
 
 if rotateMod && isfile([route '_mod.tif'])
-   image=imread([route '_mod.tif']);
+   image=readAndConvertImage([route '_mod.tif']);
    imwrite(imrotate(image,-angle),[route '_mod.tif']);
 end
 
