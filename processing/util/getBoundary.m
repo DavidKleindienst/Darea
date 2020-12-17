@@ -17,6 +17,8 @@ end
 if sum(area,'all')>0 && sum(~area,'all')>10
     boundaries=bwboundaries(area');    % Gives coordinates of 0s on edge of area
     boundaries(1)=[];
+    boundaries(cellfun('length',boundaries)<=10)=[]; %Delete all regions smaller than 10 px, because they are likely false detections
+
     if isempty(boundaries)
         %Maybe demarcation is at image border
         %Try expanding area by 4 px each side and redoing boundary computation
@@ -25,8 +27,8 @@ if sum(area,'all')>0 && sum(~area,'all')>10
         boundaries=bwboundaries(area');    % Gives coordinates of 0s on edge of area
         boundaries(1)=[];
         boundaries=cellfun(@(x)x-4,boundaries, 'UniformOutput',false); % Compensate for the 4 additional pixels
+        boundaries(cellfun('length',boundaries)<=10)=[]; %Delete all regions smaller than 10 px, because they are likely false detections
     end
-    boundaries(cellfun('length',boundaries)<=10)=[]; %Delete all regions smaller than 10 px, because they are likely false detections
     boundary=[];
     %Douglas Peucker reduces the number of points in the boundary outline,
     %such that the error of the new boundary will be 1px (thats the 1 in the argument)
