@@ -123,14 +123,20 @@ def changeScale(configFile,index,newValue):
 def addImages(configFile,imagepaths,actualConfig=False):
     #configFile is the one modified, but if actualConfig is provided,
     #Relative path is taken from actualConfig
+    print(configFile)
+    print(imagepaths)
+    print(actualConfig)
     images=file_utils.file2dict(configFile,',\t')
     imagepaths=[os.path.splitext(i)[0] for i in imagepaths]
     for i in imagepaths:
+        print(i)
         if actualConfig:
-            im=os.path.relpath(i,os.path.split(actualConfig)[0])
+            common_pref=os.path.commonprefix([i,actualConfig])
+            im=os.path.relpath(i,common_pref)
         else:
-            im=os.path.relpath(i,os.path.split(configFile)[0])
-            
+            common_pref=os.path.commonprefix([i,configFile])
+            im=os.path.relpath(i,common_pref)
+        print(im)
         if im not in images['ROUTE']:
             images['ROUTE'].append(im)
             images['PIXELSIZE'].append('NaN')

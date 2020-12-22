@@ -63,12 +63,17 @@ end
     end
 function addRow(~,~)
     [images, path]=uigetfile('*.tif', 'Select one or more images', 'Multiselect', 'on');
+    if ~iscell(images)
+        %Only one image selected
+        images=cellstr(images);
+        path=cellstr(path);
+    end
     images=images(~endsWith(images,'_mod.tif'));
     if isempty(images)
         fprintf('No valid images selected. _mod.tif images are not valid images');
         return;
     end
-    images=cellfun(@(x)fullfile(path,x),images,'UniformOutput',false);
+    images=fullfile(path,images);
     py.makeProjectFile.addImages(newConfig,py.list(images),datFile)
     readChangedConfig(); 
 end
