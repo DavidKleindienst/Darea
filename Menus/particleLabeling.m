@@ -107,8 +107,7 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
     
     %% Image measures 
     % Zoom image
-    % The images are scaled to 0.5 nm/pixel so that the dots can be detected. In order to select detect a particle, it is used an image of 20nm.
-    particleImageSideNm = 20;
+    particleImageSideNm = max(defaults.particleTypes)*2;
     
     %% GUI
     title='Darea - Particle Detection';
@@ -153,7 +152,7 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
     classifiers=listClassifiers();
     hClassifierText=uicontrol('Style', 'Text', 'String', 'Classifier', 'Position', [gridXPx(3) gridYPx(1) 80 25], 'HorizontalAlignment', 'left');
     defaultId=find(ismember(classifiers,defaults.defaultClassifier));
-    hClassifier=uicontrol('Style', 'popup', 'String', classifiers, 'Value', defaultId, 'Position', [gridXPx(3)+80 gridYPx(1) 150 25]);
+    hClassifier=uicontrol('Style', 'popup', 'String', classifiers, 'Value', defaultId, 'Position', [gridXPx(3)+80 gridYPx(1) 150 25],'Callback', @setClassifier);
     
     if numel(classifiers)<2
         %Don't show if only one classifier exists
@@ -175,7 +174,7 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
     hExact=uicontrol('Style', 'checkbox', 'String','Click exact position [x]', 'Position', [gridXPx(3)+255 gridYPx(1)+46 150 25], ...
                 'Tooltipstring', ttexact);
     
-    allowHotkeys=[hExact,hClear,hAutoDetect,saveButton,hBrightness,hBrightnessText];
+    allowHotkeys=[hExact,hClear,hAutoDetect,saveButton,hBrightness,hBrightnessText,diameterPopup];
     set(allowHotkeys, 'KeyReleaseFcn', @keyRelease);
             
     %% Loads the main image
@@ -438,10 +437,10 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
         radiiNm(indPart,:) = [];
         actRadiiNm(indPart,:) = [];
         % Removes the mark from both images.
-        delete(objectHandle)
-        particleMark = particleMarks(indPart);
-        delete(particleMark);
-        particleMarks(indPart) = [];
+        clearParticleMarks();
+        clearZoomParticleMarks();
+        addAllParticleMarks();
+        addAllZoomParticleMarks();
         updated = false;
     end
    
@@ -451,8 +450,8 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
         checked = get(toggleMarksCheckBox,'Value');
         % If not checked, removes the marks
         if ~checked
-            clearParticleMarks()
-            clearZoomParticleMarks()
+            clearParticleMarks();
+            clearZoomParticleMarks();
         else
             addAllParticleMarks();
             addAllZoomParticleMarks();
@@ -665,6 +664,10 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
         positionFigure=get(mainFigure,'Position');
         closeCB(updated, @save);
     end % closeCallback
+
+    function setClassifier(~,~)
+        defaults.defaultClassifier=classifiers{get(hClassifier, 'Value')};
+    end
 
     %% Automatic detection
     function automaticDet ( ~ , ~)

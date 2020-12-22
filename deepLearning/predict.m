@@ -20,7 +20,8 @@ safeMkdir(imFolder);
 safeMkdir(predFolder);
 
 %Get input image List
-fprintf('Reading Config File...\n');
+set(hProgress, 'String', 'Reading config file...');
+drawnow();
 path=fileparts(config);
 routes=readConfig(config);
 files=cellfun(@(x) fullfile(path,[x '.tif']),routes, 'Uni', false);

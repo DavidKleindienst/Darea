@@ -38,41 +38,41 @@ function [centers, radii, metrics, particleFeatures] = detectParticles(image, ma
 
     %% Shows the image if showing progress is enabled
     if showProgress
-            % Gets the image of interest, which will be shown.
-            resImage = image;
-            resImage(~maskSection)=resImage(~maskSection)./2;
-            % Image measures
-            sizeGUI=0.7;
-            % Main image
-            [imageHeightPx, imageWidthPx] = size(image);
-            screenSize = get(0,'Screensize');
-            % Calculates ratios image/screen 
-            ratioImScreen = [imageHeightPx/screenSize(4)  imageWidthPx/screenSize(3)];
-            % Takes the size of the screen for the dimmension with the biggest ratio
-            if ratioImScreen(1)>ratioImScreen(2)
-                dispImageHeightPx = screenSize(4) * sizeGUI; 
-                dispImageWidthPx = dispImageHeightPx/imageHeightPx * imageWidthPx;
-            else
-                dispImageWidthPx = screenSize(3) * sizeGUI; 
-                dispImageHeightPx = dispImageWidthPx/imageWidthPx * imageHeightPx;
-            end  
-            figureWidthPx = dispImageWidthPx+20;
-            figureHeightPx = dispImageHeightPx+60;
-            
-            %% Figure
-            title=sprintf('Automatic detection for %g nm particles', radiusNm*2);
-            mainFigure = figure('NumberTitle','off','Position',[screenSize(3)-figureWidthPx screenSize(4)-figureHeightPx figureWidthPx figureHeightPx],...
-                                'name',title,'keyRelease',@hotkeys);
-            set(mainFigure, 'menubar', 'none'); % No menu bar.
-            set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).
-            set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).                             
-            panelImage = uipanel('Units','pixels','Position',[10 60 dispImageWidthPx dispImageHeightPx]);
-            axesImage = axes('parent', panelImage, 'Position', [0 0 1 1]);                 
-            imshow(resImage, imR, 'Parent', axesImage);   
-            uicontrol('Style', 'pushbutton', 'String', 'Add marks','Units','pixels','Position',[dispImageWidthPx-170 20 80 25],'Tooltipstring','Closes the figure','Callback',@closeAcceptCallBack);
-            uicontrol('Style', 'pushbutton', 'String', 'Cancel','Units','pixels','Position',[dispImageWidthPx-80 20 80 25],'Tooltipstring','Closes the figure','Callback',@closeCancelCallBack); 
-            
-            pause(0.2);
+        % Gets the image of interest, which will be shown.
+        resImage = image;
+        resImage(~maskSection)=resImage(~maskSection)./2;
+        % Image measures
+        sizeGUI=0.7;
+        % Main image
+        [imageHeightPx, imageWidthPx] = size(image);
+        screenSize = get(0,'Screensize');
+        % Calculates ratios image/screen 
+        ratioImScreen = [imageHeightPx/screenSize(4)  imageWidthPx/screenSize(3)];
+        % Takes the size of the screen for the dimmension with the biggest ratio
+        if ratioImScreen(1)>ratioImScreen(2)
+            dispImageHeightPx = screenSize(4) * sizeGUI; 
+            dispImageWidthPx = dispImageHeightPx/imageHeightPx * imageWidthPx;
+        else
+            dispImageWidthPx = screenSize(3) * sizeGUI; 
+            dispImageHeightPx = dispImageWidthPx/imageWidthPx * imageHeightPx;
+        end  
+        figureWidthPx = dispImageWidthPx+20;
+        figureHeightPx = dispImageHeightPx+60;
+
+        %% Figure
+        title=sprintf('Automatic detection for %g nm particles', radiusNm*2);
+        mainFigure = figure('NumberTitle','off','Position',[screenSize(3)-figureWidthPx screenSize(4)-figureHeightPx figureWidthPx figureHeightPx],...
+                            'name',title,'keyRelease',@hotkeys);
+        set(mainFigure, 'menubar', 'none'); % No menu bar.
+        set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).
+        set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).                             
+        panelImage = uipanel('Units','pixels','Position',[10 60 dispImageWidthPx dispImageHeightPx]);
+        axesImage = axes('parent', panelImage, 'Position', [0 0 1 1]);                 
+        imshow(resImage, imR, 'Parent', axesImage);   
+        uicontrol('Style', 'pushbutton', 'String', 'Add marks','Units','pixels','Position',[dispImageWidthPx-170 20 80 25],'Tooltipstring','Closes the figure','Callback',@closeAcceptCallBack);
+        uicontrol('Style', 'pushbutton', 'String', 'Cancel','Units','pixels','Position',[dispImageWidthPx-80 20 80 25],'Tooltipstring','Closes the figure','Callback',@closeCancelCallBack); 
+
+        drawnow();
     end
     
     
@@ -88,8 +88,7 @@ function [centers, radii, metrics, particleFeatures] = detectParticles(image, ma
     
     % It is necessary to define margins.
     %marginPx = 5;
-    marginNm = 10;
-    
+    marginNm = 2*radiusNm;
     % Size of the image minus margins
     utilImageSizeNm = imageSizeNm - (2*marginNm);
     
@@ -171,11 +170,8 @@ function [centers, radii, metrics, particleFeatures] = detectParticles(image, ma
              
             %% Finds candidate particles
             lowerMargin = radiusNm - radiusMarginNm;
-            lowerMarginPx=floor(lowerMargin/scale);
-            if lowerMarginPx<1
-                lowerMarginPx=1;
-            end
-            upperMargin = radiusNm + marginNm;
+            lowerMarginPx=max(1,floor(lowerMargin/scale));
+            upperMargin = radiusNm + radiusMarginNm;
             upperMarginPx=ceil(upperMargin/scale);
             [detCentersPx, detRadiiPx, subImgMetrics] = imfindcircles(subImg, [lowerMarginPx upperMarginPx],'Method','TwoStage','ObjectPolarity','dark','Sensitivity',sensitivity);
 
