@@ -21,6 +21,12 @@ def getMag(filename):
             l=f.readline()
     return mags
 
+def rchop(string, suffix):
+    #Remove suffix from string
+    if suffix and string.endswith(suffix):
+        return string[:-len(suffix)]
+    return string
+
 def getImages(folder,subfolder,mags,output,onlyMod=False,separator='_',defaultMag=False):
     #DefaultMag only takes effect when using a dict for mags and no Magnification was found in image Name
     #defaultMag: False -> Image will be skipped
@@ -40,9 +46,9 @@ def getImages(folder,subfolder,mags,output,onlyMod=False,separator='_',defaultMa
             fn=fn[:-4]+'tif'
         if onlyMod:
             if fn.endswith('?mod.tif'):
-                os.rename(os.path.join(folder,subfolder,fn), os.path.join(folder,subfolder, fn.strip('?mod.tif')+'_mod.tif'))
+                os.rename(os.path.join(folder,subfolder,fn), os.path.join(folder,subfolder, rchop(fn,'?mod.tif')+'_mod.tif'))
             if fn.endswith('_mod.tif'):
-                fn=fn.strip('_mod.tif')
+                fn=rchop(fn,'_mod.tif')
                 fs=fn.split(separator)
                 found=False
                 for x in fs:
@@ -54,7 +60,7 @@ def getImages(folder,subfolder,mags,output,onlyMod=False,separator='_',defaultMa
                     output.append(subfolder +',\t' + subfolder+'/'+fn+',\t' + str(defaultMag))
         else:
             if fn.endswith('.tif') and not fn.endswith('_mod.tif'):
-                fn=fn.strip('.tif')
+                fn=rchop(fn,'.tif')
                 if type(mags) in [int, float, str]:
                     output.append(subfolder +',\t' + subfolder+'/'+fn+',\t' + str(mags))
                 elif type(mags)==dict:
