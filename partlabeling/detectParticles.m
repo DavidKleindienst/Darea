@@ -212,7 +212,7 @@ function [centers, radii, metrics, particleFeatures] = detectParticles(image, ma
                     % Gets the image of the particle.
                     rectParticle = [detCentersNm(partId,1)-marginNm ,detCentersNm(partId,2)-marginNm, 2*marginNm, 2*marginNm];
                     [xPx, yPx]=worldToIntrinsic(imR,rectParticle(1),rectParticle(2));
-                    rectParticlePx=[xPx,yPx,rectParticle(3)./scale,rectParticle(4)./scale];
+                    rectParticlePx=[floor(xPx),floor(yPx),ceil(rectParticle(3)./scale),ceil(rectParticle(4)./scale)];
                     
                     imageParticle = imcrop(image, rectParticlePx);
                     partR=imref2d(size(imageParticle),scale,scale);
