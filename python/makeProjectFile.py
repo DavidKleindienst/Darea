@@ -156,21 +156,24 @@ def duplicateImage(configFile,index,copyMod=False, duplicate_suffix='_dupl'):
     #index starts from 0
     images=file_utils.file2dict(configFile,',\t')
     imbasepath=os.path.join(os.path.dirname(configFile),images['ROUTE'][index])
+    modbasepath=imbasepath
+    while imbasepath.endswith('_dupl'):
+        imbasepath=imbasepath[:-5]
     impath=imbasepath+'.tif'
     assert os.path.isfile(impath)
     
-    #Find a path to copy the image to, by appending duplicat_suffix until there is no such file
+    #Find a path to copy the image to, by appending duplicat_suffix until it is not already taken
     cppath=imbasepath+duplicate_suffix
-    while os.path.isfile(cppath+'.tif'):
+    while os.path.relpath(cppath,os.path.dirname(configFile)) in images['ROUTE']:
         cppath+=duplicate_suffix
     cproute=os.path.relpath(cppath,os.path.dirname(configFile)) #Will be written to config
     cproute=cproute.replace('\\','/') #Deal with windows issues
-    if copyMod and os.path.isfile(imbasepath+'_mod.tif'):
+    if copyMod and os.path.isfile(modbasepath+'_mod.tif'):
         #Also duplicate _mod image if wanted and exists.
-        copyfile(imbasepath+'_mod.tif',cppath+'_mod.tif')
-    if copyMod and os.path.isfile(imbasepath+'dots.csv'):
-        #Also duplicat dots file
-        copyfile(imbasepath+'dots.csv',cppath+'dots.csv')
+        copyfile(modbasepath+'_mod.tif',cppath+'_mod.tif')
+    if copyMod and os.path.isfile(modbasepath+'dots.csv'):
+        #Also duplicate dots file
+        copyfile(modbasepath+'dots.csv',cppath+'dots.csv')
     
     #copyfile(impath,cppath+'.tif') #don't copy image to save space
     for k in images:
