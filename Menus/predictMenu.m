@@ -63,6 +63,8 @@ waitfor(mainFigure);
 
 
 function start(~,~)
+    set(hProgress, 'String', 'Starting Predictions...');
+    drawnow();
     if get(hPredParticles,'Value')
         %Start a parallel pool when predicting particles
         %It is started now already because it will save little bit of time
