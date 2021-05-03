@@ -60,7 +60,7 @@ for f=1:numel(datFiles)
          %% Reads the image and the mask.
         imageFullName = [fullImageName '.tif'];
         imageSelFullName= [fullImageName '_mod.tif'];
-        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName, round(dilate/scale));
+        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName,NaN, round(dilate/scale));
 
         maskSection = ~maskSection;
         imR=imref2d(size(image),scale,scale);

@@ -1,12 +1,28 @@
 
-function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, autocontrast, defaults, ~, useless, position)
-%DEMARCATE Summary of this function goes here
-%   Detailed explanation goes here
+function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, scale, selAngle, ~, autocontrast, defaults, ~, useless, position)
+%% Menu for manual demarcation of the region of interest
 
-    fullimageName=[fullfile(pathImage,imageName) '.tif'];
+    
+    if ~isnan(selAngle)
+        [~,angles]=readMdoc([fullfile(pathImage,imageName) '.mdoc']);
+        fullimageName=fullfile(pathImage,imageName);
+        
+        if selAngle
+            angle = selAngle;
+            image = readAndConvertImage(fullimageName,angle);
+        else
+            % selAngle is 0, indicating that no angle has yet been selected
+            % so pick a middle one for display
+            angle = round(numel(angles)/2);
+            image = readAndConvertImage(fullimageName,angle);
+        end
+    else
+        fullimageName=[fullfile(pathImage,imageName) '.tif'];
+        image = readAndConvertImage(fullimageName);
+    end
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
     modImage=NaN;
-    image = readAndConvertImage(fullimageName);
+    
     
     if ~isa(image, 'uint16')
         msgbox('This image is not 16 bit and cannot be processed');
@@ -88,8 +104,15 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     hdelLastPoint=uicontrol('Style', 'pushbutton', 'String', 'Remove last Point','Units','pixels','Position', [gridXPx(2)+5 20 100 25],'Tooltipstring','Delete last Point','Callback',@deleteLastPoint);   
     uicontrol('Style', 'pushbutton', 'String', 'Close [c]','Units','pixels','Position',[gridXPx(4)-80 20 80 25],'Tooltipstring','Closes the application','Callback',@closeCallBack); 
     saveButton = uicontrol('Style', 'pushbutton', 'String', 'Save [s]','Units','pixels','Position',[gridXPx(4)-170 20 80 25],'Tooltipstring','Save particle locations in a file','Callback',@save); 
-
     
+    if ~isnan(selAngle)
+        angleString = compose('%g',angles); %Convert to cell array of strings
+        angleTT = sprintf('Select the stage angle at which the Image was taken');
+        uicontrol('Style', 'text', 'String','Angle', 'Tooltipstring', angleTT, 'Position', [gridXPx(2)+140 30 60 15]);
+        hSelectAngle = uicontrol('Style', 'popup', 'Callback', @changeAngle, 'Tooltipstring', angleTT, ...
+            'String', angleString, 'Position', [gridXPx(2)+200 20 80 25], 'Value', angle);
+
+    end
     %%Visibility of things depending on displayed Filter
     visibleOnPolygon=[hdelLastPoint, hNewComponent,hFreehand];
     visibleOnSelect=[hTrim,hConnect,hAdd,hRemove,hdelLastPoint,hBrightnessText,hBrightness,hFreehand];
@@ -225,6 +248,23 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
         currentImage=get(hFilterDropdown,'Value');
         redrawImage();
         changeUI();
+    end
+
+    function changeAngle(~,~)
+        angle=hSelectAngle.Value;
+        image = readAndConvertImage(fullimageName,angle);
+        if autocontrast
+            image=imadjust(image);
+        end
+        filteredImages{1}.image=image;
+        for fil=2:numel(filteredImages)
+            if isfield(filteredImages{fil}, 'compImage')
+                filteredImages{fil}.image=image;
+                c=filteredImages{fil}.compImage;
+                filteredImages{fil}.image(c==0)=filteredImages{fil}.image(c==0)*defaults.BackgroundBrightness;
+            end
+        end
+        redrawImage();
     end
 
     function changeUI()
@@ -610,6 +650,11 @@ function [defaults,useless,position]=demarcate(pathImage, imageName, scale, ~, a
     
     %% Writes the information in the provided file
     function save(~, ~)
+        if ~isnan(selAngle) && selAngle ~= angle
+            %angle changed, will be saved to config by openImages.m
+            %after closing demarcate menu
+            selAngle=angle;
+        end
         save_Img=1;
         if strcmp(filteredImages{currentImage}.fct,'polygon') && numel(polygonPoints)>=3
             mask=poly2mask(polygonPoints(:,1)./scale,polygonPoints(:,2)./scale,size(image,1),size(image,2));

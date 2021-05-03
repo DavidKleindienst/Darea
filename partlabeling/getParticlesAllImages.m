@@ -8,6 +8,7 @@ dilate=settings.dilate;
 particleTypes=settings.particleTypes;
 sensitivity=settings.sensitivity;
 marginNm=settings.marginNm;
+%for i=1:numel(routes)
 parfor (i=1:numel(routes), getCurrentPoolSize())
     imName=[routes{i} '.tif'];
     dotFile=[routes{i} 'dots.csv'];
@@ -16,7 +17,7 @@ parfor (i=1:numel(routes), getCurrentPoolSize())
     end
     if useDemarcation
         maskName=[routes{i} '_mod.tif'];
-        [mask, image]=getBaseImages(imName, maskName, round(dilate/scales(i)));
+        [mask, image]=getBaseImages(imName, maskName,NaN, round(dilate/scales(i)));
         mask = ~mask;
     else
         image=readAndConvertImage(imName);
