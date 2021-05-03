@@ -4,7 +4,7 @@ function [groupnames, groups, routes] = readGroups(datFile)
 filename=[datFile(1:end-4) '_groups.dat'];
 
 if nargout>1
-    [routes,~,groups]=readConfig(datFile);
+    [routes,~,~,groups]=readConfig(datFile);
 end
 
 if ~isfile(filename)
@@ -20,7 +20,7 @@ header=fieldnames(G);
 groupnames=header(2:end);
 
 if nargout>1
-    [routes,~,groups]=readConfig(datFile);
+    [routes,~,~,groups]=readConfig(datFile);
     cfGroups=groups;
     %tbl=table2cell(T);
     %tbl=cellfun(@num2str, tbl, 'UniformOutput', false);

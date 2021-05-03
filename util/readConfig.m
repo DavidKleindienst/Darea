@@ -1,4 +1,4 @@
-function [routes,scales,groups,imNames,selectedAngles] = readConfig(filepath,fileextension,choice,invertChoice)
+function [routes,scales,selectedAngles,groups,imNames] = readConfig(filepath,fileextension,choice,invertChoice)
 %% Reads the .dat Configuration File
 % fileextension: fileextension of the result files, this parameter
 % is only needed when imNames (i.e. List of Images marked with asterisk if 

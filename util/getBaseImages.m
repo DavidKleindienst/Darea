@@ -45,6 +45,7 @@ if nargin<3
     selAngle=NaN;
 end
 if nargout>1
+    % Only read image if actually needed
     image = readAndConvertImage(imageName,selAngle);
 end
 if nargin<4
@@ -74,8 +75,9 @@ if nargin>1 && exist(imageSelName,'file')==2
 
 else
     if nargout<=1
-        %Image has not been read, but is needed now
-        image = readAndConvertImage(imageName);
+        % Image has not been read, but is needed now
+        % to determine size of empty output image
+        image = readAndConvertImage(imageName,selAngle);
     end
     if defaultSelIsBackground
         discardedAreas=ones(size(image));

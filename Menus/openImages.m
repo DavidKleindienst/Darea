@@ -127,7 +127,7 @@ waitfor(mainFigure);
         %if index is specified jumps to that image
         defaults=updateDefaults(getOptionsName(fullfile(path, file)),defaults);
         try
-            [routes,scales,~,imNames,selAngles] = readConfig(fullfile(path,file),fileextension);
+            [routes,scales,selAngles,~,imNames] = readConfig(fullfile(path,file),fileextension);
         catch
              msgbox([fullfile(path,file) 'is not a valid configuration file.'], 'Error','error');
         end

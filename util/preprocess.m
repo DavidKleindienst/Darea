@@ -43,7 +43,7 @@ end
 
 [path, file,fileextension]=fileparts(datFile);
 
-[routes,~,~,~,selAngle]=readConfig([fullfile(path,file) fileextension]);
+[routes,~,selAngle]=readConfig([fullfile(path,file) fileextension]);
 isSerEM=any(~isnan(selAngle));
 
 fprintf('Processing Images:\n');

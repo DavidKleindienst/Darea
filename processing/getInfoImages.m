@@ -53,9 +53,9 @@ if nargin <3
     onlyParticlesWithin=false;
 end
 %% Reads data from the configuration file
-[routes, scales]=readConfig(datFile);
+[routes, scales, selAngles]=readConfig(datFile);
 numImages=numel(routes);
-
+isSerEM=any(~isnan(selAngles));
 %% Creates the structure containing the information.
 infoImages = cell(numImages,1);
 
@@ -68,9 +68,16 @@ parfor (imgIndex=1:numImages, getCurrentPoolSize())
     scale=scales(imgIndex);
 
     %% Gets useful information.
-    imageName = [route '.tif'];
     imageSelName = [route '_mod.tif'];
-    discardedAreas = getBaseImages(imageName, imageSelName);
+    if isSerEM
+        imageName=route;
+        discardedAreas = getBaseImages(imageName, imageSelName,selAngles(imgIndex));
+    else
+        imageName = [route '.tif'];
+        discardedAreas = getBaseImages(imageName, imageSelName);
+    end
+    
+    
     if dilate && sum(discardedAreas,'all')>0
         se=strel('diamond', round(dilate/scale));
         %using imerode, since demarcated area has value 0, this will dilate it.
