@@ -42,6 +42,8 @@ path = '';
 routes = '';
 % Scale of each image.
 scales = '';
+% Selected angles for serialEM
+selAngles = NaN;
 % Displayed Names
 imNames = '';
 defaults=readDefaults();
@@ -109,9 +111,7 @@ openedFigure = false;
 if nargin>=4
     [path, file, ext]=fileparts(datFile);
     file=[file,ext];
-    readDatFile(path,file);
-    %Update defaults if neccessary
-    defaults=updateDefaults(getOptionsName(fullfile(path, file)),defaults);
+    readDatFile(path,file);  
 end
 set(hImageList, 'KeyReleaseFcn', @keyRelease);
 set(hImageList, 'KeyPressFcn', @keyPress);
@@ -123,8 +123,11 @@ waitfor(mainFigure);
 
 
     function readDatFile(path,file,index)
+        %reads the datfile
+        %if index is specified jumps to that image
+        defaults=updateDefaults(getOptionsName(fullfile(path, file)),defaults);
         try
-            [routes,scales,~,imNames] = readConfig(fullfile(path,file),fileextension);
+            [routes,scales,~,imNames,selAngles] = readConfig(fullfile(path,file),fileextension);
         catch
              msgbox([fullfile(path,file) 'is not a valid configuration file.'], 'Error','error');
         end
@@ -137,6 +140,7 @@ waitfor(mainFigure);
         end           
     end
     function keyRelease(~,key)
+        %Hotkeys
         switch key.Key
             case 'return'
                 openImage(get(hImageList, 'Value'));
@@ -164,7 +168,9 @@ waitfor(mainFigure);
         end
         route = routes{imgIndex};
         scale = scales(imgIndex);
-        if ~isfile(fullfile(path,[route '.tif'])) && ~endsWith(route, '_dupl')
+        if ~isfile(fullfile(path,[route '.tif'])) && ~endsWith(route, '_dupl') ...
+                && ~isfile(fullfile(path,route))
+            
             answer=questdlg(sprintf(['This image does not exist, perhaps it has been moved or renamed.\n',...
                         'Should it be removed from this project?']), ...
                         'Image not found', 'yes','no','no');
@@ -173,23 +179,35 @@ waitfor(mainFigure);
             end
             return;
         end
-        openedFigure = true;
-        [defaults, data, Position]=downstreamFunction(path, route, scale, imgIndex, hAutoContrast.Value, defaults, datFile, data, Position);
-        openedFigure = false;
-        %Update GUI to show modified files
-        currName=imNames{imgIndex};
-        currFile=fullfile(path, [route fileextension]);
-        if endsWith(currName, '*') && ~isfile(currFile)
-            currName=currName(1:end-3);
-        elseif ~endsWith(currName, '*') && isfile(currFile)
-            currName=sprintf([currName '\t *']);
-        end
-        imNames{imgIndex}=currName;
-        set(hImageList,'String',imNames);
-        set(hImageList,'Value',min(imgIndex+10,numel(imNames)));   %Scroll down so the mark will be in middle
-        pause(0.02)
-        set(hImageList,'Value',min(imgIndex,numel(imNames)));
         
+        openedFigure = true;
+        if isnan(selAngles)
+            selAngle = NaN;
+        else
+            selAngle = selAngles(imgIndex);
+        end
+        [defaults, data, Position,newAngle]=downstreamFunction(path, route, scale, selAngle, imgIndex, hAutoContrast.Value, defaults, datFile, data, Position);
+        openedFigure = false;
+        if newAngle && ~isnan(selAngle) && newAngle ~= selAngle
+            %Selected angle was changed,
+            %save to config file
+            py.makeProjectFile.changeSelectedAngle(datFile,py.int(imgIndex-1),py.int(newAngle));
+            readDatFile(path,file,imgIndex); %Updates GUI
+        else
+            %Update GUI to show modified files
+            currName=imNames{imgIndex};
+            currFile=fullfile(path, [route fileextension]);
+            if endsWith(currName, '*') && ~isfile(currFile)
+                currName=currName(1:end-3);
+            elseif ~endsWith(currName, '*') && isfile(currFile)
+                currName=sprintf([currName '\t *']);
+            end
+            imNames{imgIndex}=currName;
+            set(hImageList,'String',imNames);
+            set(hImageList,'Value',min(imgIndex+10,numel(imNames)));   %Scroll down so the mark will be in middle
+            pause(0.02)
+            set(hImageList,'Value',min(imgIndex,numel(imNames)));
+        end
         figure(mainFigure); %Bring Menu back to foreground when closing image
     end
 
@@ -229,9 +247,9 @@ waitfor(mainFigure);
         %Duplicate Image and update Datfile!
         if dem
             % duplicate demarcation as well
-            py.makeProjectFile.duplicateImage(fullfile(path,file),py.int(index-1),1);
+            py.makeProjectFile.duplicateImage(datFile,py.int(index-1),1);
         else
-            py.makeProjectFile.duplicateImage(fullfile(path,file),py.int(index-1));
+            py.makeProjectFile.duplicateImage(datFile,py.int(index-1));
         end
         readDatFile(path,file,index);
     end

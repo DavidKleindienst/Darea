@@ -90,7 +90,7 @@ for i=1:numel(routes)
     end
     flag=1;
     try
-        [mask, image] = getBaseImages(imageFullName,imageSelFullName,0,1);
+        [mask, image] = getBaseImages(imageFullName,imageSelFullName,NaN,0,1);
         %Always assume images without demarcation show only background (The last 1 in the function call)
         
     catch
@@ -109,7 +109,7 @@ for i=1:numel(routes)
                 imageFullName = fullfile(path,[dupl_imgs{d} '.tif']);
                 imageSelFullName= fullfile(path,[dupl_imgs{d} '_mod.tif']);
                 try 
-                    mask{end+1}=getBaseImages(imageFullName,imageSelFullName,0,1);
+                    mask{end+1}=getBaseImages(imageFullName,imageSelFullName,NaN,0,1);
                     if settings.splitDemarcationsByGroup
                         idx=strcmp(routes,dupl_imgs{d});
                         groupIdx(end+1)=find(strcmp(groups,groupImages{idx}));

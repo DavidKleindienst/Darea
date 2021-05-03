@@ -25,8 +25,8 @@
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId, autocontrast, settings, datFile, Data, position)
-   
+function [settings, Data, position,selAngle]=visualize(pathImage, imageName, scale, selAngle, imgId, autocontrast, settings, datFile, Data, position)
+    
     fullImageName=[fullfile(pathImage,imageName) '.tif'];
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
     image = readAndConvertImage(fullImageName);
@@ -212,8 +212,8 @@ function [settings, Data, position]=visualize(pathImage, imageName, scale, imgId
             rim=infoI{imgId}.discardedAreas;
             boundary=infoI{imgId}.boundary;
         else
-            mask=getBaseImages(fullImageName, modImageName);
-            rim=getBaseImages(fullImageName, modImageName, round(settings.dilate/scale));
+            mask=getBaseImages(fullImageName, modImageName,selAngle);
+            rim=getBaseImages(fullImageName, modImageName,selAngle,round(settings.dilate/scale));
             boundary=getBoundary(mask,scale,true);
         end
         mask=cat(3,mask,mask,mask);

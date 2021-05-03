@@ -24,7 +24,7 @@
 % You should have received a copy of the GNU General Public License
 % along with this program; if not, write to the Free Software
 % Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageName, scale, ~, autocontrast, defaults,~, useless,positionFigure)
+function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage, imageName, scale,selAngle, ~, autocontrast, defaults,~, useless,positionFigure)
 %% Carries out manual labeling of the dots. The results are written into a file 
 % It requires 'imageName'.tif and 'imageName'_mod.tif. The first one must contain
 % the original image, whereas the second contains a mask with the discarded area.
@@ -57,10 +57,14 @@ function [defaults,useless,positionFigure] = particleLabeling(pathImage, imageNa
     %% Full route to the image
     fullImageName = fullfile(pathImage,imageName);
     %% Reads the image and the mask.
-    imageFullName = [fullImageName '.tif'];
+    if ~isnan(selAngle)
+        imageFullName=fullImageName;
+    else
+        imageFullName = [fullImageName '.tif'];
+    end
     imageSelFullName= [fullImageName '_mod.tif'];
     try
-        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName, round(defaults.dilate/scale));
+        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName,selAngle, round(defaults.dilate/scale));
     catch
         fprintf('Image or demarcated Image not found');
         return

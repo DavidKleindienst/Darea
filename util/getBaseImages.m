@@ -27,7 +27,7 @@
 
 
 
-function [discardedAreas, image] = getBaseImages(imageName, imageSelName, dilatePx,defaultSelIsBackground)
+function [discardedAreas, image] = getBaseImages(imageName, imageSelName, selAngle, dilatePx,defaultSelIsBackground)
 %% This function gets the useful part of the original image and a mask with the regions that must be processed.
 % Discards the provided mask (if no mask is provided (i.e. imageSelName doesn't exist) no image selection will be discarded
 % Also deletes huge (greater than 200 pixels) dark shades.
@@ -41,13 +41,16 @@ function [discardedAreas, image] = getBaseImages(imageName, imageSelName, dilate
 %                 to true are discarded.
 
 %% Reads the images
-if nargout>1
-    image = readAndConvertImage(imageName);
-end
 if nargin<3
-    dilatePx=0;
+    selAngle=NaN;
+end
+if nargout>1
+    image = readAndConvertImage(imageName,selAngle);
 end
 if nargin<4
+    dilatePx=0;
+end
+if nargin<5
     defaultSelIsBackground=0;
 end
 

@@ -15,10 +15,10 @@ fprintf(fid,'Image;test_accuracy;precision;recall;f1 score;mean iou;Background a
 for i=1:nrImg
     name1=['tmp/1_' replaceSlash(imageSet1{i})];
     name2=['tmp/2_' replaceSlash(imageSet2{i})];
-    dem=getBaseImages(NaN,imageSet1{i},0);
+    dem=getBaseImages(NaN,imageSet1{i},NaN,0);
     [~, dem]=prepareImage(NaN,settings.imageSize,dem,settings.foregroundColor(1),settings.backgroundColor(1));
     imwrite(dem, name1);
-    dem=getBaseImages(NaN,imageSet2{i},0);
+    dem=getBaseImages(NaN,imageSet2{i},NaN,0);
     [~, dem]=prepareImage(NaN,settings.imageSize,dem,settings.foregroundColor(1),settings.backgroundColor(1));
     imwrite(dem,name2);
     

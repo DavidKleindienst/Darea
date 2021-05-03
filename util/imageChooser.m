@@ -61,7 +61,7 @@ i=1;
 while ~isnan(i) && i<=numel(images) 
     imFig=figure('CloseRequestFcn', '', 'Name', images{i}, 'Visible', 'off');
     imRoute=fullfile(impath,images{i});
-    [dem,im]=getBaseImages([imRoute '.tif'], [imRoute '_mod.tif'],0);
+    [dem,im]=getBaseImages([imRoute '.tif'], [imRoute '_mod.tif'],NaN,0);
     if adjustContrast
         im=imadjust(im);
     end
