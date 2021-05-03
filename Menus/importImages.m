@@ -35,8 +35,7 @@ defaultMagFile='Mags.txt';
 path='';
 folder='';
 deliminator='_';
-selectedCell=NaN;
-
+defaultMag=-1;  % -1 means skip image if no Mag found.
 
 ConfigMenu=figure('OuterPosition',[365, 255, 410, 405],'menubar', 'none', 'resize','off', 'Name', 'Import Images into Configuration File', 'CloseRequestFcn', @cancel);
 
@@ -44,38 +43,43 @@ hSelectFolder=uicontrol('Style', 'pushbutton', 'String', 'Select Image Folder', 
                     'Tooltipstring', 'Press help for details on the folderstructure', 'Callback', @userSelectFolder);
 hHelp=uicontrol('Style', 'pushbutton', 'String', 'Help', 'Position', [305, 340, 50, 25], 'Callback', @showHelp); 
 
-hTable=uitable('Data', {'',0},'Position', [25 50 200 280], 'ColumnEditable', true, ...
-        'ColumnName', {'Magnification', 'Scale [nm/px]'}, 'CellSelectionCallback',@selectCell);
-hAdd=uicontrol('Style', 'pushbutton', 'String', '+', 'Position', [230, 260, 25, 25], 'Callback', @addRow, 'Tooltipstring', 'Add row');
-hRemove=uicontrol('Style', 'pushbutton', 'String', '-', 'Position', [230, 230, 25, 25], 'Callback', @remRow, 'Tooltipstring', 'Remove selected row');
-hSaveAs=uicontrol('Style', 'pushbutton', 'String', 'Save Magnifications', 'Position', [25, 20, 100, 25], ...
-            'Callback', @(~,~)selectMagFile('write'), 'Tooltipstring', 'Remove selected row');
-hSaveAsDefault=uicontrol('Style', 'pushbutton', 'String', 'Save as Default', 'Position', [135, 20, 100, 25], ...
-            'Callback', @(~,~)writeMags(NaN), 'Tooltipstring', 'Remove selected row');
-hLoadMags=uicontrol('Style', 'pushbutton', 'String', 'Load Magnifications', 'Position', [230 308 110 25], ...
-            'Callback', @(~,~)selectMagFile('read'), 'Tooltipstring', 'Load Magnifications from file');
-hDeliminatorT=uicontrol('Style', 'Text', 'String', 'Deliminator', 'Position', [275, 258, 55, 25], 'HorizontalAlignment','left');
-hDeliminatorE=uicontrol('Style', 'Edit', 'String', deliminator, 'Position', [333, 263, 25, 20]);
 
-hSkippedImagesText=uicontrol('Style', 'Text', 'String', 'When no magnification is found in filename', 'Position', [225 167 97 50]);
-hr1=uicontrol('Style', 'radiobutton', 'String', 'Skip Image', 'Position', [322 195 100 20], 'Value', 1);
-hr2=uicontrol('Style', 'radiobutton', 'String', 'Use Value', 'Position', [322 175 100 20], 'Callback', @(h,~)selectMagDefault(h,hr1));
-set(hr1,'Callback', @(h,~)selectMagDefault(h,hr2));
-hDefaultMag=uicontrol('Style', 'Edit', 'Position', [344 155 30 20], 'Visible', 'off');
+uicontrol('Style', 'Text', 'String', 'Projectname', 'Position', [20 285 80 25]);
+hName=uicontrol('Style','Edit', 'String', 'Config', 'Position', [100 290 100 25]);
 
 
-uicontrol('Style', 'Text', 'String', 'Projectname', 'Position', [230 90 80 25]);
-hName=uicontrol('Style','Edit', 'String', 'Config', 'Position', [310 90 80 25]);
+hrTif=uicontrol('Style', 'radiobutton', 'String', 'Import .tif images', 'Position', [20 250 200 20], 'Value', 1);
+hrSer=uicontrol('Style', 'radiobutton', 'String', 'Import serialEM files with multiple angles', 'Position', [20 230 250 20], 'Callback', @(h,~)radioButtons(h,hrTif));
 
-hMake=uicontrol('Style', 'pushbutton', 'String', 'Create Project', 'Position', [228 50 100 25], 'Callback', @(~,~)makeConfig(true));
-hCancel=uicontrol('Style', 'pushbutton', 'String', 'Cancel', 'Position', [333 50 80 25], 'Callback', @cancel);
+set(hrTif,'Callback', @(h,~)radioButtons(h,hrSer));
+
+
+hMagnifications=uicontrol('Style', 'pushbutton', 'String', 'Choose Magnifications', 'Position', [30 150 150 25], 'Callback', @setMagnifications);
+
+
+hMake=uicontrol('Style', 'pushbutton', 'String', 'Create Project', 'Position', [80 50 100 25], 'Callback', @(~,~)makeConfig(true));
+hCancel=uicontrol('Style', 'pushbutton', 'String', 'Cancel', 'Position', [220 50 80 25], 'Callback', @cancel);
 
 mags=readMags(defaultMagFile);
 waitfor(ConfigMenu);
+
+function radioButtons(hObj,hOther)
+    if get(hObj,'Value')
+        set(hOther,'Value',0);
+    else
+        set(hOther,'Value',1);
+    end
+    if hObj == hrSer
+        set(hMagnifications, 'Visible', 'off');
+    else
+        set(hMagnifications, 'Visible', 'on');
+    end
+end
+
 function makeConfig(fromButton)
     fileName=hName.String;
     
-    deliminator=get(hDeliminatorE,'String');
+    
     %% Some Checks should be here
     
     if strcmp(folder(end), ' ')
@@ -88,21 +92,30 @@ function makeConfig(fromButton)
     end
     %Config File will be created by a python function
     %So we need to convert Mags to a python dictionary
-    
-    pyMags=py.dict();
-    for i=1:size(mags,1)
-       pyMags.update(pyargs(mags{i,1},mags{i,2})); 
-    end
-    if get(hr1,'Value')
-        arguments=pyargs('separator',deliminator);
+    if hrTif.Value
+        pyMags=py.dict();
+        for i=1:size(mags,1)
+           pyMags.update(pyargs(mags{i,1},mags{i,2})); 
+        end
+        if defaultMag==-1
+            arguments=pyargs('separator',deliminator);
+        else
+            arguments=pyargs('separator',deliminator, 'defaultMag',num2str(defaultMag));
+        end
+        py.makeProjectFile.run(folder,pyMags,[fileName '.dat'],arguments);
     else
-        arguments=pyargs('separator',deliminator, 'defaultMag',get(hDefaultMag,'String'));
+        arguments=pyargs('outputName',[fileName '.dat'], 'serialEM', 1);
+        py.makeProjectFile.run(folder,arguments);
     end
-    py.makeProjectFile.run(folder,pyMags,[fileName '.dat'],arguments);
     path=fullfile(folder, [fileName '.dat']);
     if fromButton
         if ~isfile(path)
             path='';
+            if hrSer.Value
+                %Maybe we can later add an autofix for this as well.
+                msgbox(sprintf("No images found. Please check that you've put the correct folder"));
+                return;
+            end
             answer=questdlg(sprintf('No Images found.\nMaybe you need to go one folderlevel deeper or less deep?\nI can attempt to fix this automatically. Should I?'), ...
                         'No Images found', 'yes','no','no');
             if strcmp(answer,'no')
@@ -144,7 +157,6 @@ function makeConfig(fromButton)
                 return;
             end
         end
-        
         msg=msgbox(sprintf('Image import successful\nProject saved as %s',path));
         waitfor(msg);
         delete(ConfigMenu);
@@ -158,58 +170,6 @@ function cancel(~,~)
     path='';
     delete(ConfigMenu);
 end
-function selectMagDefault(hObj,hOther)
-    if get(hObj,'Value')
-        set(hOther,'Value',0);
-    else
-        set(hOther,'Value',1);
-    end
-    if hObj==hr1
-        set(hDefaultMag,'Visible', 'off');
-    else
-        set(hDefaultMag,'Visible', 'on');
-    end
-end
-function addRow(~,~)
-    mags = get(hTable,'Data');
-    s=size(mags,1);
-    mags{s+1,1}='';
-    mags{s+1,2}=0;
-    set(hTable,'Data',mags)
-end
-function remRow(~,~)
-    if ~isnan(selectedCell)
-        mags = get(hTable,'Data');
-        mags(selectedCell,:)=[];
-        set(hTable,'Data',mags)
-    end
-end
-function selectCell(~,evt)
-    selectedCell=unique(evt.Indices(:,1));
-end
-function selectMagFile(instruction)
-    if strcmp(instruction,'write')
-        filename=uiputfile('Magnification.txt');
-    elseif strcmp(instruction, 'read')
-        filename=uigetfile('*.txt');
-    end
-    if filename
-        if strcmp(instruction,'write')
-            writeMags(filename);
-        elseif strcmp(instruction, 'read')
-            mags=readMags(filename);
-        end
-    end
-end
-function writeMags(filename)
-    mags=get(hTable,'Data');
-    if isnan(filename)
-        filename=defaultMagFile; %Replace Default
-    end
-    Magnification=mags(:,1);
-    Scale=mags(:,2);
-    writetable(table(Magnification,Scale),filename,'Delimiter','\t');
-end
 
 function mags=readMags(filename)
     magInfo=tdfread(filename);
@@ -218,7 +178,6 @@ function mags=readMags(filename)
        mags{i,1}=strtrim(num2str(magInfo.Magnification(i,:)));
        mags{i,2}=magInfo.Scale(i);
     end
-    set(hTable,'Data',mags)
 end
 function showHelp(~,~)
     x=repmat({'',''},1,9);
@@ -237,4 +196,8 @@ function showHelp(~,~)
         x{:}), 'Help');
         
 end
+function setMagnifications(~,~)
+    [mags,deliminator,defaultMag]=MenuMagnifications(mags,deliminator,defaultMag);
+end
+
 end
