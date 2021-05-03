@@ -1,4 +1,4 @@
-function [routes,scales,groups,imNames] = readConfig(filepath,fileextension,choice,invertChoice)
+function [routes,scales,groups,imNames,selectedAngles] = readConfig(filepath,fileextension,choice,invertChoice)
 %% Reads the .dat Configuration File
 % fileextension: fileextension of the result files, this parameter
 % is only needed when imNames (i.e. List of Images marked with asterisk if 
@@ -17,6 +17,7 @@ if nargin<4; invertChoice=false; end
 selectPath=[filepath(1:end-4) '_selected.dat'];
 path=fileparts(filepath);
 infoData = tdfread(filepath,',');
+isSerEM = isfield(infoData, 'ANGLES');
 
 if ~any(isnan(choice)) && isfile(selectPath)
     selection=tdfread(selectPath);
@@ -42,6 +43,11 @@ routes = cell(numImages,1);
 imNames = cell(numImages,1);
 scales = zeros(numImages,1);
 groups = cell(numImages,1);
+if isSerEM
+    selectedAngles=zeros(numImages,1);
+else
+    selectedAngles=NaN;
+end
 
 % Processes each image.
 for imgIndex=1:numImages
@@ -58,12 +64,15 @@ for imgIndex=1:numImages
             imNames{imgIndex}=routes{imgIndex};
         end
     end
-    if length(fieldnames(infoData))==4
+    if isfield(infoData, 'CALIBRATION')
         calibration = infoData.CALIBRATION(imgIndex);
         magnification = infoData.MAGNIFICATION(imgIndex);
         scales(imgIndex) = calibration * 10/magnification;
     else
-        scales(imgIndex)=infoData.PIXELSIZE(imgIndex);
+        scales(imgIndex) = infoData.PIXELSIZE(imgIndex);
+    end
+    if isSerEM
+        selectedAngles(imgIndex) = infoData.SELECTED(imgIndex);
     end
 end
 

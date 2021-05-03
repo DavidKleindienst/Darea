@@ -76,16 +76,59 @@ def getImages(folder,subfolder,mags,output,onlyMod=False,separator='_',defaultMa
                     
     return output
 
-def run(folder,mags=1,outputName='Config.dat',**kwargs):
+def getSerialEMImages(folder,subfolder,output,ext='.st'):
+    files=os.listdir(os.path.join(folder,subfolder))
+    files=sorted([f for f in files if f.endswith(ext) and not f.startswith('.')], key=lambda x:x.lower())
+    for fn in files:
+        pixelsize,angles=readMdoc(os.path.join(folder,subfolder,fn+'.mdoc'))
+        output.append(subfolder +',\t' + subfolder+'/'+fn+',\t' + str(pixelsize)+',\t' + ':'.join([str(a) for a in angles]) + ',\t'+ '0')
+    
+    return output
+
+def _convertLineToNum(line):
+    #Helper function for readMdoc
+    #Extracts the part after the =
+    #And converts to float
+    return float(line.split('=')[1].strip())
+    
+
+def readMdoc(file):
+    angles=[]
+    pixelspacing=[]
+    with open(file) as f:
+        line=f.readline()
+        
+        while(line):
+            if line.startswith('PixelSpacing'):
+                pixelspacing.append(_convertLineToNum(line))
+            elif line.startswith('TiltAngle'):
+                angles.append(_convertLineToNum(line))
+            line=f.readline()
+            
+    if len(set(pixelspacing))>1:
+        raise ValueError('Image {} cannot be read as in contains multiple different pixelsizes'.format(file)) 
+        
+    pixelsize=pixelspacing[0]*0.1 #Pixelspacing is in Angstrom -> convert to nm
+    
+    return pixelsize,angles
+
+def run(folder,mags=1,outputName='Config.dat',serialEM=False,**kwargs):
     subdirs = next(os.walk(folder))[1]
-    output=['GROUP,\tROUTE,\tPIXELSIZE']
+    if serialEM:
+        output=['GROUP,\tROUTE,\tPIXELSIZE,\tANGLES,\tSELECTED']
+    else:
+        output=['GROUP,\tROUTE,\tPIXELSIZE']
     for d in subdirs:
         if d[0]!='.':
-            output=getImages(folder,d,mags,output,**kwargs)
+            if serialEM:
+                output=getSerialEMImages(folder,d,output,**kwargs)
+            else:
+                output=getImages(folder,d,mags,output,**kwargs)
     if len(output)>1:
         output='\n'.join(output)
         with open(os.path.join(folder,outputName), 'w') as f:
             f.write(output)
+            
 
 def removeImage(configFile,index):
     '''Removes image with index from Darea project'''
@@ -124,6 +167,11 @@ def copyTestImages(all_configs,sourcefolder,destinationfolder,modsuffix=''):
 def changeScale(configFile,index,newValue):
     images=file_utils.file2dict(configFile,',\t')
     images['PIXELSIZE'][index]=str(newValue)
+    file_utils.dict2file(configFile,images,',\t')
+    
+def changeSelectedAngle(configFile,index,newValue):
+    images=file_utils.file2dict(configFile,',\t')
+    images['SELECTED'][index]=str(newValue)
     file_utils.dict2file(configFile,images,',\t')
 
 def addImages(configFile,imagepaths,actualConfig=False):
