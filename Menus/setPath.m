@@ -26,6 +26,7 @@ addpath('./3rdParty/p_poly_dist');
 addpath('./3rdParty/reverse_eval');
 addpath('./3rdParty/export_fig');
 addpath('./3rdParty/Douglas Peucker');
+addpath('./3rdParty/EMIODist2');
 addpath('./deepLearning/');
 addpath('./deepLearning/utils/');
 
