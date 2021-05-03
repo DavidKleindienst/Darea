@@ -27,9 +27,14 @@
 
 function [settings, Data, position,selAngle]=visualize(pathImage, imageName, scale, selAngle, imgId, autocontrast, settings, datFile, Data, position)
     
-    fullImageName=[fullfile(pathImage,imageName) '.tif'];
+    isSerEM=any(~isnan(selAngle));
+    if isSerEM
+        fullImageName=fullfile(pathImage,imageName);
+    else
+        fullImageName=[fullfile(pathImage,imageName) '.tif'];
+    end
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
-    image = readAndConvertImage(fullImageName);
+    image = readAndConvertImage(fullImageName,selAngle);
     if autocontrast
         image=imadjust(image);
     end
