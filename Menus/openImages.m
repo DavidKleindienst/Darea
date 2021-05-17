@@ -188,7 +188,7 @@ waitfor(mainFigure);
         end
         [defaults, data, Position,newAngle]=downstreamFunction(path, route, scale, selAngle, imgIndex, hAutoContrast.Value, defaults, datFile, data, Position);
         openedFigure = false;
-        if newAngle && ~isnan(selAngle) && newAngle ~= selAngle
+        if  ~isnan(selAngle) & newAngle & newAngle ~= selAngle
             %Selected angle was changed,
             %save to config file
             py.makeProjectFile.changeSelectedAngle(datFile,py.int(imgIndex-1),py.int(newAngle));

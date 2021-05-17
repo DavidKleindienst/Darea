@@ -2,6 +2,7 @@ function image = readAndConvertImage(filename,imNr)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
+
 if ~isfile(filename)
     % Duplicated image doesn't need to be stored, so remove _dupls and find original filename
     [a,n,e]=fileparts(filename);
@@ -15,6 +16,13 @@ end
 if endsWith(filename,'.tif')
     image=imread(filename);
 else
+    if imNr == 0
+        %No image has been selected, use the first one
+        %This should not happen, functions calling this function should ideally already
+        %correct for it, so issue warning
+        warning('No angle has been selected for image %s, using first image', filename);
+        imNr=1;
+    end
     image=ReadMRC(filename,imNr,1);
     image=flip(image');
 end
