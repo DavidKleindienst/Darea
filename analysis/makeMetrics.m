@@ -82,6 +82,10 @@ for g=0:nrGrp   %Go through all Groups (g=0 means pool all groups)
             %Also for simulations
             for s=1:numel(Data.simnames)
                 for a=1:numel(Data.methodA)
+                    if isnan(Data.methodB{b}{2}) && Data.methodB{b}{1} ~= Data.methodA{a}
+                        % Don't make it if none of the output values were changed by the simulation
+                        continue
+                    end
                     fileName=fullfile(indivDir, [Data.simnames{s} '_' getName(Data,Data.methodA{a}) '-' grpname '-' getName(Data,Data.methodB{b}) '.csv']);
                     SimDist=Data.([Data.simnames{s} '_cond']){a}.Distance;
                     indivDistances(Data,SimDist,fileName,dist_names,indeces,b);
