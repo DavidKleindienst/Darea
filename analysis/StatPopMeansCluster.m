@@ -47,6 +47,9 @@ header=['Original;Simulation;realmean;realstd;realsem;simmean;simstd;simsem;pVal
 Grplabels=[settings.allGroupsname; Groups.names];
 fields=fieldnames(Orig.ClusterInteraction{1});
 for f=3:numel(fields)       %For all fields containing Data
+    if strcmp(fields{f}, 'thresholdDist') || strcmp(fields{f}, 'excludedClusters')
+        continue
+    end
     filename=fullfile(outpath, [fields{f} '_PopMeans.csv']);
     file=fopen(filename, 'wt');
     fprintf(file, header);
