@@ -50,6 +50,9 @@ fields=settings.ClusterNames(:,1);
 %Collect the Data in 
 
 for f=1:numel(fields)       %For all cluster parameters
+    if strcmp(fields{f}, 'thresholdDist') || strcmp(fields{f}, 'excludedClusters')
+        continue
+    end
     Imwise=cell(nrImg,1);
     for img=1:nrImg         %For all images
         if numel(Orig.ClusterInteraction{img}.(fields{f}))==numel(methodA)      %Cluster parameters that only relate to a single particle size (most of them)
