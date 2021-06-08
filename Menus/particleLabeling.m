@@ -216,13 +216,23 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     updated = true;
     rotated=0;
 
-    %% Sets the zoom 
+    %Move field of view to demarcation if possible
+    [~, n]=bwlabel(maskSection);
+    if n == 1
+        % If there is only one component, center zoom on that one
+        props=regionprops(maskSection);
+        componentCenter=props.Centroid.*scale;
+        positionZoomNm(1) = componentCenter(1,1)-defaults.zoomImageSizeNm/2;
+        positionZoomNm(2) = componentCenter(1,2)-defaults.zoomImageSizeNm/2;
+    end
     setZoom();
+    
     set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
     if ~isnan(positionFigure)
         %Put figure to the position the user had with the image before
         set(mainFigure, 'Position', positionFigure);
     end
+    
     % Waits for the main figure to return results.
     waitfor(mainFigure);  
     
