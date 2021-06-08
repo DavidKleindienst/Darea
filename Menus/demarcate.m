@@ -35,8 +35,13 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     if isfile(modImageName)
         modImage=readAndConvertImage(modImageName);
     end
-    filteredImages = applyFilters(image,scale,defaults,{},modImage);
-    currentImage=1;
+    [filteredImages, compCenter] = loadSavedImage(image,modImage);
+    if ~isnan(compCenter)
+        currentImage=2;
+        compCenter=compCenter.*scale;
+    else
+        currentImage=1;
+    end
     %% Image measures 
     % Main image
     
@@ -70,11 +75,6 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     updateFilterDropdown();
     
     hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', [gridXPx(1)+240 132 180 25]);
-
-    if defaults.showFilters    
-        uicontrol('Style','text', 'String','Gradient Strength','FontWeight','bold',  'Position', [gridXPx(1)+5 105 80 25])
-        hGstrength=uicontrol('Style', 'edit', 'String', num2str(defaults.gw_cutoff), 'Position', [gridXPx(1)+85 105 35 25], 'Callback', @changeParameters);
-    end
     
     hMeasure=uicontrol('Style','togglebutton','String','Measure Distance', 'Position', [gridXPx(1)+5 80 100 25],'Callback',@buttonActivation);
     
@@ -155,6 +155,11 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         set(mainFigure, 'Position', position);
     end
     %% Waits for the main figure to return results.
+    if ~isnan(compCenter)
+        positionZoomNm(1) = compCenter(1,1)-defaults.zoomImageSizeNm/2;
+        positionZoomNm(2) = compCenter(1,2)-defaults.zoomImageSizeNm/2; 
+        setZoom();
+    end
     waitfor(mainFigure);  
     
     function makeNewComp(~,~)
@@ -171,9 +176,47 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         filteredImages{idx}.image(compIm==0)=image(compIm==0)*defaults.BackgroundBrightness;
         updateFilterDropdown();
         set(hFilterDropdown,'Value', idx)
-        selectFilter(0,0);
+        selectFilter();
     end
-    
+    function [filteredImages, componentCenter] = loadSavedImage(image,modImage)
+        %componentCenter shows the center of the demarcated component
+        %or is NaN if no component or more than one component have been saved
+
+        filteredImages={};
+
+        filteredImages{1}.image=image;
+        filteredImages{1}.name='Original Image';
+        filteredImages{1}.fct='polygon';
+        %image=rgb2gray(image);
+        if ~isnan(modImage)
+            modComponents=zeros(size(modImage));
+            modComponents(modImage==65535)=1;
+            modComponents = bwareaopen(modComponents,20);
+            modComponents = imopen(modComponents, strel('diamond',2));
+            modComponents = abs(modComponents-1); %Invert binary image
+        %     modComponents=imbinarize(modImage,0.97); 
+        %     modComponents=abs(bwareaopen(modComponents,100)-1); %Abs -1 because of dark foreground
+            demarc=image;
+            demarc(modComponents==0)=image(modComponents==0)*defaults.BackgroundBrightness;
+
+            filteredImages{2}.image=demarc;
+            filteredImages{2}.name='saved Component';
+            filteredImages{2}.fct='select';
+            filteredImages{2}.compImage=modComponents;
+            
+            [~, n]=bwlabel(modComponents);
+            if n ~= 1
+                %More than 1 selection, set to NaN
+                componentCenter=NaN;
+            else
+                %Get component center
+                props=regionprops(modComponents);
+                componentCenter=props.Centroid;
+            end
+        else
+            componentCenter=NaN;
+        end
+    end
     function closeStructure(~,~)
         close_radius=round(defaults.closeRadius/scale);
         filteredImages{currentImage}.compImage=imclose(filteredImages{currentImage}.compImage,strel('disk',close_radius));
@@ -292,12 +335,6 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         end
     end
     
-    function changeParameters(~,~)
-        defaults.gw_cutoff=str2double(get(hGstrength,'String'));
-        filteredImages = applyFilters(image,scale,defaults, filteredImages);
-        selectedComponent=NaN; componentOverlay=[]; componentZoomOverlay=[];
-        redrawImage();
-    end
 
     function redrawImage()
         if get(hChangeOriginal,'Value')
