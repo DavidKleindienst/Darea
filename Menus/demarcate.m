@@ -63,9 +63,10 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
 
     %% Create buttons
     
-    uicontrol('Style','text','String', 'Select Filter', 'FontWeight', 'bold', 'Position', [gridXPx(1)+5 125 80 25]);
+    filterTT=sprintf('Select displayed component\nYou can also use up and down arrow keys');
+    uicontrol('Style','text','String', 'Select Component', 'FontWeight', 'bold', 'Position', [gridXPx(1)+5 125 80 25],'Tooltipstring', filterTT);
     
-    hFilterDropdown=uicontrol('Style', 'popup', 'Callback', @selectFilter, 'Position', [gridXPx(1)+90 118 140 35], 'Tooltipstring', sprintf('Filter selection'));
+    hFilterDropdown=uicontrol('Style', 'popup', 'Callback', @selectFilter, 'Position', [gridXPx(1)+90 118 140 35], 'Tooltipstring', filterTT);
     updateFilterDropdown();
     
     hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', [gridXPx(1)+240 132 180 25]);
@@ -107,7 +108,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     
     if ~isnan(selAngle)
         angleString = compose('%g',angles); %Convert to cell array of strings
-        angleTT = sprintf('Select the stage angle at which the Image was taken');
+        angleTT = sprintf('Select the stage angle at which the Image was taken\nYou can also use left and right arrow keys.');
         uicontrol('Style', 'text', 'String','Angle', 'Tooltipstring', angleTT, 'Position', [gridXPx(2)+140 30 60 15]);
         hSelectAngle = uicontrol('Style', 'popup', 'Callback', @changeAngle, 'Tooltipstring', angleTT, ...
             'String', angleString, 'Position', [gridXPx(2)+200 20 80 25], 'Value', angle);
@@ -245,12 +246,18 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         
     
     function selectFilter(~,~)
-        currentImage=get(hFilterDropdown,'Value');
+        if currentImage==hFilterDropdown.Value
+            return;
+        end
+        currentImage=hFilterDropdown.Value;
         redrawImage();
         changeUI();
     end
 
     function changeAngle(~,~)
+        if angle == hSelectAngle.Value
+            return
+        end
         angle=hSelectAngle.Value;
         image = readAndConvertImage(fullimageName,angle);
         if autocontrast
@@ -609,6 +616,22 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                     hTrim.Value=abs(hTrim.Value-1);
                     buttonActivation(hTrim,0)
                 end
+            case 'rightarrow'   %change angle
+                if ~isnan(selAngle) %Only if image has angles
+                    hSelectAngle.Value = min(hSelectAngle.Value + 1, numel(hSelectAngle.String));
+                    changeAngle(0,0);
+                end
+            case 'leftarrow'    %change angle
+                if ~isnan(selAngle) %Only if image has angles
+                    hSelectAngle.Value = max(hSelectAngle.Value - 1, 1);
+                    changeAngle(0,0);
+                end
+            case 'downarrow'
+                hFilterDropdown.Value = min(hFilterDropdown.Value + 1, numel(hFilterDropdown.String));
+                selectFilter();
+            case 'uparrow'
+                hFilterDropdown.Value = max(hFilterDropdown.Value - 1, 1);
+                selectFilter();
         end
     end
 
