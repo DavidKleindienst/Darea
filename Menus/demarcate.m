@@ -154,12 +154,17 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         %Put figure to the position the user had with the image before
         set(mainFigure, 'Position', position);
     end
-    %% Waits for the main figure to return results.
+    
     if ~isnan(compCenter)
         positionZoomNm(1) = compCenter(1,1)-defaults.zoomImageSizeNm/2;
         positionZoomNm(2) = compCenter(1,2)-defaults.zoomImageSizeNm/2; 
         setZoom();
     end
+    if currentImage~=1
+        hFilterDropdown.Value=currentImage;
+    end
+        
+    %% Waits for the main figure to return results.
     waitfor(mainFigure);  
     
     function makeNewComp(~,~)
@@ -453,6 +458,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
             drawPolygon();
             delete(handdraw);
             handdraw=NaN;
+            updated=false;
         end   
     end
 
