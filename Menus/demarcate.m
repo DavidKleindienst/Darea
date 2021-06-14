@@ -177,6 +177,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         updateFilterDropdown();
         set(hFilterDropdown,'Value', idx)
         selectFilter();
+        updated=false;
     end
     function [filteredImages, componentCenter] = loadSavedImage(image,modImage)
         %componentCenter shows the center of the demarcated component
