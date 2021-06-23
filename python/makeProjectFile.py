@@ -59,8 +59,13 @@ def getImages(folder,subfolder,mags,output,onlyMod=False,separator='_',defaultMa
                 if not found and defaultMag is not False and type(defaultMag) in [int, float, str]:
                     output.append(subfolder +',\t' + subfolder+'/'+fn+',\t' + str(defaultMag))
         else:
-            if fn.endswith('.tif') and not fn.endswith('_mod.tif'):
-                fn=rchop(fn,'.tif')
+            if fn.endswith('.tif'):
+                if fn.endswith('_dupl_mod.tif'):
+                    fn=rchop(fn,'_mod.tif')
+                elif fn.endswith('_mod.tif'):
+                    continue
+                else:
+                    fn=rchop(fn,'.tif')
                 if type(mags) in [int, float, str]:
                     output.append(subfolder +',\t' + subfolder+'/'+fn+',\t' + str(mags))
                 elif type(mags)==dict:
