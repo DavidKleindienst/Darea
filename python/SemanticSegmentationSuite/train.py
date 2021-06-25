@@ -48,7 +48,7 @@ def data_augmentation(input_image, output_image,args):
         input_image = cv2.warpAffine(input_image, M, (input_image.shape[1], input_image.shape[0]), flags=cv2.INTER_NEAREST)
         output_image = cv2.warpAffine(output_image, M, (output_image.shape[1], output_image.shape[0]), flags=cv2.INTER_NEAREST)
     if args.rotation_perpendicular:
-        angle=round(math.floor.uniform(0,4))   #Random value between 0 and 3
+        angle=math.floor(random.uniform(0,4))   #Random value between 0 and 3
         for i in range(angle):
             input_image=np.rot90(input_image)
             output_image=np.rot90(output_image)
@@ -140,7 +140,7 @@ def main(args=None):
             if os.path.isfile(model_checkpoint_name+'.index'):
                 print('Loading latest model checkpoint...')
                 saver.restore(sess, model_checkpoint_name)
-                print('successfully loaded.')
+                print('successfully loaded {}'.format(model_checkpoint_name))
             else:
                 print('Specified checkpoint not found. Starting fresh one')
         if args.save_path:
@@ -156,7 +156,7 @@ def main(args=None):
             if os.path.isfile(model_checkpoint_name+'.index'):
                 print('Loading latest model checkpoint...')
                 saver.restore(sess, model_checkpoint_name)
-                print('successfully loaded.')
+                print('successfully loaded {}'.format(model_checkpoint_name))
             else:
                 print('{} not found. Starting a fresh training'.format(args.continue_from))
         model_checkpoint_name = os.path.join(args.save_path,"latest_model_" + args.chkpt_prefix + args.model + "_" + args.dataset + ".ckpt")
@@ -179,12 +179,14 @@ def main(args=None):
     print("Batch Size -->", args.batch_size)
     print("Num Classes -->", num_classes)
     print("Learn Rate -->", args.learn_rate)
+    print("Validation Step -->", args.validation_step)
     
     print("Data Augmentation:")
     print("\tVertical Flip -->", args.v_flip)
     print("\tHorizontal Flip -->", args.h_flip)
     print("\tBrightness Alteration -->", args.brightness)
     print("\tRotation -->", args.rotation)
+    print("\tPerpendicular Rotation -->", args.rotation_perpendicular)
     print("", flush=True)
     
     avg_loss_per_epoch = []
