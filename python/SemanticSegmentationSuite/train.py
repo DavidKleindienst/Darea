@@ -45,6 +45,12 @@ def data_augmentation(input_image, output_image,args):
         M = cv2.getRotationMatrix2D((input_image.shape[1]//2, input_image.shape[0]//2), angle, 1.0)
         input_image = cv2.warpAffine(input_image, M, (input_image.shape[1], input_image.shape[0]), flags=cv2.INTER_NEAREST)
         output_image = cv2.warpAffine(output_image, M, (output_image.shape[1], output_image.shape[0]), flags=cv2.INTER_NEAREST)
+    if args.rotation_perpendicular:
+        angle=round(math.floor.uniform(0,4))   #Random value between 0 and 3
+        for i in range(angle):
+            input_image=np.rot90(input_image)
+            output_image=np.rot90(output_image)
+        
 
     return input_image, output_image
 
@@ -69,6 +75,7 @@ def main(args=None):
     parser.add_argument('--v_flip', type=utils.str2bool, default=False, help='Whether to randomly flip the image vertically for data augmentation')
     parser.add_argument('--brightness', type=float, default=None, help='Whether to randomly change the image brightness for data augmentation. Specifies the max bightness change as a factor between 0.0 and 1.0. For example, 0.1 represents a max brightness change of 10%% (+-).')
     parser.add_argument('--rotation', type=float, default=None, help='DOES NOT WORK! Whether to randomly rotate the image for data augmentation. Specifies the max rotation angle in degrees.')
+    parser.add_argument('--rotation_perpendicular', type=utils.str2bool, default=False, help='Randomly rotates by 0, 90, 180 or 270 degrees')
     parser.add_argument('--model', type=str, default="FC-DenseNet103", help='The model you are using. See model_builder.py for supported models')
     parser.add_argument('--frontend', type=str, default="ResNet101", help='The frontend you are using. See frontend_builder.py for supported models')
     parser.add_argument('--save_best', type=utils.str2bool, default=False, help='Saves model with smallest loss rather than last model')
