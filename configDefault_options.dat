@@ -78,6 +78,7 @@ closeRadius	7.5	#Radius (in Nm) for close Structure
 gw_cutoff	0.25
 gw_sigma	2
 showFilters	false
+changeLeftImage	false
 
 #DeepLearning
 imageSize	[512,512] 	#Size to which images are converted before training/prediction

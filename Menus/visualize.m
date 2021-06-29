@@ -93,7 +93,7 @@ function [settings, Data, position,selAngle]=visualize(pathImage, imageName, sca
     %% GUI
     imR=imref2d(size(image),scale,scale);
     title='Darea - Visualize';
-    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, settings, @createZoom,@moveZoomToPos);
+    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, settings, @createZoom,@moveZoomToPos, 'off');
     
     set(mainFigure, 'CloseRequestFcn', @closeCallBack); % Manages figure closing.
     set(mainFigure, 'windowbuttonupfcn',@imageMouseReleased);
@@ -176,6 +176,7 @@ function [settings, Data, position,selAngle]=visualize(pathImage, imageName, sca
         %Put figure to the position the user had with the image before
         set(mainFigure, 'Position', position);
     end
+    set(mainFigure, 'Visible', 'on');
     % Waits for the figure to close to end the function.
     waitfor(mainFigure);
 
@@ -529,7 +530,7 @@ function [settings, Data, position,selAngle]=visualize(pathImage, imageName, sca
         else
             maskedImageZoom = imcrop(maskedImage,positionZoomPx);
         end
-        axes(axesZoom);
+        set(mainFigure,'CurrentAxes',axesZoom);
         handleZoom = imshow(maskedImageZoom,zoomR);
         set(handleZoom,'ButtonDownFcn',@zoomClickCallback);
 

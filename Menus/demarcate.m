@@ -2,7 +2,7 @@
 function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, scale, selAngle, ~, autocontrast, defaults, ~, useless, position)
 %% Menu for manual demarcation of the region of interest
 
-    
+    %Automatically taken images with serialEM can be from multiple angles
     if ~isnan(selAngle)
         [~,angles]=readMdoc([fullfile(pathImage,imageName) '.mdoc']);
         fullimageName=fullfile(pathImage,imageName);
@@ -57,7 +57,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
 
     %% Gui measures and points
     title='Darea - Area demarcation';
-    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos);
+    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos,'off');
     hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate', 'Callback', @rotateImg, 'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], ...
                     'Tooltipstring', 'Rotate image 90° clockwise');
        
@@ -74,7 +74,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     hFilterDropdown=uicontrol('Style', 'popup', 'Callback', @selectFilter, 'Position', [gridXPx(1)+90 118 140 35], 'Tooltipstring', filterTT);
     updateFilterDropdown();
     
-    hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', [gridXPx(1)+240 132 180 25]);
+    hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', [gridXPx(1)+240 132 180 25], 'Value', defaults.changeLeftImage, 'Callback', @changeLeftValue);
     
     hMeasure=uicontrol('Style','togglebutton','String','Measure Distance', 'Position', [gridXPx(1)+5 80 100 25],'Callback',@buttonActivation);
     
@@ -165,6 +165,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
         
     %% Waits for the main figure to return results.
+    set(mainFigure, 'Visible', 'on');
     waitfor(mainFigure);  
     
     function makeNewComp(~,~)
@@ -608,7 +609,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         [zoomRectangleDashed, imageZoom, zoomR, positionZoomPx, positionZoomNm]=getNewZoomPosition(positionZoomNm,zoomRectangleMov,imR,defaults.zoomImageSizeNm,axesImage,filteredImages{currentImage}.image,scale);
         hPosX.String=num2str(positionZoomNm(1));
         hPosY.String=num2str(positionZoomNm(2));
-        axes(axesZoom);
+        set(mainFigure,'CurrentAxes',axesZoom);
         handleZoom = imshow(imageZoom,zoomR);
         set(handleZoom,'ButtonDownFcn',@zoomClickCallback);
         drawPolygon();
@@ -622,10 +623,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                 componentZoomOverlay(1)=imshow(redImg, zoomR, 'parent',axesZoom);
                 set(componentZoomOverlay(1),'AlphaData',vis,'ButtonDownFcn',@zoomClickCallback);
                 hold(axesZoom, 'off');
-        end
-        
-        
-        
+        end        
     end
     
     function keyRelease(~,key)
@@ -751,7 +749,10 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         filteredImages=changeBackgroundBrightness(image,filteredImages,defaults);
         redrawImage();
     end
-
+    function changeLeftValue(hOb,~)
+        defaults.changeLeftImage=hOb.Value;
+    end
+        
     %% Closes the figure.
     function closeCallBack ( ~ , ~)
         position=get(mainFigure,'Position');

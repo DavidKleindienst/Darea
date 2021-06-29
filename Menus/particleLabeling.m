@@ -115,7 +115,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     
     %% GUI
     title='Darea - Particle Detection';
-    [mainFigure, axesImage,axesZoom,hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.7,1,0.74, defaults, @createZoom, @moveZoomToPos);
+    [mainFigure, axesImage,axesZoom,hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.7,1,0.74, defaults, @createZoom, @moveZoomToPos, 'off');
 
     hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate [r]', 'Callback', @rotateImg, 'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], ...
                     'Tooltipstring', 'Rotate image 90° clockwise');
@@ -182,7 +182,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     set(allowHotkeys, 'KeyReleaseFcn', @keyRelease);
             
     %% Loads the main image
-    maskedImage = []; %dummy, will be filled showImage
+    maskedImage = []; %dummy, will be filled by showImage
     showImage();
 
     
@@ -232,7 +232,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
         %Put figure to the position the user had with the image before
         set(mainFigure, 'Position', positionFigure);
     end
-    
+    set(mainFigure, 'Visible', 'on');
     % Waits for the main figure to return results.
     waitfor(mainFigure);  
     
@@ -550,7 +550,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
         hPosX.String=num2str(positionZoomNm(1));
         hPosY.String=num2str(positionZoomNm(2));
         maskedImageZoom = imcrop(maskedImage,positionZoomPx);
-        axes(axesZoom);
+        set(mainFigure,'CurrentAxes',axesZoom);
         handleZoom = imshow(maskedImageZoom,zoomR);
         set(handleZoom,'ButtonDownFcn',@zoomClickCallback);
 
