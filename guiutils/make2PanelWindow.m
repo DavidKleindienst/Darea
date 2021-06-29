@@ -1,4 +1,4 @@
-function [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hX,hY] = make2PanelWindow(title, image,imageName,scale,percentScreenUsed,imshrinkfactor,zoomshrinkfactor, defaults,createZoomFcn,moveZoomFcn)
+function [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hX,hY] = make2PanelWindow(title, image,imageName,scale,percentScreenUsed,imshrinkfactor,zoomshrinkfactor, defaults,createZoomFcn,moveZoomFcn,visible)
 % Creates a main Figure with 2 Panels
 % One panel for original Image, one for Zoom
 
@@ -8,8 +8,11 @@ function [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hX,
 [imageHeightPx, imageWidthPx] = size(image);
 imageHeightNm = imageHeightPx .* scale;
 imageWidthNm = imageWidthPx .* scale;
-
-mainFigure = figure('NumberTitle','off','Units', 'pixels', 'Position',[posXWindow posYWindow figureWidthPx, figureHeightPx]);
+if nargin>=11
+    mainFigure = figure('NumberTitle','off','Units', 'pixels', 'Position',[posXWindow posYWindow figureWidthPx, figureHeightPx], 'Visible',visible);
+else
+    mainFigure = figure('NumberTitle','off','Units', 'pixels', 'Position',[posXWindow posYWindow figureWidthPx, figureHeightPx]);
+end
 % Title.
 if ~isempty(imageName)
     set(mainFigure, 'Name', [title ': ' imageName]); 
