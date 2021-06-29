@@ -23,33 +23,38 @@ for i=1:numel(images)
         
         % Delete now unneccessary images
         delete(d_mod_paths{j});
-        delete(d_orig_paths{j});
+        if isfile(d_orig_paths{j})
+            delete(d_orig_paths{j});
+        end
     end
     imwrite(mod,mod_img_path{1});
     
     dot_path=getFullRoutes(images(i), datFile, 'dots.csv');
-    d_dots_paths=getFullRoutes(dupls, datFile, 'dots.csv');
-    [centers, radii, teorRadii]=readDotsFile(dot_path{1});
+    if isfile(dot_path)
+        d_dots_paths=getFullRoutes(dupls, datFile, 'dots.csv');
+        [centers, radii, teorRadii]=readDotsFile(dot_path{1});
 
-    for j=1:numel(d_dots_paths)
-        [c, r, tr, numP]=readDotsFile(d_dots_paths{j});
+        for j=1:numel(d_dots_paths)
+            [c, r, tr, numP]=readDotsFile(d_dots_paths{j});
 
-        for p=1:numP
-            if numel(radii)==0 || min(pdist2(c(p,:), centers))>1
-                %Probably not the same particle
-                centers(end+1,:)=c(p,:);
-                radii(end+1)=r(p);
-                teorRadii(end+1)=tr(p);
+            for p=1:numP
+                if numel(radii)==0 || min(pdist2(c(p,:), centers))>1
+                    %Probably not the same particle
+                    centers(end+1,:)=c(p,:);
+                    radii(end+1)=r(p);
+                    teorRadii(end+1)=tr(p);
+                end
             end
+            delete(d_dots_paths{j});
         end
-        delete(d_dots_paths{j});
+        delete(dot_path{1});
+        f=fopen(dot_path{1}, 'w');
+        for p=1:numel(radii)
+            fprintf(f, '%g, %g, %g, %g\n', centers(p,1), centers(p,2), radii(p), teorRadii(p));
+        end
+        fclose(f);
     end
-    delete(dot_path{1});
-    f=fopen(dot_path{1}, 'w');
-    for p=1:numel(radii)
-        fprintf(f, '%g, %g, %g, %g\n', centers(p,1), centers(p,2), radii(p), teorRadii(p));
-    end
-    fclose(f);
+    
 end
 
 %Remove Dupl Entries from datFile
