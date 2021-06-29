@@ -77,9 +77,11 @@ def load_image(path):
     return image
 
 # Takes an absolute file path and returns the name of the file without th extension
-def filepath_to_name(full_name):
+def filepath_to_name(full_name,remove_Mod=False):
     file_name = os.path.basename(full_name)
     file_name = os.path.splitext(file_name)[0]
+    if remove_Mod and file_name.endswith('_mod'):
+        file_name=file_name[0:-4]
     return file_name
 
 # Print with time. To console or file
@@ -361,19 +363,19 @@ def compute_class_weights(labels_dir, label_values):
 
     return class_weights
 
-def getCoordsFromPrediction(image,foregroundcolors,downscale_factor=False):
-    #_, bw=cv2.threshold(image,150,1,cv2.THRESH_BINARY)
+def getCoordsFromPrediction(image,foregroundcolors,downscale_factor=False,open_dim=4,close_dim=512,open2_dim=24):
     
     bw=np.zeros(image.shape,dtype=image.dtype)
     for c in foregroundcolors:
         bw[image==c]=1
-    open_dim=8  #Predictions smaller than this will be removed
-    close_dim=512   #Predictions closer than this will be fused
-    open2_dim=32 #Predictions smaller than this after fusing nearby ones will be removed
+
     if downscale_factor:
         #If image was downscaled, also reduce number of pixels for morph operations
         open_dim=round(open_dim*downscale_factor)
         close_dim=round(close_dim*downscale_factor)
+        #Set pixels on the border to 0 to allow for opening away from the border
+        bw[[0,1,-1,-2],:]=0
+        bw[:,[0,1,-1,-2]]=0
         open2_dim=round(open2_dim*downscale_factor)
     bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((open_dim,open_dim),np.uint8))
     bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones((close_dim,close_dim),np.uint8))
@@ -384,7 +386,7 @@ def getCoordsFromPrediction(image,foregroundcolors,downscale_factor=False):
         centroids=[[x/downscale_factor for x in c] for c in centroids]
     
     targets=[list(c) for c,s in zip(centroids,stats) if s[0]!=0 and s[1]!=0]
-    return targets
+    return targets,bw
 
 # Compute the memory usage, for debugging
 def memory():

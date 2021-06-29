@@ -54,7 +54,7 @@ def main(args=None):
     class_names_list, label_values = helpers.get_label_info(args.classes)
     
     num_classes = len(label_values)
-    assert os.path.isdir(args.image), "Argument image needs to be a folder"
+    assert os.path.isdir(args.image), "Argument image needs to be a folder, got {}".format(args.image)
 
     if args.save_coordinates:
         if args.coords_class is None:
