@@ -16,8 +16,6 @@ from builders import model_builder
 
 import matplotlib.pyplot as plt
 
-def ttest():
-    return 'yes'
 
 def data_augmentation(input_image, output_image,args):
     if args.downscale_factor and args.downscale_factor!=1:
@@ -49,9 +47,9 @@ def data_augmentation(input_image, output_image,args):
         output_image = cv2.warpAffine(output_image, M, (output_image.shape[1], output_image.shape[0]), flags=cv2.INTER_NEAREST)
     if args.rotation_perpendicular:
         angle=math.floor(random.uniform(0,4))   #Random value between 0 and 3
-        for i in range(angle):
-            input_image=np.rot90(input_image)
-            output_image=np.rot90(output_image)
+        if angle:
+            input_image=np.rot90(input_image,angle)
+            output_image=np.rot90(output_image,angle)
         
 
     return input_image, output_image
