@@ -146,7 +146,12 @@ end
  
 %% Areas (Convex Hull)
 if infoClusterImg.numClusters>=1
-	areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);
+    try
+        areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);
+    catch
+        infoImage.route
+        areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);
+    end
 	% Stores the data from each individual cluster.
 	infoClusterImg.areaCluster = zeros(infoClusterImg.numClusters,1);
     for nCluster=1:infoClusterImg.numClusters
