@@ -206,22 +206,56 @@ def lovasz_softmax(probas, labels, only_present=True, per_image=False, ignore=No
 
 
 # Randomly crop the image to a specific size. For data augmentation
-def random_crop(image, label, crop_height, crop_width):
+def random_crop(image, label, crop_height, crop_width,biased_crop,backgroundValue):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
         raise Exception('Image and label must have the same dimensions!')
-        
-    if (crop_width <= image.shape[1]) and (crop_height <= image.shape[0]):
-        x = random.randint(0, image.shape[1]-crop_width)
-        y = random.randint(0, image.shape[0]-crop_height)
     
-        if len(label.shape) == 3:
-            cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
-        else:
-            cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width]
-        return cropped_im
-            
-    else:
+    if crop_width == image.shape[1] and crop_height == image.shape[0]:
+        #Nothing to crop, return inputs
+        return image, label    
+        
+    if crop_width > image.shape[1] or crop_height > image.shape[0]:
         raise Exception('Crop shape (%d, %d) exceeds image dimensions (%d, %d)!' % (crop_height, crop_width, image.shape[0], image.shape[1]))
+        
+        
+    if biased_crop and backgroundValue is not None and random.random()<biased_crop:
+        #Carry out biased cropping which should contain some foreground pixels
+        #First check whether image contains any foreground pixels
+        arr=label!=backgroundValue
+        if arr.any():
+            #Carry out biased cropping
+            foreground=np.transpose(np.nonzero(arr.any(axis=2)))
+            #foreground is a 2 by n list of foregroundpixels
+            #Select a random one of them
+            y,x=foreground[random.randint(0,foreground.shape[0]-1),:]
+            y=_get_crop_start_from_center(y,crop_height,image.shape[0])
+            x=_get_crop_start_from_center(x,crop_width,image.shape[1])
+            if len(label.shape) == 3:
+                cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
+            else:
+                cropped_im=image[y:y+crop_height, x:x+crop_width], label[y:y+crop_height, x:x+crop_width]
+            return cropped_im
+    
+    x = random.randint(0, image.shape[1]-crop_width)
+    y = random.randint(0, image.shape[0]-crop_height)
+
+    if len(label.shape) == 3:
+        cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
+    else:
+        cropped_im=image[y:y+crop_height, x:x+crop_width], label[y:y+crop_height, x:x+crop_width]
+    return cropped_im
+
+def _get_crop_start_from_center(a,crop_size,image_size):
+    #a should be coordinate of the center of the crop 
+    #a can be either x or y coordinate, but choose crop_size and image_size along same dimension
+    #returns b which is left or uppermost coordinate of the crop
+    #So final crop can then be b:b+crop_size
+    b=a-math.floor(crop_size/2)
+    if b<0:
+        b=0
+    if b+crop_size>image_size:
+        b=image_size-crop_size
+    return b
 
 # Compute the average segmentation accuracy across all classes
 def compute_global_accuracy(pred, label):

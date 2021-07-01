@@ -17,7 +17,7 @@ from builders import model_builder
 import matplotlib.pyplot as plt
 
 
-def data_augmentation(input_image, output_image,args):
+def data_augmentation(input_image, output_image,args,backgroundValue=None):
     if args.downscale_factor and args.downscale_factor!=1:
         #Downscale image
         dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
@@ -25,7 +25,7 @@ def data_augmentation(input_image, output_image,args):
         output_image=cv2.resize(output_image,dim,interpolation=cv2.INTER_NEAREST)
         #These interpolations are same as used by Darea in matlab when preparing for prediction
     
-    input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width)
+    input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width, args.biased_crop,backgroundValue)
 
     if args.h_flip and random.randint(0,1):
         input_image = cv2.flip(input_image, 1)
@@ -70,6 +70,7 @@ def main(args=None):
     parser.add_argument('--image_suffix', type=str, default='', required=False, help='Only files with this extension should be included. You should specify it if some non-image files will be in the same folder') 
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
+    parser.add_argument('--biased_crop', type=float, default=0, help='Probability of making a biased cropped. Biased crops always contain some foreground portion. Only works if one of the classes is named "Background".')
     parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
     parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
     parser.add_argument('--num_val_images', type=int, default=20, help='The number of images to used for validations. If -1 -> use all')
@@ -97,6 +98,12 @@ def main(args=None):
     # Get the names of the classes so we can record the evaluation results
     class_names_list, label_values = helpers.get_label_info(os.path.join(args.dataset_path,args.dataset, "class_dict.csv"))
     class_names_string = ', '.join(class_names_list)
+    
+    if 'Background' not in class_names_list:
+        args.biased_crop=0
+        backgroundValue=None
+    else:
+        backgroundValue=label_values[class_names_list.index('Background')]
     
     num_classes = len(label_values)
     
@@ -234,7 +241,12 @@ def main(args=None):
                 output_image = utils.load_image(train_output_names[id])
     
                 with tf.device('/cpu:0'):
-                    input_image, output_image = data_augmentation(input_image, output_image, args)
+                    if i==0:
+                        imageSize=input_image.shape
+                        if len(imageSize)==3:
+                            imageSize=imageSize[0:1]
+                        #Save size of 1st image for Darea (all images have same size if prepared by Darea)
+                    input_image, output_image = data_augmentation(input_image, output_image, args, backgroundValue)
                     if 1:
                         #Debugging: 
                         try:
@@ -424,7 +436,7 @@ def main(args=None):
                 best_avg_iou=avg_iou
                 #Save an info file
                 with open(model_checkpoint_name[:-4]+'txt', 'w') as f:
-                    f.write('Epoch: {}\nValidation IoU score: {}'.format(epoch,avg_iou))
+                    f.write('Epoch\t{}\nValidation IoU score\t{}\n'.format(epoch,avg_iou))
         epoch_time=time.time()-epoch_st
         remain_time=epoch_time*(args.num_epochs-1-epoch)
         m, s = divmod(remain_time, 60)
@@ -435,6 +447,10 @@ def main(args=None):
             train_time="Remaining training time : Training completed.\n"
         utils.LOG(train_time)
         scores_list = []
+        
+        with open(model_checkpoint_name[:-4]+'txt', 'a+') as f:
+            #Save some info on filesizes
+            f.write('imageSize\t{}\ntrainImageSize\t{}'.format(imageSize,[args.crop_height,args.crop_width]))
     
         if not args.darea_call and args.makePlots:
             fig1, ax1 = plt.subplots(figsize=(11, 8))
@@ -468,7 +484,8 @@ def main(args=None):
             ax3.set_ylabel("Current IoU")
         
             plt.savefig('iou_vs_epochs.png')
-    
+            
+
     
 if __name__=='__main__': 
     main(None)
