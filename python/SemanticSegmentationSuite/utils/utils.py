@@ -206,7 +206,7 @@ def lovasz_softmax(probas, labels, only_present=True, per_image=False, ignore=No
 
 
 # Randomly crop the image to a specific size. For data augmentation
-def random_crop(image, label, crop_height, crop_width,biased_crop,backgroundValue):
+def random_crop(image, label, crop_height, crop_width,biased_crop=0,backgroundValue=None):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
         raise Exception('Image and label must have the same dimensions!')
     
