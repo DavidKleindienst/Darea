@@ -56,6 +56,10 @@ end
 [routes, scales, selAngles]=readConfig(datFile);
 numImages=numel(routes);
 isSerEM=any(~isnan(selAngles));
+if ~isSerEM
+    %Necessary to avoid failing of parfor
+    selAngles=NaN(1,numImages);
+end
 %% Creates the structure containing the information.
 infoImages = cell(numImages,1);
 
@@ -63,7 +67,6 @@ folder=fileparts(datFile);
 %% Processes each image.
 
 parfor (imgIndex=1:numImages, getCurrentPoolSize())
-
     route=fullfile(folder,routes{imgIndex});
     scale=scales(imgIndex);
 
