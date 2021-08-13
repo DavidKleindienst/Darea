@@ -50,6 +50,7 @@ def getCoordinatesFromFiles(images, outputPath=False, downscale_factor=False, ba
     return coordinates, images
 
 def getCoordinatesFromConfig(configFile,outputPath=False,downscale_factor=False):
+    
     config=file_utils.file2dict(configFile,',\t')
     folder=os.path.split(configFile)[0]
     
@@ -74,6 +75,8 @@ def getCoordinates(file, downscale_factor=False):
         
 
 def compareCoordinates(file1,file2,json1=False,json2=False, reportPath=False, downscale_factor1=False, downscale_factor2=False):
+    if not os.path.isdir(reportPath):
+        os.mkdir(reportPath)
     #If a json already exists, supply that to make it much quicker
     if json1:
         coord1,_ = getCoordinates(json1, downscale_factor1)
@@ -106,7 +109,11 @@ def compareCoordinates(file1,file2,json1=False,json2=False, reportPath=False, do
         with PdfPages(os.path.join(reportPath, name + '_report.pdf')) as pdf:
             
             for i,line in enumerate(l):
-                plots=compareDemVis(file1,file2,line,plot=False)
+                try:
+                    plots=compareDemVis(file1,file2,line,plot=False)
+                except:
+                    print(name)
+                    print(l)
                 pn=i % nrPlotsperPage
                 if pn==0:
                     fig, ax=plt.subplots(nrPlotsperPage,5,figsize=(8.27, 11.69), dpi=400)
@@ -165,11 +172,15 @@ def compareDemVis(configFile,prediction_folder,line, plot=True,cropsize=768):
         
         if morphPred is not None:
             morphPred = cv2.resize(morphPred,img.shape,cv2.INTER_NEAREST)
-        
-    cropY1=max(0,round(line[1][0]-cropsize/2))
-    cropY2=min(img.shape[1],round(line[1][0]+cropsize/2))
-    cropX1=max(0,round(line[1][1]-cropsize/2))
-    cropX2=min(img.shape[0],round(line[1][1]+cropsize/2))
+    try:    
+        cropY1=max(0,round(line[1][0]-cropsize/2))
+        cropY2=min(img.shape[1],round(line[1][0]+cropsize/2))
+        cropX1=max(0,round(line[1][1]-cropsize/2))
+        cropX2=min(img.shape[0],round(line[1][1]+cropsize/2))
+    except:
+        print(line)
+        raise
+    
     
     plotted_images=[img[cropX1:cropX2,cropY1:cropY2], modImg[cropX1:cropX2,cropY1:cropY2]]
     
