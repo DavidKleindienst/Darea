@@ -23,10 +23,9 @@ safeMkdir(predFolder);
 set(hProgress, 'String', 'Reading config file...');
 drawnow();
 path=fileparts(config);
-routes=readConfig(config);
-files=cellfun(@(x) fullfile(path,[x '.tif']),routes, 'Uni', false);
-modfiles=cellfun(@(x) [x(1:end-4) '_mod.tif'],files, 'Uni',false);
-modfilesExist=cellfun(@(x) isfile(x),modfiles,'Uni',true);
+[routes, ~, selAngles]=readConfig(config);
+files=cellfun(@(x) fullfile(path,x),routes, 'UniformOutput', false);
+modfilesExist=cellfun(@(x) isfile([x '_mod.tif']) | isfile([x '_mod_1.tif']),files);
 if isnan(overwrite) && any(modfilesExist)
     answer = questdlg('At least one of the _mod files already exists. Do you want to overwrite them?', ...
         'Overwrite images?', ...
@@ -53,16 +52,16 @@ end
 %Convert Images
 set(hProgress, 'String', 'Preparing Images...');
 drawnow();
-imSizes=prepareForPrediction(files, imFolder, settings.imageSize);
+imSizes=prepareForPrediction(files, imFolder,selAngles, settings.imageSize);
 
 %Do Prediction with python
 set(hProgress, 'String', 'Predicting demarcations...');
 drawnow();
-args=[' --image ', convPath(imFolder), ...
-        ' --outpath ', convPath(predFolder), ...
-        ' --file_suffix ', '.tif', ' --dataset ', convPath('deepLearning/checkpoints/') ...
-        ' --checkpoint_path ', convPath(['deepLearning/checkpoints/' feature '.ckpt']), ...
-        ' --darea_call ', '1'];
+args=[' --image "', convPath(imFolder), ...
+        '" --outpath "', convPath(predFolder), ...
+        '" --file_suffix ', '.tif', ' --dataset "', convPath('deepLearning/checkpoints/') ...
+        '" --checkpoint_path "', convPath(['deepLearning/checkpoints/' feature '.ckpt']), ...
+        '" --darea_call ', '1'];
 [~,pyExe]=pyversion;
 cmd=[pyExe ' python/SemanticSegmentationSuite/predict.py' args];
 retVal=system(cmd);
@@ -84,7 +83,7 @@ end
 %Backconvert Images
 set(hProgress, 'String', 'Converting predictions...');
 drawnow();
-convertPredictionsToMod(predFolder, modfiles, imSizes, overwrite);
+convertPredictionsToMod(predFolder, files, imSizes, overwrite);
 
 if delTmp
     rmdir(tmpFolder,'s');
