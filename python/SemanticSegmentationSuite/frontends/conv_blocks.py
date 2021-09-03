@@ -16,9 +16,9 @@
 import contextlib
 import functools
 
-import tensorflow as tf
-
-slim = tf.contrib.slim
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 
 
 def _fixed_padding(inputs, kernel_size, rate=1):

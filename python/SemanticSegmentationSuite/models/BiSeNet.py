@@ -1,7 +1,8 @@
 # coding=utf-8
 
-import tensorflow as tf
-from tensorflow.contrib import slim
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 from builders import frontend_builder
 import numpy as np
 import os, sys
