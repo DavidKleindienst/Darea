@@ -7,12 +7,12 @@ if iscell(imDataset)
     set(hProgress, 'String', 'Preparing dataset for training');
     drawnow();
     path='tmp';
-    prepareFolderForTrainDataset(path,feature,settings);
+    prepareFolderForTrainDataset(path,feature,settings.backgroundColor);
 
     delTmp=1;
     for c=1:numel(imDataset)
         [pa, fil, ext]=fileparts(imDataset{c});
-        copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),NaN,NaN,settings);
+        copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),NaN,settings);
     end
 elseif isfolder(imDataset)
     %Folder with prepared images
