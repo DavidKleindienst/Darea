@@ -1,7 +1,7 @@
 function safeMkdir(dir)
 %% Makes folder dir if it doesnt already exist
 
-try
+if ~isfolder(dir)
     mkdir(dir)
 end
 

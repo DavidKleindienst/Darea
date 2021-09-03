@@ -7,8 +7,6 @@ function num = getNum(line)
     num = str2double(strip(line{2}));
 end
 
-
-
 pixelspacing=[];
 angles=[];
 
@@ -25,11 +23,12 @@ end
 fclose(fid);
 
 
-if  numel(unique(pixelspacing))>1
+if numel(unique(pixelspacing))>1
     error('Different pixelsizes found in .mdoc file');
 end
 
-pixelsize=pixelspacing(1)*0.1;
+%Pixelspacing is in Angstrom - convert to nm
+pixelsize=pixelspacing(1)*0.1;  
 
 end
 

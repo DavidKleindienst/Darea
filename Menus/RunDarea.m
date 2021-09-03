@@ -107,7 +107,14 @@ waitfor(mainMenu);
 
 
 function bool=openFileImages(~,~)
-    [infoFile, folder] = uigetfile('*.dat');
+    persistent lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+    if ischar(folder)
+        lastfolder=folder;
+    end
     datFile=fullfile(folder,infoFile);
     if isstruct(Data)
         Data=NaN;   %Delete potentially existing Data when opening new file
