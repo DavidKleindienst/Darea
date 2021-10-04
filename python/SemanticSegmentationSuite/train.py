@@ -1,6 +1,7 @@
 from __future__ import print_function
 import os,time,datetime,cv2, sys, math,shutil
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
 import argparse
 import random

@@ -24,11 +24,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 
 from frontends import inception_utils
 
-slim = tf.contrib.slim
 
 
 def block_inception_a(inputs, scope=None, reuse=None):

@@ -1,15 +1,15 @@
 from __future__ import print_function, division
 import os,time,cv2, sys, math,argparse
-import tensorflow as tf
-slim=tf.contrib.slim
 import numpy as np
 import time, datetime
 import os, random
-from scipy.misc import imread
+from imageio import imread
 import ast
 from sklearn.metrics import precision_score, \
     recall_score, confusion_matrix, classification_report, \
     accuracy_score, f1_score
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from utils import helpers
 NOT_ALLOWED_FILENAMES=['.DS_Store']

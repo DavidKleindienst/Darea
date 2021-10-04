@@ -1,7 +1,8 @@
 from __future__ import division
 import os,time,cv2
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 import numpy as np
 
 def preact_conv(inputs, n_filters, kernel_size=[3, 3], dropout_p=0.2):

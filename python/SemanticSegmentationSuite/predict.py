@@ -1,8 +1,10 @@
 import os,time,cv2,json
-import tensorflow as tf
 import argparse
 import numpy as np
 import math as m
+
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from utils import utils, helpers
 from builders import model_builder
@@ -28,7 +30,7 @@ def main(args=None):
     parser.add_argument('--darea_call', type=utils.str2bool, default=False, required=False, help='Set to true when you call it from Darea software')
     parser.add_argument('--save_predictionImage', type=utils.str2bool, default=True, required=False, help='Whether predictions should be saved as images')
     parser.add_argument('--save_coordinates', type=utils.str2bool, default=False, required=False, help='Whether coordinates of predicted structures should be saved')
-    
+    print('wassup')
     if args is None:
         args=parser.parse_args()
     else:
