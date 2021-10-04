@@ -75,13 +75,13 @@ transparencyRim	0.85
 
 #DemarcateImage
 closeRadius	7.5	#Radius (in Nm) for close Structure
-gw_cutoff	0.25
-gw_sigma	2
 showFilters	false
 changeLeftImage	false
 
 #DeepLearning
 imageSize	[512,512] 	#Size to which images are converted before training/prediction
+trainingImageSize	[512,512]	#Size at which images are trained on/predicted on. Needs to be same size or smaller than imageSize. If smaller than imageSize, then for training a random piece of image is cropped out in each epoch; for prediction portions of the image are cropped and predicted on seperately, effectively covering whole image.
+allowNonSquareImages	false	#Set to true to be able edit both sizes in the GUI (at your own risk)
 classifierPath	'partlabeling/classifierTraining/classifiers/'
 defaultClassifier	'Forest'
 backgroundColor	0	#Should be darker than foreground

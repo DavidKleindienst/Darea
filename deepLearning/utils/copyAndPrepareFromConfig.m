@@ -88,52 +88,51 @@ for i=1:numel(routes)
     if settings.splitDemarcationsByGroup
         groupIdx=find(strcmp(groups,groupImages{i}));
     end
-    flag=1;
+
     try
         [mask, image] = getBaseImages(imageFullName,imageSelFullName,NaN,0,1);
         %Always assume images without demarcation show only background (The last 1 in the function call)
         
     catch
         fprintf('Image %s does not exist, will be skipped\n', routes{i});
-        flag=0;
+        continue;
     end
     
-    if flag
-        if ismember(routes{i},duplicated_images)
-            %Make a cell array of all masks 
-            %image should anyway be the same for all of them (This is not checked for!)
-            mask={mask};
-            dupl_imgs=duplicates(startsWith(duplicates,routes{i}));
-            
-            for d=1:numel(dupl_imgs)
-                imageFullName = fullfile(path,[dupl_imgs{d} '.tif']);
-                imageSelFullName= fullfile(path,[dupl_imgs{d} '_mod.tif']);
-                try 
-                    mask{end+1}=getBaseImages(imageFullName,imageSelFullName,NaN,0,1);
-                    if settings.splitDemarcationsByGroup
-                        idx=strcmp(routes,dupl_imgs{d});
-                        groupIdx(end+1)=find(strcmp(groups,groupImages{idx}));
-                    end
-                catch
-                    fprintf('Image %s does not exist, will be skipped\n', dupl_imgs{d});
+    if ismember(routes{i},duplicated_images)
+        %Make a cell array of all masks 
+        %image should anyway be the same for all of them (This is not checked for!)
+        mask={mask};
+        dupl_imgs=duplicates(startsWith(duplicates,routes{i}));
+
+        for d=1:numel(dupl_imgs)
+            imageFullName = fullfile(path,[dupl_imgs{d} '.tif']);
+            imageSelFullName= fullfile(path,[dupl_imgs{d} '_mod.tif']);
+            try 
+                mask{end+1}=getBaseImages(imageFullName,imageSelFullName,NaN,0,1);
+                if settings.splitDemarcationsByGroup
+                    idx=strcmp(routes,dupl_imgs{d});
+                    groupIdx(end+1)=find(strcmp(groups,groupImages{idx}));
                 end
-                
-                    
+            catch
+                fprintf('Image %s does not exist, will be skipped\n', dupl_imgs{d});
             end
-        
-        end
-        
-        imsize=[size(image,1),size(image,2)];
 
-        %For Demarcation prediction
-        [image, label]=prepareImage(image,targetsize,mask,foregroundColor,settings.backgroundColor,0,groupIdx);
 
-        imwrite(image,fullfile(targetfolder, type, fn));
-        imwrite(label,fullfile(targetfolder, [type '_labels'],fn));
-        if ~isnan(fid)
-            fprintf(fid,'\n%s;%s;%s;%s',routes{i},fn,reverse_eval(imsize),type);
         end
+
     end
+
+    imsize=[size(image,1),size(image,2)];
+
+    %For Demarcation prediction
+    [image, label]=prepareImage(image,targetsize,mask,foregroundColor,settings.backgroundColor,0,groupIdx);
+
+    imwrite(image,fullfile(targetfolder, type, fn));
+    imwrite(label,fullfile(targetfolder, [type '_labels'],fn));
+    if ~isnan(fid)
+        fprintf(fid,'\n%s;%s;%s;%s',routes{i},fn,reverse_eval(imsize),type);
+    end
+    
 end
 end
 
