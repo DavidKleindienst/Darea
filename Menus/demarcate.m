@@ -174,6 +174,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         filteredImages{idx}.fct='select';
         if strcmp(filteredImages{currentImage}.fct,'polygon') && numel(polygonPoints)>=3
             compIm=poly2mask(polygonPoints(:,1)./scale,polygonPoints(:,2)./scale,size(image,1),size(image,2));
+            polygonPoints=[];
         elseif strcmp(filteredImages{currentImage}.fct,'finalize')
             compIm=filteredImages{currentImage}.compImage;
         end
@@ -257,14 +258,12 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                 updated=false;
             elseif hOb==hTrim && size(modifyPoly,1)>1
                 filteredImages{currentImage}=getTrimming(filteredImages{currentImage},image,round(modifyPoly./scale),defaults);
-                modifyPoly=[];
-                redrawImage();
+                emptyModifyPoly();
                 updated=false;
             elseif (hOb==hAdd || hOb==hRemove) && size(modifyPoly,1)>2
                 if hOb==hAdd; action='add'; else; action='remove'; end
                 filteredImages{currentImage}=changeComponent(filteredImages{currentImage},image,round(modifyPoly./scale),action,defaults);
-                modifyPoly=[];
-                redrawImage();
+                emptyModifyPoly();
                 updated=false;
             elseif hOb==hMeasure && size(measurePoints,1)>0
                 measurePoints=[];
@@ -272,7 +271,15 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
             end
         end
     end
-   
+
+    function emptyModifyPoly()
+        if ~isempty(polygonPoints) & size(modifyPoly)==size(polygonPoints) & modifyPoly==polygonPoints
+            polygonPoints=[];
+        end
+        modifyPoly=[];
+        redrawImage();
+    end
+
     function moveZoomToPos(hOb,~)
         number=str2double(hOb.String);
         if isnan(number)
@@ -299,6 +306,15 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         if currentImage==hFilterDropdown.Value
             return;
         end
+        
+        if strcmp(filteredImages{currentImage}.fct,'polygon') && ...
+                strcmp(filteredImages{hFilterDropdown.Value}.fct,'select') && ...
+                isempty(modifyPoly) && ~isempty(polygonPoints)
+            %Transfer polygonselction to new filter, if it may be useful
+            modifyPoly=polygonPoints;
+        end
+                
+        
         currentImage=hFilterDropdown.Value;
         redrawImage();
         changeUI();
@@ -678,12 +694,12 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
 
     function deleteLastPoint(~,~)
-        trimormod=get(hTrim,'Value')==1 || get(hAdd,'Value')==1 || get(hRemove,'Value')==1;
+        
         if strcmp(filteredImages{currentImage}.fct,'polygon') && numel(polygonPoints)>0
             polygonPoints=polygonPoints(1:end-1,:);
             drawPolygon();
             updated=false;
-        elseif strcmp(filteredImages{currentImage}.fct,'select') && trimormod && ~isempty(modifyPoly)
+        elseif strcmp(filteredImages{currentImage}.fct,'select')  && ~isempty(modifyPoly)
             modifyPoly=modifyPoly(1:end-1,:);
             drawPolygon();
         end
@@ -691,14 +707,14 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
 
     function clear(~,~)
-        trimormod=get(hTrim,'Value')==1 || get(hAdd,'Value')==1 || get(hRemove,'Value')==1;
+        
         if strcmp(filteredImages{currentImage}.fct,'polygon') && numel(polygonPoints)>0
             polygonPoints=[];
             drawPolygon();
         elseif strcmp(filteredImages{currentImage}.fct,'select') && get(hConnect,'Value')==1 && ~any(any(isnan(selectedComponent)))
             selectedComponent=NaN;
             redrawImage();
-        elseif strcmp(filteredImages{currentImage}.fct,'select') && trimormod && ~isempty(modifyPoly)
+        elseif strcmp(filteredImages{currentImage}.fct,'select') && ~isempty(modifyPoly)
             modifyPoly=[];
             drawPolygon();
         end
