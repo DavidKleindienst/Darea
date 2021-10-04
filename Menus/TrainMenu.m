@@ -16,16 +16,18 @@ mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize'
 set(mainFigure, 'CloseRequestFcn', @close);
 
 bg=uibuttongroup('SelectionChangedFcn', @changeInterface);
+
 hFolderSelect=uicontrol(bg,'Style','Radiobutton', 'Position', [100 480 350 20], ...
-            'String', 'Train from folder which contains a prepared dataset');
+            'String', 'Train from prepared dataset');
 hPrepareDataset=uicontrol(bg, 'Style', 'Radiobutton', 'Position', [100 460 350 20], ...
                'String', 'Prepare a dataset for training');
 hTest=uicontrol(bg,'Style','Radiobutton', 'Position', [100 440 300 20], ...
             'String', 'Test trained network on dataset');
-hTestDat=uicontrol(bg,'Style','Radiobutton', 'Position', [100 420 300 20], ...
-            'String', 'Test trained network on project (not recommended)');
 hFromDat=uicontrol(bg,'Style','Radiobutton', 'Position', [100 400 300 20], ...
-            'String', 'Train from one or multiple projects (not recommended)');
+            'String', 'Train from one or multiple projects');
+hTestDat=uicontrol(bg,'Style','Radiobutton', 'Position', [100 420 300 20], ...
+            'String', 'Test trained network on project');
+
 
 folderTT='Select folder with prepared datasets';
 hFolderTxt=uicontrol('Style', 'Text', 'String', 'Dataset folder:','HorizontalAlignment','left','Position', [25 360 100 25]);     
@@ -35,15 +37,10 @@ hFolderButton = uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Too
 
 
 
-inputFolderTT=sprintf('Select Input Folder');
-hInputFolderTxt=uicontrol('Style', 'Text', 'String', 'Folder with analysed projects', 'Tooltipstring', inputFolderTT, 'Position', [25 360 150 25]);
-hInputFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose input folder', 'Tooltipstring', inputFolderTT, 'Position', [175 365 275 25]);
-hInputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring', inputFolderTT, 'Position', [475 365 100 25], 'Callback', @(~,~)openFolder(hInputFolderEdit));
-
 outputFolderTT=sprintf('Select Output Folder\nThe prepared dataset will be stored there\nThis should be an empty folder, or the folder where the same perepared datasets where saved to before');
-hOutputFolderTxt=uicontrol('Style', 'Text', 'String', 'Prepare dataset here', 'Tooltipstring', outputFolderTT, 'Position', [25 330 150 25]);
-hOutputFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose output folder', 'Tooltipstring', outputFolderTT, 'Position', [175 335 275 25]);
-hOutputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring', outputFolderTT, 'Position', [475 335 100 25], 'Callback', @(~,~)openFolder(hOutputFolderEdit));
+hOutputFolderTxt=uicontrol('Style', 'Text', 'String', 'Prepare dataset here', 'Tooltipstring', outputFolderTT, 'Position', [25 260 150 25]);
+hOutputFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose output folder', 'Tooltipstring', outputFolderTT, 'Position', [175 265 275 25]);
+hOutputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring', outputFolderTT, 'Position', [475 265 100 25], 'Callback', @(~,~)openFolder(hOutputFolderEdit));
 
 datTestTT=sprintf('Select project File');
 hDatTestTxt=uicontrol('Style', 'Text', 'String', 'Project file', 'Tooltipstring', datTestTT, 'Position', [25 360 150 25]);
@@ -114,19 +111,49 @@ hRatiosTe=uicontrol('Style', 'Text', 'String', 'Test', 'Position', [295 160 40 2
 hRatiosTeE=uicontrol('Style', 'Edit', 'String', num2str(defaults.train_val_test_ratios(3)), 'Position', [335 160 45 25], 'Tooltipstring', ratioTT, 'Enable', 'off');
 
 
+if defaults.allowNonSquareImages
+    sizeEnable='on';
+else
+    sizeEnable='off';
+end
+hPreparedImageSizeTT=sprintf(['Image will be downscaled to this size.\n', ...
+                    'If image is a rectangle but size is a square the largest possible middle square will be cropped', ...
+                    'Please refer to the handbook for more detailed information']);
+hPrepImageSizeText=uicontrol('Style', 'Text', 'String', 'Prepared Image Size', 'Tooltipstring', hPreparedImageSizeTT, ...
+                        'Position', [25 120 100 25]);
+hPrepImageEdit1=uicontrol('Style', 'Edit', 'String', num2str(defaults.imageSize(1)), 'Tooltipstring', hPreparedImageSizeTT, ...
+                    'Position', [125 125 50 25], 'Callback', @changeImageSize);
+hPrepImageSizeX=uicontrol('Style', 'Text', 'String', 'x', 'Tooltipstring', hPreparedImageSizeTT, 'Position', [175 120 15 25]);
+hPrepImageEdit2=uicontrol('Style', 'Edit', 'String', num2str(defaults.imageSize(2)), 'Tooltipstring', hPreparedImageSizeTT, ...
+                    'Position', [190 125 50 25], 'Callback', @changeImageSize, 'Enable', sizeEnable);
+
+
+hTrainImageSizeTT=sprintf(['Select the image size used for training. Must be same size or smaller than prepared image size\n', ...
+                    'If prepared image is larger than training image size, a random portion of the image will be cropped in each epoch. \n',...
+                    'Larger size requires more GPU memory.\nImage size of 512x512 requires 8GB or more GPU memory\n',...
+                    'Please refer to the handbook for more detailed information.']);
+hTrainImageSizeText=uicontrol('Style', 'Text', 'String', 'Training Image Size', 'Tooltipstring', hTrainImageSizeTT, ...
+                        'Position', [300 120 100 25]);
+hTrainImageEdit1=uicontrol('Style', 'Edit', 'String', num2str(defaults.trainingImageSize(1)), 'Tooltipstring', hTrainImageSizeTT, ...
+                    'Position', [400 125 50 25], 'Callback', @changeImageSize);
+hTrainImageSizeX=uicontrol('Style', 'Text', 'String', 'x', 'Tooltipstring', hTrainImageSizeTT, 'Position', [450 120 15 25]);
+hTrainImageEdit2=uicontrol('Style', 'Edit', 'String', num2str(defaults.trainingImageSize(2)), 'Tooltipstring', hTrainImageSizeTT, ...
+                    'Position', [465 125 50 25], 'Callback', @changeImageSize, 'Enable', sizeEnable);
+
 hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220 100 180 35], 'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'center');
 
 hStart=uicontrol('Style', 'pushbutton', 'String', 'Train', 'Tooltipstring', 'Start Training', 'Position', [300 60 90 30], 'Callback', @start);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 60 90 30], 'Callback', @close);
 
 visOnFolder=[hFolderTxt,hFolderEdit,hFolderButton,hFeatPopup,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
-            hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit];
-visOnPrepare=[hInputFolderTxt, hInputFolderEdit,hInputFolderButton,hOutputFolderTxt, hOutputFolderEdit,hOutputFolderButton, ...
-            hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE];
+            hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2];
+visOnPrepare=[hFileTxt,hFiles,hAdd,hRemove,hOutputFolderTxt, hOutputFolderEdit,hOutputFolderButton, ...
+            hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 visOnTest=[hFolderTxt,hFolderEdit,hFolderButton,hFeatPopup,hFeatText,hContinueDD,hTestFromText,hResultsFolderTxt,hResultsFolderEdit,hResultsFolderButton];
 visOnDatTest=[hDatTestTxt,hDatTestEdit, hDatTestButton,hContinueDD,hTestFromText,hResultsFolderTxt,hResultsFolderEdit,hResultsFolderButton];
 visOnDat=[hFileTxt,hFiles,hAdd,hRemove,hFeatEdit,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
-       hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE];
+       hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,...
+       hRatiosTe,hRatiosTeE,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 
 allHandles=unique([visOnFolder,visOnPrepare,visOnTest,visOnDat,visOnDatTest]);
 set(allHandles,'Visible', 'off');
@@ -135,20 +162,19 @@ set(visOnFolder,'Visible', 'on');
 waitfor(mainFigure);
 
     function start(~,~)
+        
         if isequal(bg.SelectedObject,hPrepareDataset)
-            if ~isfolder(hInputFolderEdit.String)
-                msgbox('The specified input folder does not exist');
-                return;
-            elseif ~isfolder(fileparts(hOutputFolderEdit.String))
+            if ~isfolder(fileparts(hOutputFolderEdit.String))
                 msgbox('The path to output folder is not valid');
                 return;
             elseif isnan(defaults.train_val_test_ratios(3))
                 msgbox('The ratios do not add up to 1');
                 return;
             end
+            dataset=hFiles.String;
             hProgress.String='Preparing Dataset...';
             drawnow();
-            CopyAndPrepareTrainingImages(hInputFolderEdit.String,hOutputFolderEdit.String,0);     
+            CopyAndPrepareTrainingImages(dataset,hOutputFolderEdit.String,0);     
             hProgress.String='Finished preparing Dataset!';
         else
             % Training
@@ -187,10 +213,45 @@ waitfor(mainFigure);
                 %To do: askd user about that!
                 test(dataset,feature,continue_from,outfolder,save_Predictions,hProgress);
             else
-                train(dataset,feature,continue_from,hProgress,defaults,hSaveAsEdit.String); %1 means continue_training, replace with user selection
+                train(dataset,feature,continue_from,hProgress,defaults,hSaveAsEdit.String); 
             end
         end
         figure(mainFigure);
+    end
+    function changeImageSize(hOb, ~)
+        val=str2double(hOb.String);
+        if isnan(val)
+            switch hOb
+                case hPrepImageEdit1
+                    hOb.String=num2str(defaults.imageSize(1));
+                case hPrepImageEdit2
+                    hOb.String=num2str(defaults.imageSize(2));    
+                case hTrainImageEdit1
+                    hOb.String=num2str(defaults.trainingImageSize(1));
+                case hTrainImageEdit2
+                    hOb.String=num2str(defaults.trainingImageSize(2));
+            end
+            return
+        end
+        val=floor(val); % Only int values are allowed
+        switch hOb
+            case hPrepImageEdit1
+                defaults.imageSize(1)=val;
+                if ~defaults.allowNonSquareImages
+                    hPrepImageEdit2.String=num2str(val);
+                    defaults.imageSize(2)=val;
+                end
+            case hPrepImageEdit2
+                defaults.imageSize(2)=val;
+            case hTrainImageEdit1
+                defaults.trainingImageSize(1)=val;
+                if ~defaults.allowNonSquareImages
+                    hTrainImageEdit2.String=num2str(val);
+                    defaults.trainingImageSize(2)=val;
+                end
+            case hTrainImageEdit2
+                defaults.trainingImageSize(2)=val;
+        end
     end
     function ratioChange(hOb,~)
         switch hOb
