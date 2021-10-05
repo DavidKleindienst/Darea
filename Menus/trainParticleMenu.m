@@ -21,7 +21,7 @@ if nargin>0
     set(hFiles, 'String', {datFile});
 end
 hAdd=uicontrol('Style', 'pushbutton', 'String', '+', 'Position', [275 430 20 20], 'Callback', @add);
-hRemove=uicontrol('Style', 'pushbutton', 'String', '-', 'Position', [275 410 20 20], 'Callback', @remove);
+hRemove=uicontrol('Style', 'pushbutton', 'String', '—', 'Position', [275 410 20 20], 'Callback', @remove);
 
 useDataTT='';
 uicontrol('Style', 'Text', 'String', 'Use Data from', 'Position', [35 315 80 25], 'Tooltipstring', useDataTT);

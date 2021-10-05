@@ -107,7 +107,7 @@ waitfor(mainMenu);
 
 
 function bool=openFileImages(~,~)
-    persistent lastfolder
+    global lastfolder
     if isempty(lastfolder)
         lastfolder=cd;
     end
