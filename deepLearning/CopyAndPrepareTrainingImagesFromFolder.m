@@ -1,10 +1,11 @@
 
-function CopyAndPrepareTrainingImagesFromFolder(infolder,outfolder)
+function success=CopyAndPrepareTrainingImagesFromFolder(infolder,outfolder,settings)
 
-
+success=false;
 safeMkdir(outfolder);
-settings=readDefaults();
-
+if nargin<3
+    settings=readDefaults();
+end
 % For all subfolders (i.e. different things to be learned) in the folder
 features=dir(infolder);
 features={features.name};
@@ -59,8 +60,8 @@ for f=1:numel(features)
        fclose(cfid);
    end
 end
-end
 
+success=true;
 
 
 function configs=getConfigsFromFolder(folder)

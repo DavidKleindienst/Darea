@@ -11,59 +11,58 @@ defaults=readDefaults();
 if nargin>0
     defaults=updateDefaults(getOptionsName(datFile), defaults);
 end
-positionFigure =  [25, 50, 650, 545];
+positionFigure =  [25, 50, 650, 565];
 mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Train Demarcation Prediction'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 bg=uibuttongroup('SelectionChangedFcn', @changeInterface);
 
-hFolderSelect=uicontrol(bg,'Style','Radiobutton', 'Position', [100 480 350 20], ...
-            'String', 'Train from prepared dataset');
-hPrepareDataset=uicontrol(bg, 'Style', 'Radiobutton', 'Position', [100 460 350 20], ...
-               'String', 'Prepare a dataset for training');
-hTest=uicontrol(bg,'Style','Radiobutton', 'Position', [100 440 300 20], ...
+hTrainFromDataset=uicontrol(bg,'Style','Radiobutton', 'Position', [60 500 460 20], ...
+            'String', 'Train from prepared dataset');  
+hPrepareDataset=uicontrol(bg, 'Style', 'Radiobutton', 'Position', [60 480 460 20], ...
+               'String', 'Prepare a dataset for training from folder containing projects');
+hPrepareDatasetFromConfig=uicontrol(bg, 'Style', 'Radiobutton', 'Position', [60 460 460 20], ...
+               'String', 'Prepare a dataset for training from one or multiple projects');
+hTestFromDataset=uicontrol(bg,'Style','Radiobutton', 'Position', [60 440 460 20], ...
             'String', 'Test trained network on dataset');
-hFromDat=uicontrol(bg,'Style','Radiobutton', 'Position', [100 400 300 20], ...
+hTrainFromConfig=uicontrol(bg,'Style','Radiobutton', 'Position', [60 420 460 20], ...
             'String', 'Train from one or multiple projects');
-hTestDat=uicontrol(bg,'Style','Radiobutton', 'Position', [100 420 300 20], ...
+hTestFromConfig=uicontrol(bg,'Style','Radiobutton', 'Position', [60 400 460 20], ...
             'String', 'Test trained network on project');
 
 
 folderTT='Select folder with prepared datasets';
-hFolderTxt=uicontrol('Style', 'Text', 'String', 'Dataset folder:','HorizontalAlignment','left','Position', [25 360 100 25]);     
-hFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose datset folder path', 'Tooltipstring',folderTT,...
-                       'HorizontalAlignment','left','backgroundcolor','white','Position', [125 365 325 25]); 
-hFolderButton = uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring',folderTT,'Position', [475 365 100 25], 'Callback', @(~,~)openFolder(hFolderEdit));
+hFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose datset folder path', ...
+                    'Tooltipstring',folderTT, 'Position', [25 365 425 25], ...
+                    'Callback',@(hOb,~)openFolder(hOb)); 
 
-
-
-outputFolderTT=sprintf('Select Output Folder\nThe prepared dataset will be stored there\nThis should be an empty folder, or the folder where the same perepared datasets where saved to before');
-hOutputFolderTxt=uicontrol('Style', 'Text', 'String', 'Prepare dataset here', 'Tooltipstring', outputFolderTT, 'Position', [25 260 150 25]);
-hOutputFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose output folder', 'Tooltipstring', outputFolderTT, 'Position', [175 265 275 25]);
-hOutputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring', outputFolderTT, 'Position', [475 265 100 25], 'Callback', @(~,~)openFolder(hOutputFolderEdit));
+inputFolderTT=sprintf(['Choose the input folder which should contain one folder per feature.\n' ...
+                      'Each feature folder should contain all the relevant project files']);
+hInputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose input folder', ...
+    'Tooltipstring', inputFolderTT, 'Position', [25 265 275 25],'Callback', @(hOb,~)openFolder(hOb));
+outputFolderTT=sprintf(['Select Output Folder\nThe prepared dataset will be stored there\n' ...
+                'This should be an empty folder, or the folder where the same perepared datasets where saved to before']);
+hOutputFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose output folder', ...
+    'Tooltipstring', outputFolderTT, 'Position', [325 265 275 25],'Callback', @(hOb,~)openFolder(hOb));
 
 datTestTT=sprintf('Select project File');
-hDatTestTxt=uicontrol('Style', 'Text', 'String', 'Project file', 'Tooltipstring', datTestTT, 'Position', [25 360 150 25]);
-hDatTestEdit=uicontrol('Style', 'Edit', 'String', 'Choose project file', 'Tooltipstring', datTestTT, 'Position', [175 365 275 25]);
-hDatTestButton=uicontrol('Style', 'pushbutton', 'String', 'Choose file', 'Tooltipstring', datTestTT, 'Position', [475 365 100 25], 'Callback', @(~,~)openDatFile(hDatTestEdit));
+hDatTestButton=uicontrol('Style', 'pushbutton', 'String', 'Choose project file', ...
+                'Tooltipstring', datTestTT, 'Position', [25 365 375 25], ...
+                'Callback', @(hOb,~)openDatFile(hOb));
 
 resultFolderTT=sprintf('Select where to save results');
-hResultsFolderTxt=uicontrol('Style', 'Text', 'String', 'Save results here', 'Tooltipstring', resultFolderTT, 'Position', [25 330 150 25]);
-hResultsFolderEdit=uicontrol('Style', 'Edit', 'String', 'Choose results folder', 'Tooltipstring', resultFolderTT, 'Position', [175 335 275 25]);
-hResultsFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose folder', 'Tooltipstring', resultFolderTT, 'Position', [475 335 100 25], 'Callback', @(~,~)openFolder(hResultsFolderEdit));
-
-
+hResultsFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose results folder', ...
+                    'Tooltipstring', resultFolderTT, 'Position', [25 335 375 25], ...
+                    'Callback', @(hOb,~)openFolder(hOb));
 
 filesTT='Select datfiles from which to train';
 hFileTxt=uicontrol('Style', 'Text', 'String', 'Config Files', 'Position', [35 350 80 25], 'Tooltipstring', filesTT);
-hFiles=uicontrol('Style', 'listbox', 'Position', [120 300 150 100], 'Tooltipstring', filesTT, 'Min', 0, 'Max', 3, 'Value', []);
+hFiles=uicontrol('Style', 'listbox', 'Position', [120 300 350 100], 'Tooltipstring', filesTT, 'Min', 0, 'Max', 3, 'Value', []);
 if nargin>0
     set(hFiles, 'String', {datFile});
 end
-hAdd=uicontrol('Style', 'pushbutton', 'String', '+', 'Position', [275 360 20 20], 'Callback', @add);
-hRemove=uicontrol('Style', 'pushbutton', 'String', '-', 'Position', [275 340 20 20], 'Callback', @remove);
-
-
+hAdd=uicontrol('Style', 'pushbutton', 'String', '+', 'Position', [480 360 20 20], 'Callback', @add);
+hRemove=uicontrol('Style', 'pushbutton', 'String', '–', 'Position', [480 330 20 20], 'Callback', @remove);
 
 featTT='Name the feature you would like to predict (e.g. PSD)';
 hFeatText=uicontrol('Style', 'Text', 'String', 'Feature', 'Position', [25 260 60 25], 'Tooltipstring', featTT);
@@ -145,78 +144,127 @@ hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220
 hStart=uicontrol('Style', 'pushbutton', 'String', 'Train', 'Tooltipstring', 'Start Training', 'Position', [300 60 90 30], 'Callback', @start);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 60 90 30], 'Callback', @close);
 
-visOnFolder=[hFolderTxt,hFolderEdit,hFolderButton,hFeatPopup,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
+visOnFolder=[hFolderButton,hFeatPopup,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
             hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2];
-visOnPrepare=[hFileTxt,hFiles,hAdd,hRemove,hOutputFolderTxt, hOutputFolderEdit,hOutputFolderButton, ...
-            hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
-visOnTest=[hFolderTxt,hFolderEdit,hFolderButton,hFeatPopup,hFeatText,hContinueDD,hTestFromText,hResultsFolderTxt,hResultsFolderEdit,hResultsFolderButton];
-visOnDatTest=[hDatTestTxt,hDatTestEdit, hDatTestButton,hContinueDD,hTestFromText,hResultsFolderTxt,hResultsFolderEdit,hResultsFolderButton];
-visOnDat=[hFileTxt,hFiles,hAdd,hRemove,hFeatEdit,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
-       hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,...
-       hRatiosTe,hRatiosTeE,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
+visOnPrepFromConf=[hFileTxt,hFiles,hAdd,hRemove, hOutputFolderButton, ...
+            hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE,...
+            hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2, ...
+            hFeatText, hFeatEdit];
+visOnPrepare=[hOutputFolderButton, hInputFolderButton, ...
+            hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE,...
+            hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
+visOnTest=[hFolderButton,hFeatPopup,hFeatText,hContinueDD,hTestFromText,hResultsFolderButton];
+visOnDatTest=[hDatTestButton,hContinueDD,hTestFromText,hResultsFolderButton, ...
+            hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2,...
+            hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
+visOnDat=[hFileTxt,hFiles,hAdd,hRemove,hFeatEdit,hFeatText,hEpochsText,hEpochsEdit, ...
+       hBatchText, hBatchEdit, hLearnRateEdit, hLearnRateText,hContinueDD,hContinueText, ...
+       hSaveAsText,hSaveAsEdit,hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,...
+       hRatiosTe,hRatiosTeE,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX, ...
+       hTrainImageEdit2, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 
-allHandles=unique([visOnFolder,visOnPrepare,visOnTest,visOnDat,visOnDatTest]);
+allHandles=unique([visOnFolder,visOnPrepare,visOnTest,visOnDat,visOnDatTest, visOnPrepFromConf]);
 set(allHandles,'Visible', 'off');
 set(visOnFolder,'Visible', 'on');
 
 waitfor(mainFigure);
 
     function start(~,~)
-        
-        if isequal(bg.SelectedObject,hPrepareDataset)
-            if ~isfolder(fileparts(hOutputFolderEdit.String))
-                msgbox('The path to output folder is not valid');
-                return;
-            elseif isnan(defaults.train_val_test_ratios(3))
-                msgbox('The ratios do not add up to 1');
-                return;
-            end
-            dataset=hFiles.String;
-            hProgress.String='Preparing Dataset...';
-            drawnow();
-            CopyAndPrepareTrainingImages(dataset,hOutputFolderEdit.String,0);     
-            hProgress.String='Finished preparing Dataset!';
-        else
-            % Training
-            if isequal(bg.SelectedObject,hFolderSelect) || isequal(bg.SelectedObject,hTest)
-                if ~isfolder(hFolderEdit.String)
-                    msgbox('The specified folder does not exist');
-                    return;
-                end
-                dataset=hFolderEdit.String;
-                feature=getSelectedStringFromPopup(hFeatPopup);
-            else
+        if ~checkUserInputs()
+            return;
+        end
+        switch bg.SelectedObject
+            %Differentiate type of inputs to pull correct values from UI
+            case {hPrepareDatasetFromConfig, hTrainFromConfig} 
                 dataset=hFiles.String;
                 feature=hFeatEdit.String;
-                if isnan(defaults.train_val_test_ratios(3))
-                    msgbox('The ratios do not add up to 1');
-                    return;
+            case hTestFromConfig
+                dataset=hDatTestButton.String;
+                feature='foreground';
+            case hPrepareDataset
+                dataset=hInputFolderButton;
+            case {hTrainFromDataset, hTestFromDataset}
+                dataset=hFolderButton.String;
+                feature=getSelectedStringFromPopup(hFeatPopup);
+        end
+        switch bg.SelectedObject
+            % Differentiate training, testing and preparation
+            case hPrepareDatasetFromConfig
+                hProgress.String='Preparing Dataset...';
+                drawnow();
+                if CopyAndPrepareTrainingImagesFromConfigs(dataset,hOutputFolderButton.String,feature,defaults)   
+                    hProgress.String='Finished preparing Dataset!';
+                else
+                    hProgress.String='Dataset preparation failed!';
                 end
-            end
-            
-            if ~feature
-                hProgress.String='You have to specify a name for the feature';
-                return
-            end
-            continue_from=getSelectedStringFromPopup(hContinueDD);
-            if isequal(bg.SelectedObject,hTest) || isequal(bg.SelectedObject,hTestDat)
-                if strcmp(continue_from, 'None')
-                    msgbox('You need to select a network to run the test from');
-                    return;
+            case hPrepareDataset
+                hProgress.String='Preparing Dataset...';
+                drawnow();
+                if CopyAndPrepareTrainingImagesFromFolder(dataset,hOutputFolderButton.String,settings)
+                    hProgress.String='Finished preparing Dataset!';
+                else
+                    hProgress.String='Dataset preparation failed!';
                 end
-                outfolder=hResultsFolderEdit.String;
-                if isequal(bg.SelectedObject,hTestDat)
+            case {hTrainFromConfig, hTrainFromDataset}
+                continue_from=getSelectedStringFromPopup(hContinueDD);
+                train(dataset,feature,continue_from,hProgress,defaults,hSaveAsEdit.String);
+            case {hTestFromDataset, hTestFromConfig}
+                continue_from=getSelectedStringFromPopup(hContinueDD);
+                outfolder=hResultsFolderButton.String;
+                if isequal(bg.SelectedObject,hTestFromConfig)
                     feature='foreground';
-                    dataset=hDatTestEdit.String;
+                    dataset=hDatTestButton.String;
                 end
                 save_Predictions=1; %Whether or not predicted demarcations should be saved
                 %To do: askd user about that!
                 test(dataset,feature,continue_from,outfolder,save_Predictions,hProgress);
-            else
-                train(dataset,feature,continue_from,hProgress,defaults,hSaveAsEdit.String); 
+        end
+        figure(mainFigure);   
+    end
+    function bool=isContainedIn(A,B)
+        %Checks if object A isequal to any object in cell array B
+        bool=false;
+        for b=1:numel(B)
+            if isequal(A, B{b})
+                bool=true;
+                return;
             end
         end
-        figure(mainFigure);
+    end
+        
+    function bool=checkUserInputs()
+        %Returns true if everything is fine
+        bool=true;
+        if isContainedIn(bg.SelectedObject, {hPrepareDataset,hPrepareDatasetFromConfig}) ...
+                    && ~isfolder(fileparts(hOutputFolderButton.String))
+            msgbox('The path to output folder is not valid');
+            bool=false;
+        end
+        if isContainedIn(bg.SelectedObject,{hPrepareDatasetFromConfig,hTrainFromConfig})
+            if isnan(defaults.train_val_test_ratios(3))
+                msgbox('The train/val/test ratios do not add up to 1');
+                bool=false;
+            end
+            if isempty(hFeatEdit.String)
+                msgbox('You have to specify a name for the feature');
+                bool=false;
+            end
+        end
+        if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) ...
+                    && ~getSelectedStringFromPopup(hFeatPopup)
+            msgbox('You have to select a feature');
+            bool=false;
+        end
+        if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) ...
+                    && ~isfolder(hFolderButton.String)
+            msgbox('The specified folder does not exist');
+            bool=false;
+        end
+        if isContainedIn(bg.SelectedObject,{hTestFromConfig,hTestFromDataset}) ...
+                    && strcmp(getSelectedStringFromPopup(hContinueDD), 'None')
+            msgbox('You need to select a network to run the test from');
+            bool=false;
+        end
     end
     function changeImageSize(hOb, ~)
         val=str2double(hOb.String);
@@ -241,16 +289,44 @@ waitfor(mainFigure);
                     hPrepImageEdit2.String=num2str(val);
                     defaults.imageSize(2)=val;
                 end
+                if defaults.trainingImageSize(1)>val
+                    %Training image size may not be larger than image size
+                    defaults.trainingImageSize(1)=val;
+                    hTrainImageEdit1.String=num2str(val);
+                    if ~defaults.allowNonSquareImages
+                        hTrainImageEdit2.String=num2str(val);
+                        defaults.trainingImageSize(2)=val;
+                    end
+                end
             case hPrepImageEdit2
                 defaults.imageSize(2)=val;
+                if defaults.trainingImageSize(2)>val
+                    %Training image size may not be larger than prep image size
+                    defaults.trainingImageSize(2)=val;
+                    hTrainImageEdit2.String=num2str(val);
+                end
             case hTrainImageEdit1
                 defaults.trainingImageSize(1)=val;
                 if ~defaults.allowNonSquareImages
                     hTrainImageEdit2.String=num2str(val);
                     defaults.trainingImageSize(2)=val;
                 end
+                if defaults.imageSize(1)<val
+                    %Training image size may not be larger than prep image size
+                    defaults.imageSize(1)=val;
+                    hPrepImageEdit1.String=num2str(val);
+                    if ~defaults.allowNonSquareImages
+                        hPrepImageEdit2.String=num2str(val);
+                        defaults.imageSize(2)=val;
+                    end
+                end
             case hTrainImageEdit2
                 defaults.trainingImageSize(2)=val;
+                if defaults.imageSize(2)<val
+                    %Training image size may not be larger than prep image size
+                    defaults.imageSize(2)=val;
+                    hPrepImageEdit2.String=num2str(val);
+                end
         end
     end
     function ratioChange(hOb,~)
@@ -282,24 +358,34 @@ waitfor(mainFigure);
     function changeInterface(~,event)
         set(allHandles,'Visible', 'off');
         switch event.NewValue
-            case hFolderSelect
+            case hTrainFromDataset
                 set(visOnFolder,'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', continueFromTT);
             case hPrepareDataset
                 set(visOnPrepare,'Visible','on');
-            case hTest
+            case hPrepareDatasetFromConfig
+                set(visOnPrepFromConf, 'Visible', 'on');
+            case hTestFromDataset
                 set(visOnTest,'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', testFromTT);
-            case hFromDat
+            case hTrainFromConfig
                 set(visOnDat,'Visible', 'on');
-            case hTestDat
+            case hTestFromConfig
                 set(visOnDatTest, 'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', testFromTT);
         end
     end
 
 function add(~,~)
-    [infoFile, folder] = uigetfile('*.dat');
+    global lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+    if ~ischar(folder)
+        return;
+    end
+    lastfolder=folder;
     newdatFile=fullfile(folder,infoFile);
     str=get(hFiles, 'String');
     if isempty(str)
@@ -322,10 +408,17 @@ function close(~,~)
     delete(gcf);
 end
 function openFolder(hOb)
+    global lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    folder = uigetdir(lastfolder);
+    if ~ischar(folder)
+        return;
+    end
+    lastfolder=folder;
 
-    folder = uigetdir();
-
-    if isequal(hOb,hFolderEdit)
+    if isequal(hOb,hFolderButton)
         %Get features in dataset
         feat=dir(folder);
         feat={feat.name};
@@ -345,11 +438,17 @@ function openFolder(hOb)
 
 end
 function openDatFile(hOb)
-    [infoFile, folder] = uigetfile('*.dat');
+    global lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+    if ~ischar(folder)
+        return;
+    end
+    lastfolder=folder;
     newdatFile=fullfile(folder,infoFile);
-
     set(hOb, 'String', newdatFile); 
-
 end
 
 end

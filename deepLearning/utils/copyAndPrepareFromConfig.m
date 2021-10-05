@@ -1,12 +1,17 @@
-function copyAndPrepareFromConfig(path,config,targetfolder,fid,settings)
+function nrImages=copyAndPrepareFromConfig(path,config,targetfolder,fid,settings, offset)
 %COPYANDPREPAREFROMDAT Summary of this function goes here
 %   Detailed explanation goes here
+%   When wanting to add images to a folder, set offset to the last previous
+%   image number
 
 if nargin<4
     fid=NaN;
 end
 if nargin<5
     settings=readDefaults(fullfile(path,config));
+end
+if nargin<6
+    offset=0;
 end
 if ~isfolder(targetfolder) || ~isfile(fullfile(targetfolder,'class_dict.csv'))
     prepareFolderForTrainDataset(targetfolder,'.',settings.backgroundColor)
@@ -71,8 +76,8 @@ else
     
 end
 fclose(f);
-
-for i=1:numel(routes)
+nrImages=numel(routes);
+for i=1:nrImages
     if ismember(routes{i},duplicates)
         %They will be included later, fusing it into the original
         continue;
@@ -80,7 +85,7 @@ for i=1:numel(routes)
     rv=rand();
     if rv<=ratios(1); type='train'; elseif rv<=ratios(1)+ratios(2)
        type='val'; else; type='test'; end
-    fn=[config(1:end-4),'_' num2str(i,'%04.f'),'.tif'];
+    fn=[config(1:end-4),'_' num2str(i+offset,'%04.f'),'.tif'];
     
     %% Reads the image and the mask.
     imageFullName = fullfile(path,[routes{i} '.tif']);
