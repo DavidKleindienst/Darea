@@ -5,7 +5,6 @@ addpath('./util/');
 addpath('./plot/');
 addpath('./guiutils/');
 addpath('./python/');
-addpath('./preembedding/');
 addpath('./partlabeling/');
 addpath('./partlabeling/classifierTraining/');
 addpath('./demarcation/');
