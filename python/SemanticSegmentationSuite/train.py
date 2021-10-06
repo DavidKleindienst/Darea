@@ -245,13 +245,8 @@ def main(args=None):
                 output_image = utils.load_image(train_output_names[id])
     
                 with tf.device('/cpu:0'):
-                    if i==0:
-                        imageSize=input_image.shape
-                        if len(imageSize)==3:
-                            imageSize=imageSize[0:1]
-                        #Save size of 1st image for Darea (all images have same size if prepared by Darea)
                     input_image, output_image = data_augmentation(input_image, output_image, args, backgroundValue)
-                    if 1:
+                    if 0:
                         #Debugging: 
                         try:
                             os.mkdir('imagesinTrain')
@@ -454,7 +449,7 @@ def main(args=None):
         
         with open(model_checkpoint_name[:-4]+'txt', 'a+') as f:
             #Save some info on filesizes
-            f.write('imageSize\t{}\ntrainImageSize\t{}'.format(imageSize,[args.crop_height,args.crop_width]))
+            f.write('imageSize\t{}'.format([args.crop_height,args.crop_width]))
     
         if not args.darea_call and args.makePlots:
             fig1, ax1 = plt.subplots(figsize=(11, 8))

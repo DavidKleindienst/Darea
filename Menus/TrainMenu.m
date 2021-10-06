@@ -32,8 +32,8 @@ hTestFromConfig=uicontrol(bg,'Style','Radiobutton', 'Position', [60 400 460 20],
 
 
 folderTT='Select folder with prepared datasets';
-hFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose datset folder path', ...
-                    'Tooltipstring',folderTT, 'Position', [25 365 425 25], ...
+hFolderButton=uicontrol('Style', 'pushbutton', 'String', 'Choose dataset folder path', ...
+                    'Tooltipstring',folderTT, 'Position', [25 365 375 25], ...
                     'Callback',@(hOb,~)openFolder(hOb)); 
 
 inputFolderTT=sprintf(['Choose the input folder which should contain one folder per feature.\n' ...
@@ -66,7 +66,6 @@ hRemove=uicontrol('Style', 'pushbutton', 'String', '–', 'Position', [480 330 2
 
 featTT='Name the feature you would like to predict (e.g. PSD)';
 hFeatText=uicontrol('Style', 'Text', 'String', 'Feature', 'Position', [25 260 60 25], 'Tooltipstring', featTT);
-hFeatEdit=uicontrol('Style', 'Edit', 'Position', [90 260 130 25], 'Tooltipstring', featTT);
 hFeatPopup=uicontrol('Style', 'popup', 'Position', [90 260 130 25], 'Tooltipstring', featTT, 'Enable', 'off', 'String',{''});
 
 
@@ -115,10 +114,10 @@ if defaults.allowNonSquareImages
 else
     sizeEnable='off';
 end
-hPreparedImageSizeTT=sprintf(['Image will be downscaled to this size.\n', ...
+hPreparedImageSizeTT=sprintf(['Image will be downscaled to this size. Needs to be a multiple of 32\n', ...
                     'If image is a rectangle but size is a square the largest possible middle square will be cropped', ...
                     'Please refer to the handbook for more detailed information']);
-hPrepImageSizeText=uicontrol('Style', 'Text', 'String', 'Prepared Image Size', 'Tooltipstring', hPreparedImageSizeTT, ...
+hPrepImageSizeText=uicontrol('Style', 'Text', 'String', 'Image Size', 'Tooltipstring', hPreparedImageSizeTT, ...
                         'Position', [25 120 100 25]);
 hPrepImageEdit1=uicontrol('Style', 'Edit', 'String', num2str(defaults.imageSize(1)), 'Tooltipstring', hPreparedImageSizeTT, ...
                     'Position', [125 125 50 25], 'Callback', @changeImageSize);
@@ -126,42 +125,26 @@ hPrepImageSizeX=uicontrol('Style', 'Text', 'String', 'x', 'Tooltipstring', hPrep
 hPrepImageEdit2=uicontrol('Style', 'Edit', 'String', num2str(defaults.imageSize(2)), 'Tooltipstring', hPreparedImageSizeTT, ...
                     'Position', [190 125 50 25], 'Callback', @changeImageSize, 'Enable', sizeEnable);
 
+hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220 70 180 35], 'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'center');
 
-hTrainImageSizeTT=sprintf(['Select the image size used for training. Must be same size or smaller than prepared image size\n', ...
-                    'If prepared image is larger than training image size, a random portion of the image will be cropped in each epoch. \n',...
-                    'Larger size requires more GPU memory.\nImage size of 512x512 requires 8GB or more GPU memory\n',...
-                    'Please refer to the handbook for more detailed information.']);
-hTrainImageSizeText=uicontrol('Style', 'Text', 'String', 'Training Image Size', 'Tooltipstring', hTrainImageSizeTT, ...
-                        'Position', [300 120 100 25]);
-hTrainImageEdit1=uicontrol('Style', 'Edit', 'String', num2str(defaults.trainingImageSize(1)), 'Tooltipstring', hTrainImageSizeTT, ...
-                    'Position', [400 125 50 25], 'Callback', @changeImageSize);
-hTrainImageSizeX=uicontrol('Style', 'Text', 'String', 'x', 'Tooltipstring', hTrainImageSizeTT, 'Position', [450 120 15 25]);
-hTrainImageEdit2=uicontrol('Style', 'Edit', 'String', num2str(defaults.trainingImageSize(2)), 'Tooltipstring', hTrainImageSizeTT, ...
-                    'Position', [465 125 50 25], 'Callback', @changeImageSize, 'Enable', sizeEnable);
+hStart=uicontrol('Style', 'pushbutton', 'String', 'Train', 'Tooltipstring', 'Start Training', 'Position', [300 30 90 30], 'Callback', @start);
+hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 30 90 30], 'Callback', @close);
 
-hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220 100 180 35], 'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'center');
-
-hStart=uicontrol('Style', 'pushbutton', 'String', 'Train', 'Tooltipstring', 'Start Training', 'Position', [300 60 90 30], 'Callback', @start);
-hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 60 90 30], 'Callback', @close);
-
-visOnFolder=[hFolderButton,hFeatPopup,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit, hLearnRateEdit, ...
-            hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2];
+visOnFolder=[hFolderButton,hFeatPopup,hFeatText,hEpochsText,hEpochsEdit,hBatchText, hBatchEdit,...
+            hLearnRateEdit, hLearnRateText,hContinueDD,hContinueText,hSaveAsText,hSaveAsEdit];
 visOnPrepFromConf=[hFileTxt,hFiles,hAdd,hRemove, hOutputFolderButton, ...
             hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE,...
-            hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2, ...
-            hFeatText, hFeatEdit];
+            hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 visOnPrepare=[hOutputFolderButton, hInputFolderButton, ...
             hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,hRatiosTe,hRatiosTeE,...
             hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 visOnTest=[hFolderButton,hFeatPopup,hFeatText,hContinueDD,hTestFromText,hResultsFolderButton];
 visOnDatTest=[hDatTestButton,hContinueDD,hTestFromText,hResultsFolderButton, ...
-            hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX,hTrainImageEdit2,...
             hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
-visOnDat=[hFileTxt,hFiles,hAdd,hRemove,hFeatEdit,hFeatText,hEpochsText,hEpochsEdit, ...
+visOnDat=[hFileTxt,hFiles,hAdd,hRemove,hEpochsText,hEpochsEdit, ...
        hBatchText, hBatchEdit, hLearnRateEdit, hLearnRateText,hContinueDD,hContinueText, ...
        hSaveAsText,hSaveAsEdit,hRatiosText,hRatiosTr,hRatiosTrE,hRatiosVE,hRatiosV,...
-       hRatiosTe,hRatiosTeE,hTrainImageSizeText,hTrainImageEdit1,hTrainImageSizeX, ...
-       hTrainImageEdit2, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
+       hRatiosTe,hRatiosTeE, hPrepImageSizeText,hPrepImageEdit1,hPrepImageSizeX,hPrepImageEdit2];
 
 allHandles=unique([visOnFolder,visOnPrepare,visOnTest,visOnDat,visOnDatTest, visOnPrepFromConf]);
 set(allHandles,'Visible', 'off');
@@ -177,12 +160,12 @@ waitfor(mainFigure);
             %Differentiate type of inputs to pull correct values from UI
             case {hPrepareDatasetFromConfig, hTrainFromConfig} 
                 dataset=hFiles.String;
-                feature=hFeatEdit.String;
+                feature='foreground';
             case hTestFromConfig
                 dataset=hDatTestButton.String;
                 feature='foreground';
             case hPrepareDataset
-                dataset=hInputFolderButton;
+                dataset=hInputFolderButton.String;
             case {hTrainFromDataset, hTestFromDataset}
                 dataset=hFolderButton.String;
                 feature=getSelectedStringFromPopup(hFeatPopup);
@@ -200,7 +183,7 @@ waitfor(mainFigure);
             case hPrepareDataset
                 hProgress.String='Preparing Dataset...';
                 drawnow();
-                if CopyAndPrepareTrainingImagesFromFolder(dataset,hOutputFolderButton.String,settings)
+                if CopyAndPrepareTrainingImagesFromFolder(dataset,hOutputFolderButton.String,defaults)
                     hProgress.String='Finished preparing Dataset!';
                 else
                     hProgress.String='Dataset preparation failed!';
@@ -216,7 +199,7 @@ waitfor(mainFigure);
                     dataset=hDatTestButton.String;
                 end
                 save_Predictions=1; %Whether or not predicted demarcations should be saved
-                %To do: askd user about that!
+                %To do: ask user about that!
                 test(dataset,feature,continue_from,outfolder,save_Predictions,hProgress);
         end
         figure(mainFigure);   
@@ -245,16 +228,8 @@ waitfor(mainFigure);
                 msgbox('The train/val/test ratios do not add up to 1');
                 bool=false;
             end
-            if isempty(hFeatEdit.String)
-                msgbox('You have to specify a name for the feature');
-                bool=false;
-            end
         end
-        if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) ...
-                    && ~getSelectedStringFromPopup(hFeatPopup)
-            msgbox('You have to select a feature');
-            bool=false;
-        end
+
         if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) ...
                     && ~isfolder(hFolderButton.String)
             msgbox('The specified folder does not exist');
@@ -269,17 +244,19 @@ waitfor(mainFigure);
     function changeImageSize(hOb, ~)
         val=str2double(hOb.String);
         if isnan(val)
+            %Illegal Input
             switch hOb
                 case hPrepImageEdit1
                     hOb.String=num2str(defaults.imageSize(1));
                 case hPrepImageEdit2
                     hOb.String=num2str(defaults.imageSize(2));    
-                case hTrainImageEdit1
-                    hOb.String=num2str(defaults.trainingImageSize(1));
-                case hTrainImageEdit2
-                    hOb.String=num2str(defaults.trainingImageSize(2));
             end
             return
+        end
+        % Only multiples of 32 are allowed. If it is not, pick the nearest valid value
+        if mod(val, 32)~=0
+            val=32*round(val/32);
+            hOb.String=num2str(val);
         end
         val=floor(val); % Only int values are allowed
         switch hOb
@@ -289,44 +266,8 @@ waitfor(mainFigure);
                     hPrepImageEdit2.String=num2str(val);
                     defaults.imageSize(2)=val;
                 end
-                if defaults.trainingImageSize(1)>val
-                    %Training image size may not be larger than image size
-                    defaults.trainingImageSize(1)=val;
-                    hTrainImageEdit1.String=num2str(val);
-                    if ~defaults.allowNonSquareImages
-                        hTrainImageEdit2.String=num2str(val);
-                        defaults.trainingImageSize(2)=val;
-                    end
-                end
             case hPrepImageEdit2
                 defaults.imageSize(2)=val;
-                if defaults.trainingImageSize(2)>val
-                    %Training image size may not be larger than prep image size
-                    defaults.trainingImageSize(2)=val;
-                    hTrainImageEdit2.String=num2str(val);
-                end
-            case hTrainImageEdit1
-                defaults.trainingImageSize(1)=val;
-                if ~defaults.allowNonSquareImages
-                    hTrainImageEdit2.String=num2str(val);
-                    defaults.trainingImageSize(2)=val;
-                end
-                if defaults.imageSize(1)<val
-                    %Training image size may not be larger than prep image size
-                    defaults.imageSize(1)=val;
-                    hPrepImageEdit1.String=num2str(val);
-                    if ~defaults.allowNonSquareImages
-                        hPrepImageEdit2.String=num2str(val);
-                        defaults.imageSize(2)=val;
-                    end
-                end
-            case hTrainImageEdit2
-                defaults.trainingImageSize(2)=val;
-                if defaults.imageSize(2)<val
-                    %Training image size may not be larger than prep image size
-                    defaults.imageSize(2)=val;
-                    hPrepImageEdit2.String=num2str(val);
-                end
         end
     end
     function ratioChange(hOb,~)
@@ -361,18 +302,24 @@ waitfor(mainFigure);
             case hTrainFromDataset
                 set(visOnFolder,'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', continueFromTT);
+                hStart.String='Train';
             case hPrepareDataset
                 set(visOnPrepare,'Visible','on');
+                hStart.String='Prepare';
             case hPrepareDatasetFromConfig
                 set(visOnPrepFromConf, 'Visible', 'on');
+                hStart.String='Prepare';
             case hTestFromDataset
                 set(visOnTest,'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', testFromTT);
+                hStart.String='Test';
             case hTrainFromConfig
                 set(visOnDat,'Visible', 'on');
+                hStart.String='Train';
             case hTestFromConfig
                 set(visOnDatTest, 'Visible', 'on');
                 set(hContinueDD, 'Tooltipstring', testFromTT);
+                hStart.String='Test';
         end
     end
 

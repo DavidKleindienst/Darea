@@ -26,8 +26,8 @@ if isfile(imDataset)
     copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),fid,settings);
     fclose(fid);
     imSizes=getImSizesFromCSV('tmp/info.csv');
-    crop_height=settings.trainingImageSize(1);
-    crop_width=settings.trainingImageSize(2);
+    crop_height=settings.imageSize(1);
+    crop_width=settings.imageSize(2);
 elseif isfolder(imDataset)
     %Folder with prepared images
     if isfolder(fullfile(imDataset,feature))

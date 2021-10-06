@@ -79,8 +79,7 @@ showFilters	false
 changeLeftImage	false
 
 #DeepLearning
-imageSize	[512,512] 	#Size to which images are converted before training/prediction
-trainingImageSize	[512,512]	#Size at which images are trained on/predicted on. Needs to be same size or smaller than imageSize. If smaller than imageSize, then for training a random piece of image is cropped out in each epoch; for prediction portions of the image are cropped and predicted on seperately, effectively covering whole image.
+imageSize	[512,512] 	#Size to which images are converted before training/prediction. Needs to be multiple of 32.
 allowNonSquareImages	false	#Set to true to be able edit both sizes in the GUI (at your own risk)
 classifierPath	'partlabeling/classifierTraining/classifiers/'
 defaultClassifier	'Forest'
@@ -97,4 +96,4 @@ featureName	'Foreground'	#This should be set to the groupname when splitDemarcat
 
 #Internal Stuff. Don't change unless you know what you're doing
 chosenGroups	[1]
-SimOptions.removeExtreme	'random'      #Alternative is NNDs, but this is more biased and may not work with other Options, therefore this value should not be changed by the user
+SimOptions.removeExtreme	'random'      #Alternative is NNDs, but this is more biased and may not work with other Options.
