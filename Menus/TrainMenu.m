@@ -89,11 +89,12 @@ continueFromTT=sprintf('Training may be continued from a previous checkpoint.\nT
 testFromTT='Select Network to perform test from';
 hContinueText=uicontrol('Style', 'Text', 'String', 'Continue Training from', 'Position', [25 190 120 25], 'Tooltipstring',continueFromTT);
 hTestFromText=uicontrol('Style', 'Text', 'String', 'Test network', 'Position', [25 190 120 25], 'Tooltipstring',testFromTT);
-hContinueDD=uicontrol('Style', 'popup', 'String',trained_networks, 'Position', [155 190 160 25], 'Tooltipstring', continueFromTT);
+hContinueDD=uicontrol('Style', 'popup', 'String',trained_networks, 'Position', ...
+                [155 190 160 25], 'Tooltipstring', continueFromTT, 'Callback', @selectNetwork);
 
 saveAsTT=sprintf('Name of the newly trained network\nWhen picking a  name present in the continue training list, that one will be overwritten');
 hSaveAsText=uicontrol('Style', 'Text', 'String', 'Save As', 'Position', [320 190 60 25], 'Tooltipstring', saveAsTT);
-hSaveAsEdit=uicontrol('Style', 'Edit', 'Position', [380 190 80 25], 'Tooltipstring', saveAsTT);
+hSaveAsEdit=uicontrol('Style', 'Edit', 'Position', [380 190 80 25], 'Tooltipstring', saveAsTT, 'Callback', @checkSaveName);
 
 ratioTT=sprintf(['Which fraction of images should be used for training, validation and test.\n'...
                 'The numbers have to add up to 1. So we copute test from your other inputs.\n' ...
@@ -191,6 +192,9 @@ waitfor(mainFigure);
             case {hTrainFromConfig, hTrainFromDataset}
                 continue_from=getSelectedStringFromPopup(hContinueDD);
                 train(dataset,feature,continue_from,hProgress,defaults,hSaveAsEdit.String);
+                trained_networks=getTrainedNetworks();
+                trained_networks=[{'None'}, trained_networks];
+                hContinueDD.String=trained_networks;
             case {hTestFromDataset, hTestFromConfig}
                 continue_from=getSelectedStringFromPopup(hContinueDD);
                 outfolder=hResultsFolderButton.String;
@@ -214,31 +218,88 @@ waitfor(mainFigure);
             end
         end
     end
-        
+    function selectNetwork(hOb, ~)
+        % On Training, if a network is selected to continue from
+        % imageSize has to be same then for that network
+        switch bg.SelectedObject
+            case {hTrainFromConfig, hTrainFromDataset}
+                if hOb.Value==1
+                    %No network selected
+                    enableImageEdits()
+                    return;
+                end
+                imageSize=getNetworkImageSize(getSelectedStringFromPopup(hOb));
+                defaults.imageSize=imageSize;
+                hPrepImageEdit1.String=num2str(imageSize(1));
+                hPrepImageEdit2.String=num2str(imageSize(2));
+                set(hPrepImageEdit1, 'enable', 'off');
+                set(hPrepImageEdit2, 'enable', 'off');
+                
+            otherwise
+                return;                
+        end
+    end
+    function enableImageEdits()
+        set(hPrepImageEdit1, 'enable', 'on');
+        if defaults.allowNonSquareImages
+            set(hPrepImageEdit2, 'enable', 'off');
+        end
+    end
     function bool=checkUserInputs()
         %Returns true if everything is fine
         bool=true;
         if isContainedIn(bg.SelectedObject, {hPrepareDataset,hPrepareDatasetFromConfig}) ...
-                    && ~isfolder(fileparts(hOutputFolderButton.String))
+                    && ~isfolder(hOutputFolderButton.String)
             msgbox('The path to output folder is not valid');
             bool=false;
         end
-        if isContainedIn(bg.SelectedObject,{hPrepareDatasetFromConfig,hTrainFromConfig})
-            if isnan(defaults.train_val_test_ratios(3))
-                msgbox('The train/val/test ratios do not add up to 1');
+        
+        if isContainedIn(bg.SelectedObject,{hPrepareDatasetFromConfig,hTrainFromConfig}) ...
+                    && isnan(defaults.train_val_test_ratios(3))
+            msgbox('The train/val/test ratios do not add up to 1');
+            bool=false;
+        end
+        if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) 
+            if ~isfolder(hFolderButton.String)
+                msgbox('The specified folder does not exist');
+                bool=false;
+            elseif ~strcmp(getSelectedStringFromPopup(hContinueDD), 'None')
+                imSizeNetwork=getNetworkImageSize(getSelectedStringFromPopup(hContinueDD));
+                imSizeDataset=getImageSizeFromInfoFile(fullfile(hFolderButton.String, 'dataset.info'));
+                
+                if ~isequal(imSizeNetwork, imSizeDataset)
+                    bool=false;
+                    if isequal(bg.SelectedObject,hTrainFromDataset)
+                        name='Training';
+                    else
+                        name='Testing';
+                    end
+                    msgbox(sprintf(['The selected network requires a different image ' ...
+                        'size (%ix%i) than the one in the selected dataset (%ix%i).\n' ...
+                        '%s can therefore not be performed with this combination of dataset and network'], ...
+                        imSizeNetwork(1), imSizeNetwork(2), imSizeDataset(1), imSizeDataset(2),name));
+                end
+            end 
+        end
+        if isContainedIn(bg.SelectedObject,{hTestFromConfig,hTestFromDataset}) 
+            if strcmp(getSelectedStringFromPopup(hContinueDD), 'None')
+                msgbox('You need to select a network to run the test from');
+                bool=false;
+            end
+            if ~isfolder(hResultsFolderButton.String)
+                msgbox('The path to results folder is not valid');
                 bool=false;
             end
         end
-
-        if isContainedIn(bg.SelectedObject,{hTrainFromDataset,hTestFromDataset}) ...
-                    && ~isfolder(hFolderButton.String)
-            msgbox('The specified folder does not exist');
-            bool=false;
-        end
-        if isContainedIn(bg.SelectedObject,{hTestFromConfig,hTestFromDataset}) ...
-                    && strcmp(getSelectedStringFromPopup(hContinueDD), 'None')
-            msgbox('You need to select a network to run the test from');
-            bool=false;
+        if isContainedIn(bg.SelectedObject, {hTrainFromConfig,hTrainFromDataset})
+            name=hSaveAsEdit.String;
+            if isempty(name)
+                msgbox('Please select a name to save network as');
+                bool=false;
+            elseif strcmp(name, 'None')
+                msgbox('Save network name may not be "None"')
+                bool=false;
+            end
         end
     end
     function changeImageSize(hOb, ~)
@@ -258,7 +319,6 @@ waitfor(mainFigure);
             val=32*round(val/32);
             hOb.String=num2str(val);
         end
-        val=floor(val); % Only int values are allowed
         switch hOb
             case hPrepImageEdit1
                 defaults.imageSize(1)=val;
@@ -323,80 +383,107 @@ waitfor(mainFigure);
         end
     end
 
-function add(~,~)
-    global lastfolder
-    if isempty(lastfolder)
-        lastfolder=cd;
+    function checkSaveName(hOb, ~)
+        while startsWith(hOb.String, '.')
+            hOb.String=hOb.String(2:end);
+        end
+        hOb.String=strrep(hOb.String, '/', '_');
+        hOb.String=strrep(hOb.String, '\', '_');
     end
-    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
-    if ~ischar(folder)
-        return;
-    end
-    lastfolder=folder;
-    newdatFile=fullfile(folder,infoFile);
-    str=get(hFiles, 'String');
-    if isempty(str)
-        str={newdatFile};
-    else
-        str{end+1}=newdatFile;
-    end
-    set(hFiles, 'String', unique(str));
-end
-
-function remove(~,~)
-    str=get(hFiles, 'String');
-    val=get(hFiles, 'Value');
-    str(val)=[];
-    set(hFiles, 'String', str);
-    set(hFiles, 'Value', []);
-end
-
-function close(~,~)
-    delete(gcf);
-end
-function openFolder(hOb)
-    global lastfolder
-    if isempty(lastfolder)
-        lastfolder=cd;
-    end
-    folder = uigetdir(lastfolder);
-    if ~ischar(folder)
-        return;
-    end
-    lastfolder=folder;
-
-    if isequal(hOb,hFolderButton)
-        %Get features in dataset
-        feat=dir(folder);
-        feat={feat.name};
-        feat=feat(~startsWith(feat,'.'));
-        feat=feat(isfolder(fullfile(folder,feat)));
-        if isempty(feat)
-            %No features found
-            hOb.String='Error. No features found in this dataset';
-            hFeatPopup.Enable='off';
+    function add(~,~)
+        global lastfolder
+        if isempty(lastfolder)
+            lastfolder=cd;
+        end
+        [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+        if ~ischar(folder)
             return;
         end
-        hFeatPopup.Enable='on';
-        hFeatPopup.String=feat;
+        lastfolder=folder;
+        newdatFile=fullfile(folder,infoFile);
+        str=get(hFiles, 'String');
+        if isempty(str)
+            str={newdatFile};
+        else
+            str{end+1}=newdatFile;
+        end
+        set(hFiles, 'String', unique(str));
     end
-    % Updates the interface.
-    set(hOb, 'String', folder); 
 
-end
-function openDatFile(hOb)
-    global lastfolder
-    if isempty(lastfolder)
-        lastfolder=cd;
+    function remove(~,~)
+        str=get(hFiles, 'String');
+        val=get(hFiles, 'Value');
+        str(val)=[];
+        set(hFiles, 'String', str);
+        set(hFiles, 'Value', []);
     end
-    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
-    if ~ischar(folder)
-        return;
+
+    function close(~,~)
+        delete(gcf);
     end
-    lastfolder=folder;
-    newdatFile=fullfile(folder,infoFile);
-    set(hOb, 'String', newdatFile); 
-end
+    function openFolder(hOb)
+        global lastfolder
+        if isempty(lastfolder)
+            lastfolder=cd;
+        end
+        folder = uigetdir(lastfolder);
+        if ~ischar(folder)
+            return;
+        end
+        lastfolder=folder;
+
+        if isequal(hOb,hFolderButton)
+            %Get features in dataset
+            feat=dir(folder);
+            feat={feat.name};
+            feat=feat(~startsWith(feat,'.'));
+            feat=feat(isfolder(fullfile(folder,feat)));
+            if isempty(feat)
+                %No features found
+                hOb.String='Error. No features found in this dataset';
+                hFeatPopup.Enable='off';
+                return;
+            end
+            hFeatPopup.Enable='on';
+            hFeatPopup.String=feat;
+        end
+        
+        if isContainedIn(bg.SelectedObject, {hPrepareDataset, hPrepareDatasetFromConfig}) ...
+                    && isequal(hOb, hOutputFolderButton)
+            if ~isfile(fullfile(folder, 'dataset.info')) && isfile(fullfile(fileparts(folder), 'dataset.info')) ...
+                        && isfile(fullfile(folder, 'configs.csv'))
+                %User should have selected one folderlevel higher, correct this
+                folder=fileparts(folder);
+            end
+            if isfile(fullfile(folder, 'dataset.info'))
+                imageSize=getImageSizeFromInfoFile(fullfile(folder, 'dataset.info'));
+                defaults.imageSize=imageSize;
+                hPrepImageEdit1.String=num2str(imageSize(1));
+                hPrepImageEdit2.String=num2str(imageSize(2));
+                set(hPrepImageEdit1, 'enable', 'off');
+                set(hPrepImageEdit2, 'enable', 'off');
+            else
+                enableImageEdits()
+            end
+                
+        end
+        % Updates the interface.
+        set(hOb, 'String', folder); 
+
+    end
+    function openDatFile(hOb)
+        global lastfolder
+        if isempty(lastfolder)
+            lastfolder=cd;
+        end
+        [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+        if ~ischar(folder)
+            return;
+        end
+        lastfolder=folder;
+        newdatFile=fullfile(folder,infoFile);
+        set(hOb, 'String', newdatFile); 
+    end
 
 end
 

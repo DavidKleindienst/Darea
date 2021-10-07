@@ -7,6 +7,9 @@ if isfile(imDataset)
     if nargin < 7
         settings=readDefaults(imDataset);
     end
+    settings.imageSize=getNetworkImageSize(network);
+    crop_height=settings.imageSize(1);
+    crop_width=settings.imageSize(2);
     %datFile
     %->Convert and then test
     set(hProgress, 'String', 'Preparing dataset for test');
@@ -23,13 +26,16 @@ if isfile(imDataset)
     fprintf(fid,'OriginalRoute;Name;ImageSize;Type');
 
     [pa, fil, ext]=fileparts(imDataset);
+
     copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),fid,settings);
     fclose(fid);
     imSizes=getImSizesFromCSV('tmp/info.csv');
-    crop_height=settings.imageSize(1);
-    crop_width=settings.imageSize(2);
+
 elseif isfolder(imDataset)
     %Folder with prepared images
+    imageSize=getNetworkImageSize(network);
+    crop_height=imageSize(1);
+    crop_width=imageSize(2);
     if isfolder(fullfile(imDataset,feature))
         path=imDataset;
     else

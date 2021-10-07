@@ -78,7 +78,7 @@ function start(~,~)
         set(hProgress, 'String', 'Starting Demarcation Prediction');
         drawnow();
         try
-            predict(datFile,feature,hProgress,get(hOverwrite,'Value'),settings);
+            predict(datFile,feature,hProgress,hOverwrite.Value);
         catch expt
             set(hProgress, 'String', 'Demarcation Prediction failed');
             rethrow(expt);

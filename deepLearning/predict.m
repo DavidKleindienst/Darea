@@ -1,4 +1,4 @@
-function predict(config, feature,hProgress, overwrite,settings)
+function predict(config, network,hProgress, overwrite)
 %% Carries out all preparations for prediction and calls python function to do predictions
 %First Converts all images and saves in tmp folder
 %Then assembles all pyargs 
@@ -6,10 +6,10 @@ function predict(config, feature,hProgress, overwrite,settings)
 %Then converts back the prediction outputs and saves them in original folder
 %Then deletes all tmp files
 
-
 if nargin<4
     overwrite=NaN;
 end
+imageSize=getNetworkImageSize(network);
 delTmp=true;    %Whether to delete temporary folder. (Only disable for bugfixing)
 %Prepare temporary Folders
 tmpFolder='tmp/';
@@ -52,7 +52,7 @@ end
 %Convert Images
 set(hProgress, 'String', 'Preparing Images...');
 drawnow();
-imSizes=prepareForPrediction(files, imFolder,selAngles, settings.imageSize);
+imSizes=prepareForPrediction(files, imFolder,selAngles, imageSize);
 
 %Do Prediction with python
 set(hProgress, 'String', 'Predicting demarcations...');
@@ -60,7 +60,7 @@ drawnow();
 args=[' --image "', convPath(imFolder), ...
         '" --outpath "', convPath(predFolder), ...
         '" --file_suffix ', '.tif', ' --dataset "', convPath('deepLearning/checkpoints/') ...
-        '" --checkpoint_path "', convPath(['deepLearning/checkpoints/' feature '.ckpt']), ...
+        '" --checkpoint_path "', convPath(['deepLearning/checkpoints/' network '.ckpt']), ...
         '" --darea_call ', '1'];
 [~,pyExe]=pyversion;
 cmd=[pyExe ' python/SemanticSegmentationSuite/predict.py' args];

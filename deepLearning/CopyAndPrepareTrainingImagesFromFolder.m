@@ -6,6 +6,18 @@ safeMkdir(outfolder);
 if nargin<3
     settings=readDefaults();
 end
+infoFile=fullfile(outfolder,'dataset.info');
+if isfile(infoFile)
+    settings.imageSize=getImageSizeFromInfoFile(infoFile);
+    f=fopen(infoFile,'a');
+    fprintf(f, '\nUpdated\t%s',  datestr(datetime('now')));
+    fclose(f);
+else
+    f=fopen(infoFile,'w');
+    fprintf(f, 'imageSize\t[%i, %i]', settings.imageSize(1),settings.imageSize(2));
+    fprintf(f, '\nCreated\t%s',  datestr(datetime('now')));
+    fclose(f);
+end
 % For all subfolders (i.e. different things to be learned) in the folder
 features=dir(infolder);
 features={features.name};

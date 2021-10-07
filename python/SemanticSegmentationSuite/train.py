@@ -145,13 +145,13 @@ def main(args=None):
     # Load a previous checkpoint if desired    
     if args.darea_call:
         if args.continue_training and args.continue_from:
-            model_checkpoint_name='../../DeepLearning/checkpoints/' + args.continue_from + '.ckpt'
+            model_checkpoint_name='../../deepLearning/checkpoints/' + args.continue_from + '.ckpt'
             if os.path.isfile(model_checkpoint_name+'.index'):
                 print('Loading latest model checkpoint...')
                 saver.restore(sess, model_checkpoint_name)
                 print('successfully loaded {}'.format(model_checkpoint_name))
             else:
-                print('Specified checkpoint not found. Starting fresh one')
+                print('Specified checkpoint {} not found. Starting fresh one'.format(os.path.abspath(model_checkpoint_name)))
         if args.save_path:
             model_checkpoint_name=os.path.join(args.save_path, args.dataset + '.ckpt')
     else:
@@ -378,7 +378,7 @@ def main(args=None):
                     
                 else:
                     input_image=np.expand_dims(np.float32(input_image)/255.0,axis=0)
-                    output_image = sess.run(network,feed_dict={net_input:input_image})
+                    output_image = sess.ruCreatedn(network,feed_dict={net_input:input_image})
                     output_image = np.array(output_image[0,:,:,:])
                     output_image = helpers.reverse_one_hot(output_image)
     
@@ -434,8 +434,8 @@ def main(args=None):
                 saver.save(sess,model_checkpoint_name)
                 best_avg_iou=avg_iou
                 #Save an info file
-                with open(model_checkpoint_name[:-4]+'txt', 'w') as f:
-                    f.write('Epoch\t{}\nValidation IoU score\t{}\n'.format(epoch,avg_iou))
+                with open(model_checkpoint_name[:-5]+'.info', 'w') as f:
+                    f.write('Epoch\t{}\nValidation IoU score\t{}'.format(epoch,avg_iou))
         epoch_time=time.time()-epoch_st
         remain_time=epoch_time*(args.num_epochs-1-epoch)
         m, s = divmod(remain_time, 60)
@@ -447,42 +447,43 @@ def main(args=None):
         utils.LOG(train_time)
         scores_list = []
         
-        with open(model_checkpoint_name[:-4]+'txt', 'a+') as f:
-            #Save some info on filesizes
-            f.write('imageSize\t{}'.format([args.crop_height,args.crop_width]))
+    with open(model_checkpoint_name[:-5]+'.info', 'a+') as f:
+        #Save some info on filesizes
+        f.write('\nimageSize\t{}'.format([args.crop_height,args.crop_width]))
+        f.write('\nTraining completed\t{}'.format(datetime.datetime.now().strftime("%d-%b-%Y %H:%M:%S")))
+
+    if not args.darea_call and args.makePlots:
+        fig1, ax1 = plt.subplots(figsize=(11, 8))
     
-        if not args.darea_call and args.makePlots:
-            fig1, ax1 = plt.subplots(figsize=(11, 8))
-        
-            ax1.plot(range(epoch+1), avg_scores_per_epoch)
-            ax1.set_title("Average validation accuracy vs epochs")
-            ax1.set_xlabel("Epoch")
-            ax1.set_ylabel("Avg. val. accuracy")
-        
-        
-            plt.savefig('accuracy_vs_epochs.png')
-        
-            plt.clf()
-        
-            fig2, ax2 = plt.subplots(figsize=(11, 8))
-        
-            ax2.plot(range(epoch+1), avg_loss_per_epoch)
-            ax2.set_title("Average loss vs epochs")
-            ax2.set_xlabel("Epoch")
-            ax2.set_ylabel("Current loss")
-        
-            plt.savefig('loss_vs_epochs.png')
-        
-            plt.clf()
-        
-            fig3, ax3 = plt.subplots(figsize=(11, 8))
-        
-            ax3.plot(range(epoch+1), avg_iou_per_epoch)
-            ax3.set_title("Average IoU vs epochs")
-            ax3.set_xlabel("Epoch")
-            ax3.set_ylabel("Current IoU")
-        
-            plt.savefig('iou_vs_epochs.png')
+        ax1.plot(range(epoch+1), avg_scores_per_epoch)
+        ax1.set_title("Average validation accuracy vs epochs")
+        ax1.set_xlabel("Epoch")
+        ax1.set_ylabel("Avg. val. accuracy")
+    
+    
+        plt.savefig('accuracy_vs_epochs.png')
+    
+        plt.clf()
+    
+        fig2, ax2 = plt.subplots(figsize=(11, 8))
+    
+        ax2.plot(range(epoch+1), avg_loss_per_epoch)
+        ax2.set_title("Average loss vs epochs")
+        ax2.set_xlabel("Epoch")
+        ax2.set_ylabel("Current loss")
+    
+        plt.savefig('loss_vs_epochs.png')
+    
+        plt.clf()
+    
+        fig3, ax3 = plt.subplots(figsize=(11, 8))
+    
+        ax3.plot(range(epoch+1), avg_iou_per_epoch)
+        ax3.set_title("Average IoU vs epochs")
+        ax3.set_xlabel("Epoch")
+        ax3.set_ylabel("Current IoU")
+
+        plt.savefig('iou_vs_epochs.png')
             
 
     

@@ -41,7 +41,7 @@ hGroups = uicontrol('Style', 'pushbutton', 'String', 'Group Settings', 'Position
 
                 
 %Preparation functions
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Preparation', 'Position', [20 290 100 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Preparation', 'Position', [20 290 250 25], 'FontWeight', 'bold');
 ttPrepro=sprintf('Image preprocessing\ne.g. convert to 16bit, adjust contrast, invert images.');
 ttDemarcate=sprintf('Demarcate Area of Interest');
 ttParticles=sprintf('Detect gold particles');
@@ -54,7 +54,7 @@ hParticles=uicontrol('Style', 'pushbutton', 'String', 'Particles', 'Tooltipstrin
 align([hPrepro, hDemarcate, hParticles], 'none','top');
 
 %Analysis function
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Analysis', 'Position', [20 235 100 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Analysis', 'Position', [20 235 250 25], 'FontWeight', 'bold');
 ttAnalysis=sprintf('Measure area, density, perform simulations and cluster analysis');
 ttFigures=sprintf('Calculate statistics and make figures');
 hAnalysis=uicontrol('Style', 'pushbutton', 'String', 'Analysis', 'Tooltipstring', ttAnalysis, 'Position',[25 215 100 25], ...
@@ -66,7 +66,7 @@ hVisualize=uicontrol('Style', 'pushbutton', 'String', 'Visualize', 'Tooltipstrin
 align([hAnalysis, hFigures,hVisualize], 'none','top');
 
 %DeepLearningStuff
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'DeepLearning', 'Position', [20 180 130 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'DeepLearning', 'Position', [20 180 250 25], 'FontWeight', 'bold');
 ttPredict='Use deeplearning to demarcate images';
 hPredict=uicontrol('Style', 'pushbutton', 'String', 'Automated Prediction', 'Tooltipstring', ttPredict, 'Position', [20 160 110 25], ...
                     'Callback', @(~,~)launchFunction(@predictMenu));
