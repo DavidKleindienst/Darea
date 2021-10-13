@@ -378,7 +378,7 @@ def main(args=None):
                     
                 else:
                     input_image=np.expand_dims(np.float32(input_image)/255.0,axis=0)
-                    output_image = sess.ruCreatedn(network,feed_dict={net_input:input_image})
+                    output_image = sess.run(network,feed_dict={net_input:input_image})
                     output_image = np.array(output_image[0,:,:,:])
                     output_image = helpers.reverse_one_hot(output_image)
     
