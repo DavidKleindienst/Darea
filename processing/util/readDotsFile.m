@@ -1,4 +1,4 @@
-function [centers,radii,teorRadii, numParticles] = readDotsFile(dotsFile,onlyParticlesWithin, infoI,scale)
+function [centers,radii,teorRadii, numParticles] = readDotsFile(dotsFile,onlyParticlesWithin, discardedAreas,scale)
 %READDOTSFILE Summary of this function goes here
 %   Detailed explanation goes here
 if nargin<4
@@ -25,7 +25,7 @@ if isfile(dotsFile) && dotsFileInfo.bytes>0
       toBeRemoved=[];
        for i=1:numParticles
            pxCenters=round(centers./scale);
-           if infoI.discardedAreas(pxCenters(i,2),pxCenters(i,1))
+           if discardedAreas(pxCenters(i,2),pxCenters(i,1))
                toBeRemoved=[toBeRemoved i];
            end
        end
