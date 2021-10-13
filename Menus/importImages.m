@@ -49,7 +49,7 @@ hName=uicontrol('Style','Edit', 'String', 'Config', 'Position', [100 290 100 25]
 
 
 hrTif=uicontrol('Style', 'radiobutton', 'String', 'Import .tif images', 'Position', [20 250 200 20], 'Value', 1);
-hrSer=uicontrol('Style', 'radiobutton', 'String', 'Import serialEM files with multiple angles', 'Position', [20 230 250 20], 'Callback', @(h,~)radioButtons(h,hrTif));
+hrSer=uicontrol('Style', 'radiobutton', 'String', 'Import SerialEM files with multiple angles', 'Position', [20 230 250 20], 'Callback', @(h,~)radioButtons(h,hrTif));
 
 set(hrTif,'Callback', @(h,~)radioButtons(h,hrSer));
 
