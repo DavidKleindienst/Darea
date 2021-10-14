@@ -48,18 +48,18 @@ function infoClusterImg = clusterImage(infoImage, radii, maxDistance,  minPoints
 %       infoClusterImg.id:                          Id of the image.
 %
 %       infoClusterImg.radius:                      Considered radii
-%       infoClusterImg.maxDistance:                 Maximum intra cluster distance.
+%       infoClusterImg.thresholdDistance:                 Maximum intra cluster distance.
 %       infoClusterImg.minPoints:                   Minimum number of points on each cluster.
 %       
 %       infoClusterImg.clusters:                    Vector of integers containing the cluster each particle belongs to:
 %                                                        0) Outlier. The particle is not included in a cluster or is out of range.                                                      of range.
 %                                                        n) Number of cluster.
-%       infoClusterImg.numClusters:                 Number of clusters detected.
-%       infoClusterImg.numPointsCluster:            Vector of integers containing the number of particles included in each cluster.
+%       infoClusterImg.NumberOfClusters:                 Number of clusters detected.
+%       infoClusterImg.ParticlesPerCluster:            Vector of integers containing the number of particles included in each cluster.
 %       infoClusterImg.distPointsCluster:           Matrix of integers containing the number of particles with each one of the radii considered.
 %
-%       infoClusterImg.areaCluster:                 Vector of doubles containing the area of each cluster.
-%       infoClusterImg.densityCluster:              Vector of doubles containing the density (particles/squared nanometer) of each cluster.
+%       infoClusterImg.ClusterArea:                 Vector of doubles containing the area of each cluster.
+%       infoClusterImg.DensityWithinCluster:              Vector of doubles containing the density (particles/squared nanometer) of each cluster.
 %       infoClusterImg.ripleysL:                    Vector of doubles containing the value of stabilized Ripley's k (l) for each cluster.
 %       infoClusterImg.nearestCluster:              Vector of doubles containing the distance to the nearest cluster.
 %       infoClusterImg.excludedClusters:            Number of clusters excluded because all three particles lay on one line
@@ -91,17 +91,17 @@ numPoints = size(consideredPoints,1);
 % Only carries out the clustering if there is points enough
 if (numPoints>=minPoints)
     infoClusterImg.clusters = hClustering(consideredPoints, maxDistance, minPoints);
-    infoClusterImg.numClusters = max(infoClusterImg.clusters);
+    infoClusterImg.NumberOfClusters = max(infoClusterImg.clusters);
 else
-    infoClusterImg.numClusters = 0;
+    infoClusterImg.NumberOfClusters = 0;
     infoClusterImg.clusters = zeros(numPoints,1);
 end
 
 %% If a cluster consists of 3 particles that are on one line, it is not considered as cluster
 
-if infoClusterImg.numClusters>=1
+if infoClusterImg.NumberOfClusters>=1
     ClusterToBeRemoved=[];
-    for nCluster=1:infoClusterImg.numClusters
+    for nCluster=1:infoClusterImg.NumberOfClusters
         points=consideredPoints(infoClusterImg.clusters==nCluster,:);
         if checkColinearity(points)
             ClusterToBeRemoved=[ClusterToBeRemoved,nCluster];   %Ignore Cluster if all points lie on one line. (Would throw error because such cluster have no area)
@@ -121,7 +121,7 @@ if infoClusterImg.numClusters>=1
 
         end
         
-        infoClusterImg.numClusters=infoClusterImg.numClusters-numel(ClusterToBeRemoved);
+        infoClusterImg.NumberOfClusters=infoClusterImg.NumberOfClusters-numel(ClusterToBeRemoved);
         %Reduce number of Clusters accordingly
             
     end
@@ -131,21 +131,21 @@ end
 
 
 %% Number of particles of each cluster.
-if infoClusterImg.numClusters >=1
+if infoClusterImg.NumberOfClusters >=1
     % Stores the data from each individual cluster.
-	infoClusterImg.numPointsCluster = zeros(infoClusterImg.numClusters,1);
-    for nCluster=1:infoClusterImg.numClusters
+	infoClusterImg.ParticlesPerCluster = zeros(infoClusterImg.NumberOfClusters,1);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         % Number of points per cluster
-        infoClusterImg.numPointsCluster(nCluster) = numel(find(infoClusterImg.clusters==nCluster));
+        infoClusterImg.ParticlesPerCluster(nCluster) = numel(find(infoClusterImg.clusters==nCluster));
     end
 else
     % If there is no cluster, it is better to use NaN
-	infoClusterImg.numPointsCluster=NaN;
+	infoClusterImg.ParticlesPerCluster=NaN;
 end
     
  
 %% Areas (Convex Hull)
-if infoClusterImg.numClusters>=1
+if infoClusterImg.NumberOfClusters>=1
     try
         areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);
     catch
@@ -153,20 +153,21 @@ if infoClusterImg.numClusters>=1
         areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);
     end
 	% Stores the data from each individual cluster.
-	infoClusterImg.areaCluster = zeros(infoClusterImg.numClusters,1);
-    for nCluster=1:infoClusterImg.numClusters
+	infoClusterImg.ClusterArea = zeros(infoClusterImg.NumberOfClusters,1);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         % Area  per cluster
-        infoClusterImg.areaCluster(nCluster) = areaClusterImg(nCluster)/10^6;
+        infoClusterImg.ClusterArea(nCluster) = areaClusterImg(nCluster)/10^6;
     end
 else
     % If there is no cluster, it is better to use NaN
-    infoClusterImg.areaCluster=NaN;
+    infoClusterImg.ClusterArea=NaN;
 end
 
-%% Distance from edge
-if infoClusterImg.numClusters>=1
-    infoClusterImg.distanceFromEdge=zeros(infoClusterImg.numClusters,1);
-    for nCluster=1:infoClusterImg.numClusters
+%% Distance from edge and center
+if infoClusterImg.NumberOfClusters>=1
+    infoClusterImg.distanceFromEdge=zeros(infoClusterImg.NumberOfClusters,1);
+    infoClusterImg.distanceFromCenter=zeros(infoClusterImg.NumberOfClusters,1);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         %Compute center of gravity
         particles = consideredPoints(infoClusterImg.clusters==nCluster,:);
         ch=convhull(particles(:,1), particles(:,2));
@@ -175,27 +176,38 @@ if infoClusterImg.numClusters>=1
         Ar=0.5*sum(sortedx(1:end-1).*sortedy(2:end)-sortedx(2:end).*sortedy(1:end-1));
         Massx=(1/(6*Ar))*sum((sortedx(1:end-1)+sortedx(2:end)).*(sortedx(1:end-1).*sortedy(2:end)-sortedx(2:end).*sortedy(1:end-1)));
         Massy=(1/(6*Ar))*sum((sortedy(1:end-1)+sortedy(2:end)).*(sortedx(1:end-1).*sortedy(2:end)-sortedx(2:end).*sortedy(1:end-1)));
-        %Get Distance from edge
+        %Get Distance from edge and center
         infoClusterImg.distanceFromEdge(nCluster)=distanceFromEdge([Massx,Massy],infoImage.boundary);
+        infoClusterImg.distanceFromCenter(nCluster)=distanceFromCenter([Massx,Massy],infoImage.boundary);
+    end
+ 
+    infoClusterImg.normalizedDistanceFromCenter=infoClusterImg.distanceFromCenter ./ ...
+                                    (infoClusterImg.distanceFromCenter + infoClusterImg.distanceFromEdge);
+                                
+    if infoImage.id==185
+        adfasdf=12;
+        
     end
 else
     infoClusterImg.distanceFromEdge=NaN;
+    infoClusterImg.distanceFromCenter=NaN;
+    infoClusterImg.normalizedDistanceFromCenter=NaN;
 end
     
 %% Density of each cluster
-if infoClusterImg.numClusters>=1
-    infoClusterImg.densityCluster=infoClusterImg.numPointsCluster./infoClusterImg.areaCluster;
+if infoClusterImg.NumberOfClusters>=1
+    infoClusterImg.DensityWithinCluster=infoClusterImg.ParticlesPerCluster./infoClusterImg.ClusterArea;
 else
 	% If there is no cluster, it is better to use NaN
-	infoClusterImg.densityCluster=NaN;
+	infoClusterImg.DensityWithinCluster=NaN;
 end
    
 %% Ripley's
-if infoClusterImg.numClusters>=1
-    infoClusterImg.ripleysL = zeros(infoClusterImg.numClusters,1);
-    for nCluster=1:infoClusterImg.numClusters
+if infoClusterImg.NumberOfClusters>=1
+    infoClusterImg.ripleysL = zeros(infoClusterImg.NumberOfClusters,1);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         pointsCluster = consideredPoints(infoClusterImg.clusters==nCluster,:);
-        [k, l] = ripleysK(pointsCluster,  maxDistance, infoClusterImg.areaCluster(nCluster));
+        [~, l] = ripleysK(pointsCluster,  maxDistance, infoClusterImg.ClusterArea(nCluster));
         infoClusterImg.ripleysL(nCluster) = l;
     end
 % If there is no cluster,
@@ -205,9 +217,9 @@ end
 
 
 %% Nearest  cluster
-if infoClusterImg.numClusters>=1
-    infoClusterImg.nearestCluster = zeros(infoClusterImg.numClusters,1);
-    for nCluster=1:infoClusterImg.numClusters
+if infoClusterImg.NumberOfClusters>=1
+    infoClusterImg.nearestCluster = zeros(infoClusterImg.NumberOfClusters,1);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         pointsCluster = consideredPoints(infoClusterImg.clusters==nCluster,:);
         pointsOtherClusters = consideredPoints(infoClusterImg.clusters>0 & infoClusterImg.clusters~=nCluster,:);
         infoClusterImg.nearestCluster(nCluster) = min(distToNearestPoint2Sets(pointsCluster, pointsOtherClusters));
@@ -224,9 +236,9 @@ infoClusterImg.clusters(consideredPointsIdx) = auxClusters;
 
 %% For each cluster, calculates the distribution of particles with each considered radii.
 numConsideredRadii = numel(radii);
-if infoClusterImg.numClusters>=1
-    infoClusterImg.distPointsCluster = zeros(infoClusterImg.numClusters, numConsideredRadii);
-    for nCluster=1:infoClusterImg.numClusters
+if infoClusterImg.NumberOfClusters>=1
+    infoClusterImg.distPointsCluster = zeros(infoClusterImg.NumberOfClusters, numConsideredRadii);
+    for nCluster=1:infoClusterImg.NumberOfClusters
         for nRadius=1:numConsideredRadii
             infoClusterImg.distPointsCluster(nCluster,nRadius)=sum(infoClusterImg.clusters==nCluster & infoImage.teorRadii==radii(nRadius));
         end

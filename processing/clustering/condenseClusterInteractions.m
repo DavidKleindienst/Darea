@@ -50,8 +50,10 @@ function info=condenseClusterInteractions(infoI, infoCI)
 numImg=size(infoI,1);
 nrClusterings=numel(infoCI{1}{1}.radius);       %Number of different sizes of particles
 info=infoCI{1};    %Keep the first clustering info; condense all others into that later.
-properties1d={'number','particles','area','density','intraDistance','excludedClusters','thresholdDist','distanceFromEdge'};
-properties2d={'overlap','interDistance'};
+properties1d= {'NumberOfClusters', 'ParticlesPerCluster', 'ClusterArea', ...
+                'DensityWithinCluster', 'excludedClusters', 'NNDbetweenSameSizeClusters', 'distanceFromEdge', ...
+                'distanceFromCenter', 'normalizedDistanceFromCenter', 'maxDistance'};
+properties2d={'Overlap_with_','NND_to_'};
 for s=2:numel(infoCI)
     for img=1:numImg
         radiusConstantCheck=zeros(nrClusterings);

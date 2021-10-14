@@ -20,19 +20,14 @@ for f=1:numel(fields)   % For all cluster parameters
             L=NaN;      %Not enough observations
         end
         Cluster.([fields{f} '_lil'])=L;
-    else %Overlap and InterclusterDistance
+    else %Overlap and NND_to different size cluster
         for j=1:numel(Data.methodA)
             if j~=i
                 variable=[];
                 for ind=1:numel(indeces)
                     variable=[variable, ClusterInteraction{indeces(ind)}.(fields{f}){i,j}];
                 end
-                if isequal(Data.methodA{j}, 'all')
-                    string='all';
-                else
-                    string=strrep(num2str(Data.methodA{j}*2), '.', '_');
-                end
-                fieldname=[fields{f} '_' string];
+                fieldname=[fields{f} getName(Data,Data.methodA{j}) '_Cluster'];
                 Cluster.(fieldname)=variable;
                 try
                     [~, L]=lillietest(variable);
