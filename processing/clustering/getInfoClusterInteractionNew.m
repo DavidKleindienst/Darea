@@ -34,9 +34,9 @@ warning('off', 'MATLAB:mir_warning_maybe_uninitialized_temporary');
 % infoClI{}.particles{i}:       Number of Particles in each Cluster i
 % infoClI{}.area{i}:            Area of each Cluster i
 % infoClI{}.density{i}:         Density of Particles in each Cluster i
-% infoClI{}.intraDistance{i}:        Distance from each Cluster to nearest Cluster of same type
-% infoClI{}.interDistance{i}:       Distance from each Cluster1 to nearest Cluster of other type
-% infoClI{}.overlap{i}:       Percent of area of each Cluster that is overlapped by Cluster of other type
+% infoClI{}.NNDbetweenSameSizeClusters{i}:        Distance from each Cluster to nearest Cluster of same type
+% infoClI{}.NND_to_{i}:       Distance from each Cluster1 to nearest Cluster of other type
+% infoClI{}.Overlap_with_{i}:       Percent of area of each Cluster that is overlapped by Cluster of other type
 % infoClI{}..excludedClusters:  Number of clusters that were excluded because all three particles lay in one line.
 
 
@@ -89,23 +89,22 @@ warning('off', 'MATLAB:mir_warning_maybe_uninitialized_temporary')      %Turn of
 for i=1:imgNr
     for c=1:inputNr
         %Copy already known values
+        
+        fields={'radius', 'NumberOfClusters', 'ParticlesPerCluster', 'ClusterArea', ...
+                'DensityWithinCluster', 'excludedClusters', 'maxDistance', 'distanceFromEdge', ...
+                'distanceFromCenter', 'normalizedDistanceFromCenter'};
         infoClI{i}.id=infoI{i}.id;
-        infoClI{i}.radius{c}=infoC{c}{i}.radius;
-        infoClI{i}.number{c}=infoC{c}{i}.numClusters;
-        infoClI{i}.particles{c}=infoC{c}{i}.numPointsCluster';
-        infoClI{i}.area{c}=infoC{c}{i}.areaCluster';
-        infoClI{i}.distanceFromEdge{c}=infoC{c}{i}.distanceFromEdge';
-        infoClI{i}.density{c}=infoC{c}{i}.densityCluster';
-        infoClI{i}.excludedClusters{c}=infoC{c}{i}.excludedClusters;
-        infoClI{i}.thresholdDist{c}=infoC{c}{i}.maxDistance;
-
+        for f=1:numel(fields)
+            infoClI{i}.(fields{f}){c}=infoC{c}{i}.(fields{f})';
+        end
+        
 
         %% Get Distances to other Cluster
-        numClusters = infoC{c}{i}.numClusters;
+        numClusters = infoC{c}{i}.NumberOfClusters;
         
         %%Calculate Intragroup distance between Clusters
         if numClusters>1
-            infoClI{i}.intraDistance{c}=zeros(numClusters,1)';
+            infoClI{i}.NNDbetweenSameSizeClusters{c}=zeros(numClusters,1)';
             for nC1=1:numClusters              
                 pClust1=infoI{i}.centers(infoC{c}{i}.clusters==nC1,:);
                 distances=[];
@@ -117,10 +116,10 @@ for i=1:imgNr
                 end
 
 
-                infoClI{i}.intraDistance{c}(nC1)=min(distances);
+                infoClI{i}.NNDbetweenSameSizeClusters{c}(nC1)=min(distances);
             end
         else
-            infoClI{i}.intraDistance{c} = NaN;
+            infoClI{i}.NNDbetweenSameSizeClusters{c} = NaN;
         end
         
         %% Compute intergroup distances and overlap
@@ -131,17 +130,17 @@ for i=1:imgNr
         
         for d=1:inputNr
             if d~=c
-            numClusters_2=infoC{d}{i}.numClusters;
+            numClusters_2=infoC{d}{i}.NumberOfClusters;
                 if numClusters==0
-                    infoClI{i}.interDistance{c,d}=NaN;
-                    infoClI{i}.overlap{c,d}=NaN;
+                    infoClI{i}.NND_to_{c,d}=NaN;
+                    infoClI{i}.Overlap_with_{c,d}=NaN;
                 elseif numClusters_2==0    
-                    infoClI{i}.interDistance{c,d}=NaN(numClusters,1)';
-                    infoClI{i}.overlap{c,d}=NaN(numClusters,1)';
+                    infoClI{i}.NND_to_{c,d}=NaN(numClusters,1)';
+                    infoClI{i}.Overlap_with_{c,d}=NaN(numClusters,1)';
                 else
                     % Otherwise, it stores a value for each cluster.
-                    infoClI{i}.interDistance{c,d} = zeros(numClusters,1)';
-                    infoClI{i}.overlap{c,d} = zeros(numClusters,1)';
+                    infoClI{i}.NND_to_{c,d} = zeros(numClusters,1)';
+                    infoClI{i}.Overlap_with_{c,d} = zeros(numClusters,1)';
 
                     %% Calculates the distances and Overlap.
 
@@ -153,17 +152,17 @@ for i=1:imgNr
                             distances=[distances, dist2Clusters(pClust1,pClust2, Options)];
                         end
                         try 
-                            infoClI{i}.overlap{c,d}(nC1)=areaPercentOverlap(pClust1,pClust2);
+                            infoClI{i}.Overlap_with_{c,d}(nC1)=areaPercentOverlap(pClust1,pClust2);
                         catch
                             pClust1
                             pClust2
-                            infoClI{i}.overlap{c,d}(nC2)=areaPercentOverlap(pClust2,pClust1);
+                            infoClI{i}.Overlap_with_{c,d}(nC2)=areaPercentOverlap(pClust2,pClust1);
                         end
                         try
-                            infoClI{i}.interDistance{c,d}(nC1)=min(distances);
+                            infoClI{i}.NND_to_{c,d}(nC1)=min(distances);
                         catch
                             distances
-                            infoClI{i}.interDistance
+                            infoClI{i}.NND_to_
                         end
                             
                     end
