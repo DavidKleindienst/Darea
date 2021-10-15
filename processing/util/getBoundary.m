@@ -31,8 +31,8 @@ if sum(area,'all')>0 && sum(~area,'all')>10
     end
     boundary=[];
     %Douglas Peucker reduces the number of points in the boundary outline,
-    %such that the error of the new boundary will be 1px (thats the 1 in the argument)
-    %or less at every position 
+    %such that the error of the new boundary will be <=1px (thats the 1 in the argument)
+    %at every position 
     boundaries=cellfun(@(x)DouglasPeucker(x,1),boundaries,'UniformOutput',false);
     boundaries=cellfun(@(x)x.*scale,boundaries,'UniformOutput',false);
     if ~fuseBoundaries
@@ -43,7 +43,7 @@ if sum(area,'all')>0 && sum(~area,'all')>10
         boundary=[boundary;boundaries{i}];
     end
     if numel(boundaries)>2
-        fprintf('Image %s has more than 2 regions. If it was not intentially demarcated like that, it is due to some very bright pixels and will cause issues for distance from edge measurements\n', imageName);
+        fprintf('Image %s has more than 2 regions. This might cause inaccuracies in distance from edge measurements.\n', imageName);
     end
     if isempty(boundary)
        %Something is wrong; output these for troubleshooting

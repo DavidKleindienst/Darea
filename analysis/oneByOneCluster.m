@@ -50,7 +50,7 @@ fields=settings.ClusterNames(:,1);
 %Collect the Data in 
 
 for f=1:numel(fields)       %For all cluster parameters
-    if strcmp(fields{f}, 'thresholdDist') || strcmp(fields{f}, 'excludedClusters')
+    if strcmp(fields{f}, 'thresholdDist') || strcmp(fields{f}, 'excludedClusters') || strcmp(fields{f}, 'maxDistance') 
         continue
     end
     Imwise=cell(nrImg,1);

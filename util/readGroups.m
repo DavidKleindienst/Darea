@@ -47,7 +47,8 @@ if nargout>1
             % it at correct position
             idx=find(ismember(routes,diffs{i}));
             newline=cell(1,size(groups,2));
-            if idx>1 && endsWith(routes{idx}, '_dupl') && strcmp(routes{idx}(1:end-5),routes{idx-1})
+            if idx>1 && endsWith(routes{idx}, '_dupl') && idx+1 <= size(groups,1)... 
+                    && strcmp(removeDuplsFromName(routes{idx}),removeDuplsFromName(routes{idx-1})) 
                 %New Image is a duplicate, copy the groups from the original image
                 newline(:)=groups(idx-1,:);
             else

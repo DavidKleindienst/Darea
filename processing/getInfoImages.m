@@ -30,6 +30,7 @@ function infoImages = getInfoImages(datFile, dilate, onlyParticlesWithin)
 %% Gets the basic information necessary to process the images. It must be listed in the file 'folder/datFile'. 
 % Input arguments:
 % datFile: Full path to the projects .dat file (see Menu/importImages)
+% dilate: Thickness of outer rim in nm; or false for no outer rim
 
 % Output arguments
 %   infoImages: cell array with the information relative to each image.
@@ -43,7 +44,8 @@ function infoImages = getInfoImages(datFile, dilate, onlyParticlesWithin)
 %   infoImages{}.radii:                   Actual radii of the particles (nanometers).
 %   infoImages{}.teorRadii:               Theorethical radii of the particles.
 %   infoImages{}.discardedAreas           Truth values for each pixel they belong to the area of interest or not
-
+%   infoImages{}.dilate                   Thickness of outer rim in nm; or false
+%   
 
 
 if nargin <2
@@ -87,7 +89,7 @@ parfor (imgIndex=1:numImages, getCurrentPoolSize())
         dil_discardedAreas=imerode(discardedAreas,se);
     end
     % area is calculated without dilation
-    pixelsDiscarded = numel(find(discardedAreas==true));
+    pixelsDiscarded = sum(discardedAreas,'all');
     pixelsConsidered = numel(discardedAreas)-pixelsDiscarded;
     % Calculates the considered area (in squared micrometers)
     area = pixelsConsidered .* (scale^2)*1e-6;  
@@ -99,26 +101,39 @@ parfor (imgIndex=1:numImages, getCurrentPoolSize())
     infoImages{imgIndex}.route = route;
     infoImages{imgIndex}.scale = scale;
     infoImages{imgIndex}.area = area;
+    infoImages{imgIndex}.dilate = dilate;
     %store both dilated and undilated demarcation
     infoImages{imgIndex}.demarcatedAreas=discardedAreas;
     if dilate && sum(discardedAreas,'all')>0
         infoImages{imgIndex}.discardedAreas=dil_discardedAreas;
+        outerRim = xor(dil_discardedAreas, discardedAreas);
+        infoImages{imgIndex}.outerRimArea = sum(outerRim, 'all') .* (scale^2)*1e-6
     else
         %No dilation was performed; store undilated area again
         infoImages{imgIndex}.discardedAreas=discardedAreas;
+        infoImages{imgIndex}.outerRimArea=0;
     end
+    
+    
     
     %Get boundary of demarcated area
     infoImages{imgIndex}.boundary=getBoundary(discardedAreas,scale,true,imgIndex,imageName);
     %Get Information about particles
     dotsFile=[route 'dots.csv'];
     
-    [centers, radii, teorRadii, numParticles]=readDotsFile(dotsFile,onlyParticlesWithin, infoImages{imgIndex},scale);
+    [centers, radii, teorRadii, numParticles]=readDotsFile(dotsFile,onlyParticlesWithin, infoImages{imgIndex}.discardedAreas,scale);
 
     infoImages{imgIndex}.numParticles = numParticles;
     infoImages{imgIndex}.centers = centers;
     infoImages{imgIndex}.radii = radii;
     infoImages{imgIndex}.teorRadii = teorRadii;      
+    
+    if dilate
+        [~,~,infoImages{imgIndex}.teorRadiiInOuterRim, ~]=readDotsFile(dotsFile,onlyParticlesWithin, ...
+                                                        xor(dil_discardedAreas, discardedAreas), scale);
+    else
+        infoImages{imgIndex}.teorRadiiInOuterRim = [];
+    end
 
    
 end

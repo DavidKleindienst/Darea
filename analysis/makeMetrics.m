@@ -12,7 +12,6 @@ function makeMetrics(Data,outpath,settings,dist_names)
 
 %Some simplification
 radi=Data.methodA;
-
 Groups=Data.Groups;
 Images=Data.Orig.Images;
 Distance=Data.Orig.Distance;
@@ -50,6 +49,23 @@ for g=0:nrGrp   %Go through all Groups (g=0 means pool all groups)
             end
         end
     end
+    if settings.StatisticsOptions.outerRimDetails && isfield(Images{1}, 'outerRimArea')
+        outerRimDetails=true;
+        outerArea=zeros(1,numel(indeces));
+        outerParticles=zeros(numel(radi),numel(indeces));
+        for i=1:numel(indeces)                  %Read out Area and
+            outerArea(i)=Images{indeces(i)}.outerRimArea;
+            for r=1:numel(radi)                 %number of particles
+                if strcmp(radi{r},'all')
+                    outerParticles(r,i)=numel(Images{indeces(i)}.teorRadiiInOuterRim);
+                else
+                    outerParticles(r,i)=numel(Images{indeces(i)}.teorRadiiInOuterRim(Images{indeces(i)}.teorRadiiInOuterRim==radi{r}));
+                end
+            end
+        end
+    else
+        outerRimDetails=false;
+    end
     if settings.StatisticsOptions.makeIndiv
         indivDir=fullfile(outpath,'individual_Metrics');
         safeMkdir(indivDir);
@@ -60,6 +76,12 @@ for g=0:nrGrp   %Go through all Groups (g=0 means pool all groups)
         for r=1:numel(radi)
             fprintf(fid,';%s;%s', getName(Data,radi{r}), ['Density' getName(Data,radi{r})]);        %Write particle names
         end
+        if outerRimDetails
+            fprintf(fid, ';Outer Rim Area');
+            for r=1:numel(radi)
+                fprintf(fid,';%s;%s', ['Outer Rim ' getName(Data,radi{r})], ['Outer Rim Density' getName(Data,radi{r})]);        %Write particle names
+            end
+        end    
         fprintf(fid,'\n');
         %Write values for each image
         for i=1:numel(indeces)
@@ -67,6 +89,12 @@ for g=0:nrGrp   %Go through all Groups (g=0 means pool all groups)
             for r=1:numel(radi)
                 fprintf(fid,';%i;%g', particles(r,i),particles(r,i)/(area(i)));
             end
+            if outerRimDetails
+                fprintf(fid, ';%g', outerArea(i));
+                for r=1:numel(radi)
+                    fprintf(fid,';%i;%g', outerParticles(r,i),outerParticles(r,i)/(outerArea(i)));
+                end
+            end 
             if i<numel(indeces)
                 fprintf(fid,'\n');
             end

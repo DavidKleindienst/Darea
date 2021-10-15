@@ -57,9 +57,10 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
 
     %% Gui measures and points
     title='Darea - Area demarcation';
-    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos,'off');
-    hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate', 'Callback', @rotateImg, 'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], ...
-                    'Tooltipstring', 'Rotate image 90° clockwise');
+    [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = ...
+            make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos,'off');
+    hRotate=uicontrol('Style','pushbutton', 'String', 'Rotate', 'Callback', @rotateImg,  ...
+                    'Position', [gridXPx(3)-70 gridYPx(2)+15 60 25], 'Tooltipstring', 'Rotate image 90° clockwise');
        
     set(mainFigure, 'CloseRequestFcn', @closeCallBack);% Manages figure closing.
     set(mainFigure, 'windowbuttonupfcn',@imageMouseReleased);
@@ -74,24 +75,37 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     hFilterDropdown=uicontrol('Style', 'popup', 'Callback', @selectFilter, 'Position', [gridXPx(1)+90 118 140 35], 'Tooltipstring', filterTT);
     updateFilterDropdown();
     
-    hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', [gridXPx(1)+240 132 180 25], 'Value', defaults.changeLeftImage, 'Callback', @changeLeftValue);
+    hChangeOriginal=uicontrol('Style','Checkbox', 'String', 'Change left Image', 'Position', ...
+                    [gridXPx(1)+240 132 180 25], 'Value', defaults.changeLeftImage, 'Callback', @changeLeftValue);
     
-    hMeasure=uicontrol('Style','togglebutton','String','Measure Distance', 'Position', [gridXPx(1)+5 80 100 25],'Callback',@buttonActivation);
+    hMeasure=uicontrol('Style','togglebutton','String','Measure Distance', 'Position', ...
+                    [gridXPx(1)+5 80 100 25],'Callback',@buttonActivation);
     
-    hFreehand=uicontrol('Style','togglebutton','String', 'Freehand [f]', 'Position', [gridXPx(1)+110 80 100 25], 'Callback', @freehand, 'Tooltipstring', 'Demarcate using free hand drawing');
+    hFreehand=uicontrol('Style','togglebutton','String', 'Freehand [f]', 'Position', [gridXPx(1)+110 80 100 25], ...
+                    'Callback', @freehand, 'Tooltipstring', 'Demarcate using free hand drawing');
+    hRectangle=uicontrol('Style', 'togglebutton', 'String', 'Rectangle [e]', 'Position', [gridXPx(1)+220 80 100 25], ...
+                    'Callback', @freehand, 'Tooltipstring', 'Demarcate using a rectangle tool');
     ver=version('-release');
     if str2double(ver(1:end-1))<2019 && ~strcmp(ver, '2018b')
-        set(hFreehand, 'Tooltipstring','Requires Matlab 2018b or later');
-        jButton= findjobj(hFreehand);
-        set(jButton,'Enabled',false);
+        disableButtons=[hFreehand, hRectangle];
+        for but=1:numel(disableButtons)
+            set(disableButtons(but), 'Tooltipstring','Requires Matlab 2018b or later');
+            jButton=findjobj(disableButtons(but));
+            set(jButton,'Enabled',false);
+        end
     end
-    hAdd=uicontrol('Style','togglebutton', 'String', 'Add [a]', 'Tooltipstring', 'Activate this to draw a polygon to add to component', 'Position', [gridXPx(2)-100 105 40 25], 'Callback', @buttonActivation);
-    hRemove=uicontrol('Style','togglebutton', 'String', 'Remove [r]', 'Tooltipstring', 'Activate this to draw a polygon to remove from the component', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @buttonActivation);
-    hTrim=uicontrol('Style','togglebutton', 'String', 'Trim [t]', 'Tooltipstring', 'Activate this to Trim away unneccessary parts of the connected components', 'Position', [gridXPx(2)-100 80 40 25], 'Callback', @buttonActivation);
-    hConnect=uicontrol('Style','togglebutton', 'String', 'Connect', 'Tooltipstring', 'Activate this to connect several connected components', 'Position', [gridXPx(2)-55 80 60 25], 'Callback', @buttonActivation);
+    hAdd=uicontrol('Style','togglebutton', 'String', 'Add [a]', 'Tooltipstring', 'Activate this to draw a polygon to add to component', ...
+                    'Position', [gridXPx(2)-100 105 40 25], 'Callback', @buttonActivation);
+    hRemove=uicontrol('Style','togglebutton', 'String', 'Remove [r]', 'Tooltipstring', ...
+                'Activate this to draw a polygon to remove from the component', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @buttonActivation);
+    hTrim=uicontrol('Style','togglebutton', 'String', 'Trim [t]', 'Position', [gridXPx(2)-100 80 40 25],  ...
+                'Tooltipstring', 'Activate this to Trim away unneccessary parts of the connected components', 'Callback', @buttonActivation);
+    hConnect=uicontrol('Style','togglebutton', 'String', 'Connect', 'Tooltipstring', 'Activate this to connect several connected components', ...
+                'Position', [gridXPx(2)-55 80 60 25], 'Callback', @buttonActivation);
     
-    hNewComponent=uicontrol('Style', 'pushbutton', 'String', 'New Component from Selection [n]', 'Position', [gridXPx(2)-310 20 190 25], ...
-                        'Callback', @makeNewComp, 'Tooltipstring', sprintf('Makes a new component from current selection\nThis is equivalent to saving, closing and reopening image'));
+    hNewComponent=uicontrol('Style', 'pushbutton', 'String', 'New Component from Selection [n]',  ...
+                        'Position', [gridXPx(2)-310 20 190 25], 'Callback', @makeNewComp, 'Tooltipstring', ...
+                        sprintf('Makes a new component from current selection\nThis is equivalent to saving, closing and reopening image'));
                     
     
     
@@ -100,11 +114,16 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         'Tooltipstring',sprintf('Close holes in the structure'));
     
     hBrightnessText=uicontrol('Style','text','String','BackgroundBrightness','Position' ,[gridXPx(1)+5 40 105 25]);
-    hBrightness=uicontrol('Style','slider','Min',0,'Max',1,'Value',defaults.BackgroundBrightness,'Position',[gridXPx(1)+125 40 150 25],'Callback',@changeBgBrightness);
-    uicontrol('Style', 'pushbutton', 'String', 'Clear','Units','pixels','Position', [gridXPx(2)-80 20 80 25],'Tooltipstring','Delete all marks and points','Callback',@clear);   
-    hdelLastPoint=uicontrol('Style', 'pushbutton', 'String', 'Remove last Point','Units','pixels','Position', [gridXPx(2)+5 20 100 25],'Tooltipstring','Delete last Point','Callback',@deleteLastPoint);   
-    uicontrol('Style', 'pushbutton', 'String', 'Close [c]','Units','pixels','Position',[gridXPx(4)-80 20 80 25],'Tooltipstring','Closes the application','Callback',@closeCallBack); 
-    saveButton = uicontrol('Style', 'pushbutton', 'String', 'Save [s]','Units','pixels','Position',[gridXPx(4)-170 20 80 25],'Tooltipstring','Save particle locations in a file','Callback',@save); 
+    hBrightness=uicontrol('Style','slider','Min',0,'Max',1,'Value',defaults.BackgroundBrightness,'Position', ...
+                [gridXPx(1)+125 40 150 25],'Callback',@changeBgBrightness);
+    uicontrol('Style', 'pushbutton', 'String', 'Clear','Units','pixels','Position', [gridXPx(2)-80 20 80 25], ...
+                    'Tooltipstring','Delete all marks and points','Callback',@clear);   
+    hdelLastPoint=uicontrol('Style', 'pushbutton', 'String', 'Remove last Point','Units','pixels','Position', ...
+                    [gridXPx(2)+5 20 100 25],'Tooltipstring','Delete last Point','Callback',@deleteLastPoint);   
+    uicontrol('Style', 'pushbutton', 'String', 'Close [c]','Units','pixels','Position',[gridXPx(4)-80 20 80 25], ...
+                    'Tooltipstring','Closes the application','Callback',@closeCallBack); 
+    saveButton = uicontrol('Style', 'pushbutton', 'String', 'Save [s]','Units','pixels','Position', ...
+                    [gridXPx(4)-170 20 80 25],'Tooltipstring','Save particle locations in a file','Callback',@save); 
     
     if ~isnan(selAngle)
         angleString = compose('%g',angles); %Convert to cell array of strings
@@ -115,10 +134,11 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
 
     end
     %%Visibility of things depending on displayed Filter
-    visibleOnPolygon=[hdelLastPoint, hNewComponent,hFreehand];
-    visibleOnSelect=[hTrim,hConnect,hAdd,hRemove,hdelLastPoint,hBrightnessText,hBrightness,hFreehand];
+    visibleOnPolygon=[hdelLastPoint, hNewComponent,hFreehand,hRectangle];
+    visibleOnSelect=[hTrim,hConnect,hAdd,hRemove,hdelLastPoint,hBrightnessText,hBrightness,hFreehand,hRectangle];
     visibleOnFinalize=[hHoles,hClose,hBrightnessText,hBrightness, hNewComponent];
-    allowHotkeys=[hFilterDropdown,hHoles,hClose,hdelLastPoint,hNewComponent,hBrightness,hTrim,hConnect,hAdd,hRemove,saveButton,hFreehand,hMeasure,hChangeOriginal];
+    allowHotkeys=[hFilterDropdown,hHoles,hClose,hdelLastPoint,hNewComponent,hBrightness,hTrim, ...
+        hConnect,hAdd,hRemove,saveButton,hFreehand,hMeasure,hChangeOriginal,hRectangle];
     for i=1:numel(allowHotkeys)
         set(allowHotkeys(i),'KeyReleaseFcn', @keyRelease);
     end
@@ -134,7 +154,8 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     set(handleImage,'ButtonDownFcn',@imageClickCallBack);
 
     %% Creates the zoom 
-    positionZoomNm = [imR.ImageExtentInWorldX/2-defaults.zoomImageSizeNm/2 imR.ImageExtentInWorldY/2-defaults.zoomImageSizeNm/2 defaults.zoomImageSizeNm defaults.zoomImageSizeNm];
+    positionZoomNm = [imR.ImageExtentInWorldX/2-defaults.zoomImageSizeNm/2 ...
+                imR.ImageExtentInWorldY/2-defaults.zoomImageSizeNm/2 defaults.zoomImageSizeNm defaults.zoomImageSizeNm];
 
     % Declares these elements so that they can be accesed in the whole function
     zoomRectangleDashed=[];
@@ -229,14 +250,16 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         close_radius=round(defaults.closeRadius/scale);
         filteredImages{currentImage}.compImage=imclose(filteredImages{currentImage}.compImage,strel('disk',close_radius));
         filteredImages{currentImage}.image=image;
-        filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)=filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)*defaults.BackgroundBrightness;
+        filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)= ...
+                filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)*defaults.BackgroundBrightness;
         redrawImage();
     end
 
     function fillHoles(~,~)
         filteredImages{currentImage}.compImage=imfill(filteredImages{currentImage}.compImage,'holes');
         filteredImages{currentImage}.image=image;
-        filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)=filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)*defaults.BackgroundBrightness;
+        filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)= ...
+                filteredImages{currentImage}.image(filteredImages{currentImage}.compImage==0)*defaults.BackgroundBrightness;
         redrawImage();
     end
     
@@ -445,10 +468,16 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         %createZoom(0,0);
     end
 
-    function freehand(~,~)
-        if get(hFreehand, 'Value')==1
+    function freehand(hOb,~)
+        if hFreehand.Value==1 && hRectangle.Value==1
+            if isqeual(hOb,hFreehand)
+                hRectangle.Value=0;
+            else
+                hFreehand.Value=0;
+            end
+        end
+        if get(hOb, 'Value')==1
             %Draw freehand polygon
-            
             %First delete any drawn polygons
             if get(hMeasure, 'Value')==1
                 set(hMeasure, 'Value', 0);
@@ -461,23 +490,39 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
             end
             drawPolygon();
             %Let user do freehand draw
-            handdraw=drawfreehand(axesZoom);
-        elseif isa(handdraw, 'images.roi.Freehand')
-            
-            handdraw.Visible='off';
-            if strcmp(filteredImages{currentImage}.fct,'polygon')
-                polygonPoints=DouglasPeucker(handdraw.Position,scale);
-            elseif strcmp(filteredImages{currentImage}.fct,'select')                     
-                modifyPoly=DouglasPeucker(handdraw.Position,scale);
+            if isequal(hOb,hFreehand)
+                handdraw=drawfreehand(axesZoom);
+            else
+                handdraw=drawrectangle(axesZoom);
             end
-            %Now accept polygon selection
+        elseif isa(handdraw, 'images.roi.Freehand') || isa(handdraw, 'images.roi.Rectangle')
+            handdraw.Visible='off';
+            if isa(handdraw, 'images.roi.Freehand')
+                %Remove unnecessary points
+                pointlist=DouglasPeucker(handdraw.Position,scale);
+            else
+                pos=handdraw.Position;
+                pointlist=[pos(1),   pos(2);
+                           pos(1)+pos(3),   pos(2);
+                           pos(1)+pos(3),   pos(2)+pos(4);
+                           pos(1),   pos(2)+pos(4)];
+            end
+            if strcmp(filteredImages{currentImage}.fct,'polygon')
+                polygonPoints=pointlist;
+            elseif strcmp(filteredImages{currentImage}.fct,'select')                     
+                modifyPoly=pointlist;
+            end
             
             drawPolygon();
             delete(handdraw);
             handdraw=NaN;
             updated=false;
+           
+        
         end   
+        
     end
+
 
     %% Click event over the right image. Marks a dot.
     function zoomClickCallback(~ , ~)
@@ -622,7 +667,8 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         end
         % Deletes the old rectangle and creates the new one.
         delete(zoomRectangleDashed);
-        [zoomRectangleDashed, imageZoom, zoomR, positionZoomPx, positionZoomNm]=getNewZoomPosition(positionZoomNm,zoomRectangleMov,imR,defaults.zoomImageSizeNm,axesImage,filteredImages{currentImage}.image,scale);
+        [zoomRectangleDashed, imageZoom, zoomR, positionZoomPx, positionZoomNm]= ...
+                getNewZoomPosition(positionZoomNm,zoomRectangleMov,imR,defaults.zoomImageSizeNm,axesImage,filteredImages{currentImage}.image,scale);
         hPosX.String=num2str(positionZoomNm(1));
         hPosY.String=num2str(positionZoomNm(2));
         set(mainFigure,'CurrentAxes',axesZoom);
@@ -646,10 +692,15 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         switch key.Key
             case 'backspace'
                 deleteLastPoint();
-            case 'f'
+            case {'f','e'}
+                if strcmp(key.Key,'f')
+                    hOb=hFreehand;
+                else
+                    hOb=hRectangle;
+                end
                 if strcmp(filteredImages{currentImage}.fct, 'select') || strcmp(filteredImages{currentImage}.fct, 'polygon')
-                    hFreehand.Value=abs(hFreehand.Value-1);
-                    freehand();
+                    hOb.Value=abs(hOb.Value-1);
+                    freehand(hOb);
                 end
             case 's'
                 save();
@@ -768,6 +819,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     function changeLeftValue(hOb,~)
         defaults.changeLeftImage=hOb.Value;
     end
+
         
     %% Closes the figure.
     function closeCallBack ( ~ , ~)

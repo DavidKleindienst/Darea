@@ -3,4 +3,7 @@
 processing/util/dist.m
 *__pycache__*
 *.ckpt.*
+*.ckpt
 *handbook/screenshots/Screenshot*
+deepLearning/checkpoints/*
+partlabeling/classifierTraining/classifiers/*.mat

@@ -72,6 +72,7 @@ settings.StatisticsOptions.ImageWisePopMeans=true;
 settings.StatisticsOptions.makeDistEdge=true;
 settings.StatisticsOptions.maketSNE=false;
 settings.StatisticsOptions.makeIndiv=true;
+settings.StatisticsOptions.outerRimDetails=true;
 settings.StatisticsOptions.makeCorrel=true;
 
 settings.figformat='.png';

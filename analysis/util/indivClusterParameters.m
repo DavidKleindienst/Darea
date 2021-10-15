@@ -2,8 +2,22 @@ function indivClusterParameters(Data,indeces,fileName)
 %UNTITLED2 Summary of this function goes here
 %   Detailed explanation goes here
 
-properties1d={'particles','area','density','intraDistance','distanceFromEdge'};
-properties2d={'overlap','interDistance'};
+if isfield(Data.Orig.ClusterInteraction{1}, 'NumberOfClusters')
+    properties1d= {'ParticlesPerCluster', 'ClusterArea', ...
+                    'DensityWithinCluster', 'NNDbetweenSameSizeClusters',  ...
+                    'distanceFromCenter', 'distanceFromEdge', 'normalizedDistanceFromCenter'};
+    numberfield='NumberOfClusters';
+    thresholdfield='maxDistance';
+    properties2d={'Overlap_with_','NND_to_'};
+else
+    %For compatibility with files made by previous software version
+    properties1d={'particles','area','density','intraDistance','distanceFromEdge'};
+    numberfield='number';
+    thresholdfield='thresholdDist';
+    properties2d={'overlap','interDistance'};
+end
+excludedfield='excludedClusters';
+
 for a=1:numel(Data.methodA)
     for s=0:numel(Data.simnames)
         for part=1:numel(Data.methodA) %Simulated particles
@@ -24,13 +38,14 @@ for a=1:numel(Data.methodA)
                     nrClust=0;
                 else
                     img=indeces(i);
-                    nrClust=sum(Clust{img}.number{a});
+                    nrClust=sum(Clust{img}.(numberfield){a});
                 end
                 for c=0:nrClust
                     if i==0   %Printing headers
-                        fprintf(fid, 'Image Id;ClusterId;Number;thresholdDist;excludedClusters');
+                        fprintf(fid, 'Image Id;ClusterId;%s;%s;%s',numberfield,thresholdfield,excludedfield);
                     elseif c==0
-                        fprintf(fid,'\n%g;mean;%g;%g;%g', Clust{img}.id, mean(Clust{img}.number{a}),mean(Clust{img}.thresholdDist{a}),mean(Clust{img}.excludedClusters{a}));
+                        fprintf(fid,'\n%g;mean;%g;%g;%g', Clust{img}.id, mean(Clust{img}.(numberfield){a}),...
+                                mean(Clust{img}.(thresholdfield){a}),mean(Clust{img}.(excludedfield){a}));
                     else 
                         fprintf(fid,'\n;%g;;;', c);
                     end
@@ -52,7 +67,7 @@ for a=1:numel(Data.methodA)
                             %Second particle (e.g. 5->10)
                             if aa==a; continue; end     %5->5 distance not captured here
                             if img==0
-                                fprintf(fid,';%s', [properties2d{p} '_' getName(Data,Data.methodA{a}) ' to ' getName(Data,Data.methodA{aa})]);
+                                fprintf(fid,';%s', [properties2d{p} getName(Data,Data.methodA{aa}) '_Cluster']);
                             elseif c==0
                                 fprintf(fid,';%g', mean(Clust{img}.(properties2d{p}){a,aa}));
                             else 

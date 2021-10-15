@@ -9,10 +9,7 @@ function results= imageChooser(title,explanation,strings,hotkeys,configpath,show
 %           strings, if specified. 
 % configpath: path to configfile. User will be asked if not specified
 
-%Disable some warning:
 warning('off','images:initSize:adjustingMag');
-
-screenSize = get(0,'Screensize');
 
 if nargin<5 || all(isnan(configpath))
     [f,p]=uigetfile('*.dat');
@@ -58,7 +55,8 @@ results=cell(numel(images),1+nrQuestions);
 pos=[10 40 150+maxnrChoices*100 200];
 % Loop through images:
 i=1;
-while ~isnan(i) && i<=numel(images) 
+position=NaN;
+while ~isnan(i) && i<=numel(images)
     imFig=figure('CloseRequestFcn', '', 'Name', images{i}, 'Visible', 'off');
     imRoute=fullfile(impath,images{i});
     [dem,im]=getBaseImages([imRoute '.tif'], [imRoute '_mod.tif'],NaN,0);
@@ -69,8 +67,10 @@ while ~isnan(i) && i<=numel(images)
        im(dem)=im(dem).*0.8;
     end
     imshow(im);
-    currPos=get(imFig,'Position');
-    set(imFig, 'Position',[screenSize(3)/2 3*screenSize(4)/4, currPos(3), currPos(4)], 'Visible', 'on');
+    if ~isnan(position)
+        set(imFig, 'Position', position);
+    end
+    set(imFig, 'Visible', 'on');
     
     for q=1:nrQuestions
         if isnan(i); break; end
@@ -120,6 +120,7 @@ delete(choiceMenu);
         results{i,q+1}=st;
         if q==nrQuestions
             i=i+1;
+            position=get(imFig, 'Position');
             delete(imFig);
         end
         delete(choiceMenu);
@@ -138,6 +139,7 @@ delete(choiceMenu);
     function back(~,~)
        i=i-1;
        if i<1; i=1; end
+       position=get(imFig, 'Position');
        delete(imFig);
        delete(choiceMenu);
     end

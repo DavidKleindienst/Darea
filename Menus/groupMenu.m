@@ -9,7 +9,6 @@ end
 [groupnames, groups, routes]=readGroups(datFile);
 groupnames=groupnames';
 
-settings=readDefaults(datFile);
 
 positionFigure =  [25, 50, 850, 505];
 mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Assign Groups'); 
@@ -39,6 +38,10 @@ end
 
 function choiceByImage(~,~)
     [groupings,results]=chooseGroupByImage(groupnames, datFile);
+    if isnan(results)
+        %Was cancelled
+        return;
+    end
     for g=1:numel(groupings)
         idx=strcmp(groupnames,groupings{g});
         for i=1:size(results,1)
