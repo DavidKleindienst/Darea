@@ -84,10 +84,18 @@ def main(args=None):
     
     if args.save_coordinates:
         coordinates=dict()
-    print('Performing predictions...')
+    print('Performing predictions...\n')
+    progress_string=''
     for index,image in enumerate(images):
-        if not args.darea_call:
-            print("Testing image {}".format(image))
+        
+        if args.darea_call:
+            if index>1:
+                print('\b'*(len(progress_string)+2))    #Deletes previous output in matlab console
+            progress_string='Predicting on image {} / {}'.format(index+1, len(images))
+            print(progress_string)
+        else:
+            print('Predicting on image {} / {}\r'.format(index+1, len(images)))
+
         
         input_image = utils.load_image(image)
         if args.downscale_factor and args.downscale_factor !=1:

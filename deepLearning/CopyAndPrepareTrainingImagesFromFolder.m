@@ -24,8 +24,8 @@ features={features.name};
 features=features(~startsWith(features,'.'));
 
 for f=1:numel(features)   
-
     feat=features{f};
+    fprintf('Processing feature %s\n', feat);
     if isfolder(fullfile(infolder,feat))
        prepareFolderForTrainDataset(outfolder,feat,settings.backgroundColor)
        targetfolder=fullfile(outfolder,feat);
@@ -54,6 +54,7 @@ for f=1:numel(features)
            end
        end   
        for c=1:numel(configs)
+           fprintf('Processing config %i of %i\n', c, numel(configs));
            conf=configs{c};
            sourceFolder=fullfile(infolder,feat);
 

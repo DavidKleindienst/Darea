@@ -77,11 +77,15 @@ else
 end
 fclose(f);
 nrImages=numel(routes);
+nbytes = fprintf('Processing image 0 / %i', nrImages);
+
 for i=1:nrImages
     if ismember(routes{i},duplicates)
         %They will be included later, fusing it into the original
         continue;
     end
+    fprintf(repmat('\b',1,nbytes))
+    nbytes = fprintf('Processing image %i / %i\n', i, nrImages);
     rv=rand();
     if rv<=ratios(1); type='train'; elseif rv<=ratios(1)+ratios(2)
        type='val'; else; type='test'; end

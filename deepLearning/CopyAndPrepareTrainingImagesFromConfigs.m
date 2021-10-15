@@ -48,7 +48,7 @@ else
 end
 
 for c=1:numel(configs)
-    
+   fprintf('Processing config %i of %i\n', c, numel(configs));
    [path,conf,ext]=fileparts(configs{c});
    conf=[conf ext];
    nrImages=copyAndPrepareFromConfig(path,conf,outfolder,NaN,settings, offset);

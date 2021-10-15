@@ -70,14 +70,21 @@ recall_list = []
 f1_list = []
 iou_list = []
 run_times_list = []
-
+print('Performing testing...\n')
+progress_string=''
 # Run testing on ALL test images
-for ind in range(len(test_input_names)):
-    print("Running test image %d / %d"%(ind+1, len(test_input_names)),flush=True)
+for ind,input_name in enumerate(test_input_names):
+    if args.darea_call:
+        if ind>1:
+            print('\b'*(len(progress_string)+2)) #Deletes previous output in matlab console
+        progress_string='Testing image {} / {}'.format(ind+1, len(test_input_names))
+        print(progress_string)
+    else:
+        print('Testing image {} / {}\r'.format(ind+1, len(test_input_names)))
     
     #st = time.time()
 
-    input_image = np.expand_dims(np.float32(utils.load_image(test_input_names[ind])[:args.crop_height, :args.crop_width]),axis=0)/255.0
+    input_image = np.expand_dims(np.float32(utils.load_image(input_name)[:args.crop_height, :args.crop_width]),axis=0)/255.0
     gt = utils.load_image(test_output_names[ind])[:args.crop_height, :args.crop_width]
     gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
 
@@ -99,7 +106,7 @@ for ind in range(len(test_input_names)):
     #print('Computed metrics, took {}'.format(time.time()-st))
     #st = time.time()
 
-    file_name = utils.filepath_to_name(test_input_names[ind])
+    file_name = utils.filepath_to_name(input_name)
     target.write("\n%s,%g,%g,%g,%g,%g"%(file_name, accuracy, prec, rec, f1, iou))
     for item in class_accuracies:
         target.write(",%g"%(item))
