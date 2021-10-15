@@ -122,7 +122,8 @@ for ind,input_name in enumerate(test_input_names):
     
     #print('Wrote metrics, took {}'.format(time.time()-st))
     #st = time.time()
-    cv2.imwrite("%s/%s_pred.tif"%(args.output_path, file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+    cv2.imwrite(os.path.join(args.output_path,"{}_pred.tif".format(file_name)),
+                cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
 
     if not args.darea_call:
         gt = helpers.colour_code_segmentation(gt, label_values)

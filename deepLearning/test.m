@@ -102,7 +102,6 @@ safeMkdir(outfolder);
 copyfile('tmpResults/test.csv', fullfile(outfolder,'test_results.csv'));
 
 if savePredictions
-    routes=cellfun(@(x) [x '.tif'],routes, 'UniformOutput', false);
     routes=cellfun(@(x) fullfile(outfolder,x),routes, 'UniformOutput',false);
     subfolders=unique(cellfun(@(x)fileparts(x), routes, 'UniformOutput', false));
     for i=1:numel(subfolders)

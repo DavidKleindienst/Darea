@@ -40,7 +40,6 @@ elseif isnan(overwrite)
 end
 if ~overwrite
     files=files(~modfilesExist);
-    modfiles=modfiles(~modfilesExist);
 end
 
 if isempty(files)
