@@ -82,7 +82,6 @@ parfor (imgIndex=1:numImages, getCurrentPoolSize())
         discardedAreas = getBaseImages(imageName, imageSelName);
     end
     
-    
     if dilate && sum(discardedAreas,'all')>0
         se=strel('diamond', round(dilate/scale));
         %using imerode, since demarcated area has value 0, this will dilate it.
@@ -128,9 +127,9 @@ parfor (imgIndex=1:numImages, getCurrentPoolSize())
     infoImages{imgIndex}.radii = radii;
     infoImages{imgIndex}.teorRadii = teorRadii;      
     
-    if dilate
+    if dilate && sum(discardedAreas,'all')>0
         [~,~,infoImages{imgIndex}.teorRadiiInOuterRim, ~]=readDotsFile(dotsFile,onlyParticlesWithin, ...
-                                                        xor(dil_discardedAreas, discardedAreas), scale);
+                                                        ~outerRim, scale);
     else
         infoImages{imgIndex}.teorRadiiInOuterRim = [];
     end
