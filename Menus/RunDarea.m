@@ -16,7 +16,6 @@ if isfile('Batch.mat')
     %properly
     delete('Batch.mat');
 end
-showExperimental=0;
 
 %% Darea Main Menu
 %any 0 in position indicates that this value will be computed later using align
@@ -42,7 +41,7 @@ hGroups = uicontrol('Style', 'pushbutton', 'String', 'Group Settings', 'Position
 
                 
 %Preparation functions
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Preparation', 'Position', [20 290 100 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Preparation', 'Position', [20 290 250 25], 'FontWeight', 'bold');
 ttPrepro=sprintf('Image preprocessing\ne.g. convert to 16bit, adjust contrast, invert images.');
 ttDemarcate=sprintf('Demarcate Area of Interest');
 ttParticles=sprintf('Detect gold particles');
@@ -55,32 +54,26 @@ hParticles=uicontrol('Style', 'pushbutton', 'String', 'Particles', 'Tooltipstrin
 align([hPrepro, hDemarcate, hParticles], 'none','top');
 
 %Analysis function
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Analysis', 'Position', [20 235 100 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'Image Analysis', 'Position', [20 235 250 25], 'FontWeight', 'bold');
 ttAnalysis=sprintf('Measure area, density, perform simulations and cluster analysis');
 ttFigures=sprintf('Calculate statistics and make figures');
 hAnalysis=uicontrol('Style', 'pushbutton', 'String', 'Analysis', 'Tooltipstring', ttAnalysis, 'Position',[25 215 100 25], ...
                 'Callback', @(~,~)launchAnalysis(true));
 hFigures=uicontrol('Style', 'pushbutton', 'String', 'Figures', 'Tooltipstring', ttFigures, 'Position',[140 0 100 25], ...
                 'Callback', @(~,~)launchWithData(@FiguresDialog));
-hVisualize=uicontrol('Style', 'pushbutton', 'String', 'Visualize', 'Tooltipstring', 'Visualize Image and try simulations', ...
+hVisualize=uicontrol('Style', 'pushbutton', 'String', 'Visualize', 'Tooltipstring', 'Visualize image and simulations', ...
                 'Position', [255 0 100 25], 'Callback', @(~,~)launchWithData(@visualize,'Visualize',NaN));
 align([hAnalysis, hFigures,hVisualize], 'none','top');
 
 %DeepLearningStuff
-uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'DeepLearning', 'Position', [20 180 130 25], 'FontWeight', 'bold');
+uicontrol('HorizontalAlignment','left', 'Style','Text','String', 'DeepLearning', 'Position', [20 180 250 25], 'FontWeight', 'bold');
 ttPredict='Use deeplearning to demarcate images';
 hPredict=uicontrol('Style', 'pushbutton', 'String', 'Automated Prediction', 'Tooltipstring', ttPredict, 'Position', [20 160 110 25], ...
                     'Callback', @(~,~)launchFunction(@predictMenu));
 hTrainPart=uicontrol('Style', 'pushbutton', 'String', 'Train particle detection', 'Tooltipstring', 'Learn particle prediction based from data', ...
                     'Callback', @(~,~)launchFunctionWithoutDat(@trainParticleMenu), 'Position', [135 160 120 25]);
 hTrain=uicontrol('Style', 'pushbutton', 'String', 'Train demarcation', 'Callback', @(~,~)launchFunctionWithoutDat(@TrainMenu),'Position', [270 160 120 25]);            
-if showExperimental
-%Experimental features
-uicontrol('HorizontalAlignment','left','Style','Text','String', 'Experimental Features', 'Position', [20 125 130 25], ...
-        'FontWeight', 'bold', 'Foregroundcolor','red', 'Tooltipstring', "If something goes wrong, it's your own fault");
-hPreEmb=uicontrol('Style', 'pushbutton', 'String', 'Pre-Embedding', 'Position',[25 105 100 25], ...
-                'Callback', @(~,~)launchOpener( @preEmb, 'Pre-embedding Analysis', '_mod.tif'));        
-end
+
 
 if nargin>0
     set(hImageLPathEdit,'String',datFile);
@@ -107,7 +100,14 @@ waitfor(mainMenu);
 
 
 function bool=openFileImages(~,~)
-    [infoFile, folder] = uigetfile('*.dat');
+    global lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    [infoFile, folder] = uigetfile('*.dat', 'Choose project file', lastfolder);
+    if ischar(folder)
+        lastfolder=folder;
+    end
     datFile=fullfile(folder,infoFile);
     if isstruct(Data)
         Data=NaN;   %Delete potentially existing Data when opening new file

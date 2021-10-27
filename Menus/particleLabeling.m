@@ -100,6 +100,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     centersNm = [];
     actRadiiNm = [];
     radiiNm = [];    
+    scores = NaN;
     % Structures containing the graphical dots
     particleMarks = [];
     zoomParticleMarks = [];

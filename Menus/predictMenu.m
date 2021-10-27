@@ -63,6 +63,8 @@ waitfor(mainFigure);
 
 
 function start(~,~)
+    set(hProgress, 'String', 'Starting Predictions...');
+    drawnow();
     if get(hPredParticles,'Value')
         %Start a parallel pool when predicting particles
         %It is started now already because it will save little bit of time
@@ -76,7 +78,7 @@ function start(~,~)
         set(hProgress, 'String', 'Starting Demarcation Prediction');
         drawnow();
         try
-            predict(datFile,feature,hProgress,get(hOverwrite,'Value'),settings);
+            predict(datFile,feature,hProgress,hOverwrite.Value);
         catch expt
             set(hProgress, 'String', 'Demarcation Prediction failed');
             rethrow(expt);

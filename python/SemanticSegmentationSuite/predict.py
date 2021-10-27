@@ -1,7 +1,10 @@
-import os,time,cv2
-import tensorflow as tf
+import os,time,cv2,json
 import argparse
 import numpy as np
+import math as m
+
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from utils import utils, helpers
 from builders import model_builder
@@ -18,11 +21,16 @@ def main(args=None):
     parser.add_argument('--checkpoint_path', type=str, default=None, required=False, help='The path to the latest checkpoint weights for your model. Will guess based on model and dataset if not specified')
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
+    parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
     parser.add_argument('--model', type=str, default="FC-DenseNet103", required=False, help='The model you are using')
     parser.add_argument('--dataset', type=str, default="CamVid", required=False, help='The dataset you are using')
+    parser.add_argument('--image_suffix', type=str, default='', required=False, help='Only files with this extension should be included. You should specify it if some non-image files will be in the same folder') 
     parser.add_argument('--outpath', type=str, default='./', required=False, help='Folder where predicted images should be saved to')
     parser.add_argument('--file_suffix', type=str, default='_pred.png', required=False, help='Suffix appended to input image name for output image')
     parser.add_argument('--darea_call', type=utils.str2bool, default=False, required=False, help='Set to true when you call it from Darea software')
+    parser.add_argument('--save_predictionImage', type=utils.str2bool, default=True, required=False, help='Whether predictions should be saved as images')
+    parser.add_argument('--save_coordinates', type=utils.str2bool, default=False, required=False, help='Whether coordinates of predicted structures should be saved')
+    print('wassup')
     if args is None:
         args=parser.parse_args()
     else:
@@ -66,39 +74,100 @@ def main(args=None):
     
     if os.path.isdir(args.image):
         folder=args.image
-        not_allowed_filenames=['.DS_Store']
-        images=[os.path.join(folder,file) for file in os.listdir(folder) if file not in not_allowed_filenames]
+        #Get list of all images in the folder, ignore hidden files, subfolders and files not ending with correct suffix
+        images=[os.path.join(folder,file) for file in os.listdir(folder) if not file.startswith('.') and not os.path.isdir(file) and file.endswith(args.image_suffix)]
     else:
         images=[args.image]
     
     if not os.path.isdir(args.outpath):
         os.mkdir(args.outpath)
-
-    print('Performing predictions...')
-    for image in images:
-        if not args.darea_call:
-            print("Testing image {}".format(image))
+    
+    if args.save_coordinates:
+        coordinates=dict()
+    print('Performing predictions...\n')
+    progress_string=''
+    for index,image in enumerate(images):
         
-        loaded_image = utils.load_image(image)
-        resized_image =cv2.resize(loaded_image, (args.crop_width, args.crop_height))
-        input_image = np.expand_dims(np.float32(resized_image[:args.crop_height, :args.crop_width]),axis=0)/255.0
+        if args.darea_call:
+            if index>1:
+                print('\b'*(len(progress_string)+2))    #Deletes previous output in matlab console
+            progress_string='Predicting on image {} / {}'.format(index+1, len(images))
+            print(progress_string)
+        else:
+            print('Predicting on image {} / {}\r'.format(index+1, len(images)))
+
+        
+        input_image = utils.load_image(image)
+        if args.downscale_factor and args.downscale_factor !=1:
+            dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+            input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
         
         st = time.time()
-        output_image = sess.run(network,feed_dict={net_input:input_image})
+        crop_height=args.crop_height
+        crop_width=args.crop_width
+        
+        if input_image.shape[0]>crop_height or input_image.shape[1]>crop_width:
+            #rectangle in bottom right corner smaller than cropped im will not be used
+            nrCroppingsY=m.ceil(input_image.shape[0]/crop_height)
+            nrCroppingsX=m.ceil(input_image.shape[1]/crop_width)
+            output_image=np.zeros([nrCroppingsY*crop_height,nrCroppingsX*crop_width])
+            for yi in range(nrCroppingsY):
+                row=np.zeros([crop_height,nrCroppingsX*crop_width])
+                cropYstart=yi*crop_height;
+                cropYstop=(1+yi)*crop_height
+                if cropYstop>=input_image.shape[0]:
+                    cropYstop=input_image.shape[0]-1
+                    cropYstart=cropYstop-crop_height
+                for xi in range(nrCroppingsX):
+                    cropXstart=xi*crop_width;
+                    cropXstop=(1+xi)*crop_width
+                    if cropXstop>=input_image.shape[1]:
+                        cropXstop=input_image.shape[1]-1
+                        cropXstart=cropXstop-crop_width
+                    inputIm=input_image[cropYstart:cropYstop,cropXstart:cropXstop,:]
+                    inputIm=np.expand_dims(np.float32(inputIm)/255.0,axis=0)
+                    #print(inputIm.shape)
+                    out=sess.run(network,feed_dict={net_input:inputIm})
+                    out = np.array(out[0,:,:,:])
+                    out=helpers.reverse_one_hot(out)
+                    if (1+xi)*crop_width>=input_image.shape[1]:
+                        row[:,xi*crop_width:]=out
+                    else:
+                        row[:,xi*crop_width:(1+xi)*crop_width]=out
+                if (1+yi)*crop_height>=input_image.shape[0]:
+                    output_image[yi*crop_height:,:]=row
+                else:
+                    output_image[yi*crop_height:(1+yi)*crop_height,:]=row
+        # st = time.time()                    
+            
+        else:
+            input_image=np.expand_dims(np.float32(input_image)/255.0,axis=0)
+            output_image = sess.run(network,feed_dict={net_input:input_image})
+            output_image = np.array(output_image[0,:,:,:])
+            output_image = helpers.reverse_one_hot(output_image)
         
         run_time = time.time()-st
         
-        output_image = np.array(output_image[0,:,:,:])
-        output_image = helpers.reverse_one_hot(output_image)
         
         out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
-        file_name = "{}{}".format(utils.filepath_to_name(image),args.file_suffix)
-        cv2.imwrite(os.path.join(args.outpath,file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+        if args.save_predictionImage:
+            file_name = "{}{}".format(utils.filepath_to_name(image),args.file_suffix)
+            cv2.imwrite(os.path.join(args.outpath,file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+        
+        if args.save_coordinates:
+            coordinates[utils.filepath_to_name(image)]=utils.getCoordsFromPrediction(cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2GRAY),args.downscale_factor);
+            
+        
         if not args.darea_call:
             print("Wrote image {}".format(file_name))
             print("")
+    if args.save_coordinates:
+        with open(os.path.join(args.outpath,'centroids.json'), 'w') as f:
+            json.dump(coordinates,f)
+        
     if not args.darea_call:
         print("Finished!")
     
 if __name__=='__main__':
+    
     main(None)

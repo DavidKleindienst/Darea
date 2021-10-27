@@ -75,23 +75,25 @@ transparencyRim	0.85
 
 #DemarcateImage
 closeRadius	7.5	#Radius (in Nm) for close Structure
-gw_cutoff	0.25
-gw_sigma	2
 showFilters	false
 changeLeftImage	false
 
 #DeepLearning
-imageSize	[512,512] 	#Size to which images are converted before training/prediction
+imageSize	[512,512] 	#Size to which images are converted before training/prediction. Needs to be multiple of 32.
+allowNonSquareImages	false	#Set to true to be able edit both sizes in the GUI (at your own risk)
 classifierPath	'partlabeling/classifierTraining/classifiers/'
 defaultClassifier	'Forest'
-backgroundColor	[50,50,50]	#All 3 values have to be same
-foregroundColor	[128,128,128]	#All 3 values have to be same
+backgroundColor	0	#Should be darker than foreground
+foregroundColors	[208,111,42,66,99,128,166,200,240,241,242,243,244,245,246,247,248,249,250]
+#There will be a problem if more features than foregroundColors in this list exist
 train_val_test_ratios	[0.75,0.2,0.05]  # probabilities for train, val, test. Have to add up to 1
 epochs	200
 batchSize	1
-learnRate	0.0001
+learnRate	0.001
 noROI_is_Background	0
+splitDemarcationsByGroup	false
+featureName	'Foreground'	#This should be set to the groupname when splitDemarcationsByGroup is true
 
 #Internal Stuff. Don't change unless you know what you're doing
 chosenGroups	[1]
-SimOptions.removeExtreme	'random'      #Alternative is NNDs, but this is more biased and may not work with other Options, therefore this value should not be changed by the user
+SimOptions.removeExtreme	'random'      #Alternative is NNDs, but this is more biased and may not work with other Options.

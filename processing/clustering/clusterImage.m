@@ -145,7 +145,6 @@ end
     
  
 %% Areas (Convex Hull)
-
 if infoClusterImg.NumberOfClusters>=1
     try
         areaClusterImg = areaClusters(consideredPoints, infoClusterImg.clusters);

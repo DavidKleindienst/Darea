@@ -24,4 +24,4 @@ end
 if nargin>0
     defaults=updateDefaults(getOptionsName(config),defaults);
 end
-
+fclose(f);

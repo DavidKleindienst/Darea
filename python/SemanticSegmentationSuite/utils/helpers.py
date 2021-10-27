@@ -3,7 +3,8 @@ import numpy as np
 import itertools
 import operator
 import os, csv
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 import time, datetime
 
@@ -19,8 +20,8 @@ def get_label_info(csv_path):
         Two lists: one for the class names and the other for the label values
     """
     filename, file_extension = os.path.splitext(csv_path)
-    if not file_extension == ".csv":
-        return ValueError("File is not a CSV!")
+    if not file_extension == ".csv" and not file_extension == ".classes":
+        raise ValueError("File is not a CSV!")
 
     class_names = []
     label_values = []

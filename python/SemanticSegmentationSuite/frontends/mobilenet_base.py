@@ -22,10 +22,9 @@ import contextlib
 import copy
 import os
 
-import tensorflow as tf
-
-
-slim = tf.contrib.slim
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+import tf_slim as slim
 
 
 @slim.add_arg_scope

@@ -7,12 +7,12 @@ if iscell(imDataset)
     set(hProgress, 'String', 'Preparing dataset for training');
     drawnow();
     path='tmp';
-    prepareFolderForTrainDataset(path,feature,settings);
+    prepareFolderForTrainDataset(path,feature,settings.backgroundColor);
 
     delTmp=1;
     for c=1:numel(imDataset)
         [pa, fil, ext]=fileparts(imDataset{c});
-        copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),NaN,NaN,settings);
+        copyAndPrepareFromConfig(pa, [fil ext], fullfile(path,feature),NaN,settings);
     end
 elseif isfolder(imDataset)
     %Folder with prepared images
@@ -46,9 +46,11 @@ end
 args=[... 
         ' --dataset ', feature, ' --dataset_path ', convPath(path), ...
         ' --batch_size ', batchSize,  ' --learn_rate ', learnRate, ' --num_epochs ', epochs ...
-        ' --continue_training ', continue_training, ' --continue_from ', continue_from ' --save_path ', convPath(savePath) ... 
+        ' --continue_training ', continue_training, ' --continue_from ', continue_from, ...
+        ' --save_path ', convPath(savePath), ' --rotation_perpendicular ', '1', ... 
         ' --h_flip ', '1', ' --v_flip ', '1', ' --brightness ', '0.5', ' --checkpoint_step ', '10000' ...
-        ' --save_best ', '1',' --num_val_images ', '-1',' --darea_call ', '1'];
+        ' --save_best ', '1',' --num_val_images ', '-1',' --darea_call ', '1', ...
+        ' --crop_height ', num2str(settings.imageSize(1)), ' --crop_width ', num2str(settings.imageSize(2))];
 set(hProgress, 'String', 'Performing Training');
 drawnow();
 [~,pyExe]=pyversion; 
@@ -64,9 +66,9 @@ else
     if isfile(fullfile(savePath, [feature '.ckpt.index']))
         ckfiles=dir(savePath);
         ckfiles={ckfiles.name};
-        ckfiles=ckfiles(contains(ckfiles,'.ckpt'));
-        ckfiles=ckfiles(contains(ckfiles,feature));
-        outfiles=cellfun(@(x) strrep(x, feature, saveName),ckfiles, 'UniformOutput', false);
+        ckfiles=ckfiles(startsWith(ckfiles,feature));
+        ckfiles=ckfiles(~endsWith(ckfiles, '.classes'));
+        outfiles=cellfun(@(x) [saveName x(numel(feature)+1:end)],ckfiles, 'UniformOutput', false);
         for f=1:numel(ckfiles)
             copyfile(fullfile(savePath,ckfiles{f}),fullfile('deepLearning/checkpoints', outfiles{f}));
         end

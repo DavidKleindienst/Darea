@@ -1,30 +1,32 @@
-function sizes=prepareForPrediction(images,outputFolder, imSize, adjustContrast)
+function sizes=prepareForPrediction(images,outputFolder, selAngles, imSize, adjustContrast)
 %Converts image list for prediction
 %Return original image sizes (useful for converting back
 %If adjustContrast is True, imadjcontrast is applied
 
-if nargin<4
+if nargin<5
     adjustContrast=false;
 end
 
 safeMkdir(outputFolder);
-sizes=cell(1,numel(images));
-parfor (img=1:numel(images),getCurrentPoolSize())
+sizes={};
+offset=0;
+nbytes = fprintf('Preparing image 0 / %i', numel(images));
+for img=1:numel(images)
+    fprintf(repmat('\b',1,nbytes))
+    nbytes = fprintf('Preparing image %i / %i\n', img, numel(images));
     imName=images{img};
-    image=readAndConvertImage(imName);
-    if ~isa(image, 'uint16')
-        msgbox(sprintf('Not all images are 16 bit!\nPlease run the conversion then try again.'));
-        error('Not all images are 16 bit! Please run the conversion then try again.');
+    [~, n, ~]=fileparts(imName);
+    if endsWith(n, '_dupl')
+        offset=offset+1;
+        continue;
     end
-    if adjustContrast
-        image=imadjust(image);
+    if isnan(selAngles)
+        outpath=fullfile(outputFolder, int2str(img-offset));
+        sizes{end+1} = prepareImageForPrediction(imName, NaN, imSize,outpath, adjustContrast);
+    else
+        error('prepareForPrediction.m cannot handle serialEM images. Please file a bug report!');
+        %TODO!!
     end
-    sizes{img}=[size(image,1),size(image,2)];
-    image=prepareImage(image,imSize);
-    outpath=fullfile(outputFolder, [int2str(img) '.tif']);
-    %Images will be just numbered
-    %So you'll need the original image list to backconvert
-    imwrite(image,outpath);
 end
 
 end

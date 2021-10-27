@@ -9,7 +9,9 @@ selectedCell=NaN;
 hTable=uitable('Data', {'',0},'Position', [25 50 200 280], 'ColumnEditable', true, ...
         'ColumnName', {'Magnification', 'Scale [nm/px]'}, 'CellSelectionCallback',@selectCell);
 hAdd=uicontrol('Style', 'pushbutton', 'String', '+', 'Position', [230, 260, 25, 25], 'Callback', @addRow, 'Tooltipstring', 'Add row');
+
 hRemove=uicontrol('Style', 'pushbutton', 'String', '-', 'Position', [230, 230, 25, 25], 'Callback', @remRow, 'Tooltipstring', 'Remove selected row');
+
 hSaveAs=uicontrol('Style', 'pushbutton', 'String', 'Save Magnifications', 'Position', [25, 20, 100, 25], ...
             'Callback', @(~,~)selectMagFile('write'), 'Tooltipstring', 'Remove selected row');
 hSaveAsDefault=uicontrol('Style', 'pushbutton', 'String', 'Save as Default', 'Position', [135, 20, 100, 25], ...

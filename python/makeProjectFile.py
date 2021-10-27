@@ -239,20 +239,3 @@ def duplicateImage(configFile,index,copyMod=False, duplicate_suffix='_dupl'):
         images[k]=lst
     file_utils.dict2file(configFile,images,',\t')
     
-    
-
-def main():
-    #--------------------------------------------------------
-    # USER CHANGEABLE PARAMETERS
-    onlyMod=False;
-    folder='/Users/dkleindienst/Documents/test/Selected Folder/'
-    mags=getMag('../Mags.txt')
-    outputName='Config.dat'
-    
-    #--------------------------------------------------------
-    
-    #run(folder,mags,outputName,onlyMod=onlyMod,separator='_',defaultMag=False)
-
-if __name__=='__main__':
-    #main()
-    pass

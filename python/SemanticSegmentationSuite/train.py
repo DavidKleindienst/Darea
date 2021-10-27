@@ -1,13 +1,10 @@
 from __future__ import print_function
-import os,time,cv2, sys, math
-import tensorflow as tf
-import tensorflow.contrib.slim as slim
+import os,time,datetime,cv2, sys, math,shutil
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 import numpy as np
-import time, datetime
 import argparse
 import random
-import os, sys
-import subprocess
 
 
 # use 'Agg' on matplotlib so that plots could be generated even without Xserver
@@ -21,9 +18,15 @@ from builders import model_builder
 import matplotlib.pyplot as plt
 
 
-def data_augmentation(input_image, output_image,args):
-    # Data augmentation
-    input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width)
+def data_augmentation(input_image, output_image,args,backgroundValue=None):
+    if args.downscale_factor and args.downscale_factor!=1:
+        #Downscale image
+        dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+        input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
+        output_image=cv2.resize(output_image,dim,interpolation=cv2.INTER_NEAREST)
+        #These interpolations are same as used by Darea in matlab when preparing for prediction
+    
+    input_image, output_image = utils.random_crop(input_image, output_image, args.crop_height, args.crop_width, args.biased_crop,backgroundValue)
 
     if args.h_flip and random.randint(0,1):
         input_image = cv2.flip(input_image, 1)
@@ -45,10 +48,13 @@ def data_augmentation(input_image, output_image,args):
         output_image = cv2.warpAffine(output_image, M, (output_image.shape[1], output_image.shape[0]), flags=cv2.INTER_NEAREST)
     if args.rotation_perpendicular:
         angle=math.floor(random.uniform(0,4))   #Random value between 0 and 3
-        if angle:
-            input_image=np.rot90(input_image,angle)
-            output_image=np.rot90(output_image,angle)
-        
+
+        for i in range(angle):
+            input_image=np.rot90(input_image)
+            output_image=np.rot90(output_image)
+#        if angle:
+#            input_image=np.rot90(input_image,angle)
+#            output_image=np.rot90(output_image,angle)
 
     return input_image, output_image
 
@@ -65,8 +71,11 @@ def main(args=None):
     parser.add_argument('--continue_from', type=str, default='', help='From which checkpoint to continue. Only relevant with darea_call.')
     parser.add_argument('--dataset', type=str, default="CamVid", help='Dataset you are using.')
     parser.add_argument('--dataset_path', type=str, default="", help='Path to Dataset folder.')
+    parser.add_argument('--image_suffix', type=str, default='', required=False, help='Only files with this extension should be included. You should specify it if some non-image files will be in the same folder') 
     parser.add_argument('--crop_height', type=int, default=512, help='Height of cropped input image to network')
     parser.add_argument('--crop_width', type=int, default=512, help='Width of cropped input image to network')
+    parser.add_argument('--biased_crop', type=float, default=0, help='Probability of making a biased cropped. Biased crops always contain some foreground portion. Only works if one of the classes is named "Background".')
+    parser.add_argument('--downscale_factor', type=float, default=0, required=False, help='Shrink image by this factor. E.g. if image is 1024x1024 and downscale_factor is 0.5, downscaled image will be 512x512. This is applied before cropping.')
     parser.add_argument('--batch_size', type=int, default=1, help='Number of images in each batch')
     parser.add_argument('--num_val_images', type=int, default=20, help='The number of images to used for validations. If -1 -> use all')
     parser.add_argument('--h_flip', type=utils.str2bool, default=False, help='Whether to randomly flip the image horizontally for data augmentation')
@@ -94,6 +103,12 @@ def main(args=None):
     class_names_list, label_values = helpers.get_label_info(os.path.join(args.dataset_path,args.dataset, "class_dict.csv"))
     class_names_string = ', '.join(class_names_list)
     
+    if 'Background' not in class_names_list:
+        args.biased_crop=0
+        backgroundValue=None
+    else:
+        backgroundValue=label_values[class_names_list.index('Background')]
+    
     num_classes = len(label_values)
     
     config = tf.ConfigProto()
@@ -105,9 +120,15 @@ def main(args=None):
     net_input = tf.placeholder(tf.float32,shape=[None,None,None,3])     #Try setting to 1 for grayscale, think theres no other changes needed.
     net_output = tf.placeholder(tf.float32,shape=[None,None,None,num_classes])
     
-    network, init_fn = model_builder.build_model(model_name=args.model, frontend=args.frontend, net_input=net_input, num_classes=num_classes, crop_width=args.crop_width, crop_height=args.crop_height, is_training=True)
+    network, init_fn = model_builder.build_model(model_name=args.model,
+                                                frontend=args.frontend,
+                                                net_input=net_input,
+                                                num_classes=num_classes,
+                                                crop_width=args.crop_width,
+                                                crop_height=args.crop_height,
+                                                is_training=True)
     
-    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=network, labels=net_output))
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=network, labels=net_output))
     
     opt = tf.train.RMSPropOptimizer(learning_rate=args.learn_rate, decay=0.995).minimize(loss, var_list=[var for var in tf.trainable_variables()])
     
@@ -124,13 +145,13 @@ def main(args=None):
     # Load a previous checkpoint if desired    
     if args.darea_call:
         if args.continue_training and args.continue_from:
-            model_checkpoint_name='../../DeepLearning/checkpoints/' + args.continue_from + '.ckpt'
+            model_checkpoint_name='../../deepLearning/checkpoints/' + args.continue_from + '.ckpt'
             if os.path.isfile(model_checkpoint_name+'.index'):
                 print('Loading latest model checkpoint...')
                 saver.restore(sess, model_checkpoint_name)
                 print('successfully loaded {}'.format(model_checkpoint_name))
             else:
-                print('Specified checkpoint not found. Starting fresh one')
+                print('Specified checkpoint {} not found. Starting fresh one'.format(os.path.abspath(model_checkpoint_name)))
         if args.save_path:
             model_checkpoint_name=os.path.join(args.save_path, args.dataset + '.ckpt')
     else:
@@ -152,13 +173,15 @@ def main(args=None):
     # Load the data
     print("Loading the data ...")
     train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names = \
-                                    utils.prepare_data(dataset_dir=os.path.join(args.dataset_path,args.dataset))
+                                    utils.prepare_data(dataset_dir=os.path.join(args.dataset_path,args.dataset),image_suffix=args.image_suffix)
     
     
     
     print("\n***** Begin training *****")
     print("Dataset -->", args.dataset)
     print("Model -->", args.model)
+    if args.downscale_factor:
+        print("Downscale Factor -->", args.downscale_factor)
     print("Crop Height -->", args.crop_height)
     print("Crop Width -->", args.crop_width)
     print("Num Epochs -->", args.num_epochs)
@@ -192,6 +215,9 @@ def main(args=None):
         random.seed(16)
         val_indices=random.sample(range(0,len(val_input_names)),num_vals)
     
+    #Copy class file with same name as checkpoint
+    shutil.copyfile(os.path.join(args.dataset_path,args.dataset, "class_dict.csv"), 
+                    os.path.splitext(model_checkpoint_name)[0]+'.classes')
     # Do the training here
     for epoch in range(args.epoch_start_i, args.num_epochs):
     
@@ -219,31 +245,67 @@ def main(args=None):
                 output_image = utils.load_image(train_output_names[id])
     
                 with tf.device('/cpu:0'):
-                    input_image, output_image = data_augmentation(input_image, output_image, args)
-    
-    
+                    input_image, output_image = data_augmentation(input_image, output_image, args, backgroundValue)
+                    if 0:
+                        #Debugging: 
+                        try:
+                            os.mkdir('imagesinTrain')
+                            'kj'
+                        except:
+                            pass
+                        try:
+                            os.mkdir('imagesinTrain/%04d'%(epoch))
+                        except:
+                            pass
+                        file_name = utils.filepath_to_name(train_input_names[id])
+                        file_name = os.path.splitext(file_name)[0]
+                        cv2.imwrite("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(input_image), cv2.COLOR_RGB2BGR))
+                        cv2.imwrite("%s/%04d/%s_gt.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(output_image), cv2.COLOR_RGB2BGR))
                     # Prep the data. Make sure the labels are in one-hot format
                     input_image = np.float32(input_image) / 255.0
                     output_image = np.float32(helpers.one_hot_it(label=output_image, label_values=label_values))
-    
+                    if 0:
+                        #Debugging: 
+                        try:
+                            os.mkdir('imagesinTrain')
+                        except:
+                            pass
+                        try:
+                            os.mkdir('imagesinTrain/%04d'%(epoch))
+                        except:
+                            pass
+                        file_name = utils.filepath_to_name(train_input_names[id])
+                        file_name = os.path.splitext(file_name)[0]
+                        print("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name))
+                        cv2.imwrite("%s/%04d/%s_im.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(input_image), cv2.COLOR_RGB2BGR))
+                        #cv2.imwrite("%s/%04d/%s_gt.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(output_image), cv2.COLOR_RGB2BGR))
                     input_image_batch.append(np.expand_dims(input_image, axis=0))
                     output_image_batch.append(np.expand_dims(output_image, axis=0))
     
             if args.batch_size == 1:
                 input_image_batch = input_image_batch[0]
                 output_image_batch = output_image_batch[0]
+                
             else:
                 input_image_batch = np.squeeze(np.stack(input_image_batch, axis=1))
                 output_image_batch = np.squeeze(np.stack(output_image_batch, axis=1))
-    
+
             # Do the training
-            _,current=sess.run([opt,loss],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
+            _,current,output_image=sess.run([opt,loss,network],feed_dict={net_input:input_image_batch,net_output:output_image_batch})
             current_losses.append(current)
             cnt = cnt + args.batch_size
-            if cnt % 60 == 0:
+            if cnt % 25 == 0:
                 string_print = "Epoch = %d Count = %d Current_Loss = %.4f Time = %.2f"%(epoch,cnt,current,time.time()-st)
                 utils.LOG(string_print)
                 st = time.time()
+            
+            if 0:
+                #For Debugging
+                output_image = np.array(output_image[0,:,:,:])
+                output_image = helpers.reverse_one_hot(output_image)
+                out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
+                cv2.imwrite("%s/%04d/%s_pred.png"%("imagesinTrain",epoch, file_name),cv2.cvtColor(np.uint8(out_vis_image), cv2.COLOR_RGB2BGR))
+
     
         mean_loss = np.mean(current_losses)
         avg_loss_per_epoch.append(mean_loss)
@@ -280,20 +342,48 @@ def main(args=None):
     
             # Do the validation on a small set of validation images
             for ind in val_indices:
-    
-                input_image = np.expand_dims(np.float32(utils.load_image(val_input_names[ind])[:args.crop_height, :args.crop_width]),axis=0)/255.0
-                gt = utils.load_image(val_output_names[ind])[:args.crop_height, :args.crop_width]
+
+                input_image = utils.load_image(val_input_names[ind])
+                gt = utils.load_image(val_output_names[ind])
+                if args.downscale_factor and args.downscale_factor !=1:
+                    dim=(int(input_image.shape[0]*args.downscale_factor), int(input_image.shape[1]*args.downscale_factor))
+                    input_image=cv2.resize(input_image,dim,interpolation=cv2.INTER_CUBIC)
+                    gt=cv2.resize(gt,dim,interpolation=cv2.INTER_NEAREST)
+                
+                #input_image, gt = data_augmentation(input_image, gt, args)
+                    
+                    
                 gt = helpers.reverse_one_hot(helpers.one_hot_it(gt, label_values))
+                
+                crop_height=args.crop_height
+                crop_width=args.crop_width
+                
+                if input_image.shape[0]>crop_height or input_image.shape[1]>crop_width:
+                    #rectangle in bottom right corner smaller than cropped im will not be used
+                    nrCroppingsY=input_image.shape[0]//crop_height
+                    nrCroppingsX=input_image.shape[1]//crop_width
+                    output_image=np.zeros([nrCroppingsY*crop_height,nrCroppingsX*crop_width])
+                    gt=gt[0:nrCroppingsY*crop_height,0:nrCroppingsX*crop_width]
+                    for yi in range(nrCroppingsY):
+                        row=np.zeros([crop_height,nrCroppingsX*crop_width])
+                        for xi in range(nrCroppingsX):
+                            inputIm=input_image[yi*crop_height:(1+yi)*crop_height,xi*crop_width:(1+xi)*crop_width,:]
+                            inputIm=np.expand_dims(np.float32(inputIm)/255.0,axis=0)
+                            out=sess.run(network,feed_dict={net_input:inputIm})
+                            out = np.array(out[0,:,:,:])
+                            out=helpers.reverse_one_hot(out)
+                            row[:,xi*crop_width:(1+xi)*crop_width]=out
+                        output_image[yi*crop_height:(1+yi)*crop_height,:]=row
+                # st = time.time()                    
+                    
+                else:
+                    input_image=np.expand_dims(np.float32(input_image)/255.0,axis=0)
+                    output_image = sess.run(network,feed_dict={net_input:input_image})
+                    output_image = np.array(output_image[0,:,:,:])
+                    output_image = helpers.reverse_one_hot(output_image)
     
-                # st = time.time()
-    
-                output_image = sess.run(network,feed_dict={net_input:input_image})
-    
-    
-                output_image = np.array(output_image[0,:,:,:])
-                output_image = helpers.reverse_one_hot(output_image)
+                
                 out_vis_image = helpers.colour_code_segmentation(output_image, label_values)
-    
                 accuracy, class_accuracies, prec, rec, f1, iou, class_iou = utils.evaluate_segmentation(pred=output_image, label=gt, num_classes=num_classes)
     
                 file_name = utils.filepath_to_name(val_input_names[ind])
@@ -344,8 +434,8 @@ def main(args=None):
                 saver.save(sess,model_checkpoint_name)
                 best_avg_iou=avg_iou
                 #Save an info file
-                with open(model_checkpoint_name[:-4]+'txt', 'w') as f:
-                    f.write('Epoch: {}\nValidation IoU score: {}'.format(epoch,avg_iou))
+                with open(model_checkpoint_name[:-5]+'.info', 'w') as f:
+                    f.write('Epoch\t{}\nValidation IoU score\t{}'.format(epoch,avg_iou))
         epoch_time=time.time()-epoch_st
         remain_time=epoch_time*(args.num_epochs-1-epoch)
         m, s = divmod(remain_time, 60)
@@ -356,40 +446,46 @@ def main(args=None):
             train_time="Remaining training time : Training completed.\n"
         utils.LOG(train_time)
         scores_list = []
+        
+    with open(model_checkpoint_name[:-5]+'.info', 'a+') as f:
+        #Save some info on filesizes
+        f.write('\nimageSize\t{}'.format([args.crop_height,args.crop_width]))
+        f.write('\nTraining completed\t{}'.format(datetime.datetime.now().strftime("%d-%b-%Y %H:%M:%S")))
+
+    if not args.darea_call and args.makePlots:
+        fig1, ax1 = plt.subplots(figsize=(11, 8))
     
-        if not args.darea_call and args.makePlots:
-            fig1, ax1 = plt.subplots(figsize=(11, 8))
-        
-            ax1.plot(range(epoch+1), avg_scores_per_epoch)
-            ax1.set_title("Average validation accuracy vs epochs")
-            ax1.set_xlabel("Epoch")
-            ax1.set_ylabel("Avg. val. accuracy")
-        
-        
-            plt.savefig('accuracy_vs_epochs.png')
-        
-            plt.clf()
-        
-            fig2, ax2 = plt.subplots(figsize=(11, 8))
-        
-            ax2.plot(range(epoch+1), avg_loss_per_epoch)
-            ax2.set_title("Average loss vs epochs")
-            ax2.set_xlabel("Epoch")
-            ax2.set_ylabel("Current loss")
-        
-            plt.savefig('loss_vs_epochs.png')
-        
-            plt.clf()
-        
-            fig3, ax3 = plt.subplots(figsize=(11, 8))
-        
-            ax3.plot(range(epoch+1), avg_iou_per_epoch)
-            ax3.set_title("Average IoU vs epochs")
-            ax3.set_xlabel("Epoch")
-            ax3.set_ylabel("Current IoU")
-        
-            plt.savefig('iou_vs_epochs.png')
+        ax1.plot(range(epoch+1), avg_scores_per_epoch)
+        ax1.set_title("Average validation accuracy vs epochs")
+        ax1.set_xlabel("Epoch")
+        ax1.set_ylabel("Avg. val. accuracy")
     
+    
+        plt.savefig('accuracy_vs_epochs.png')
+    
+        plt.clf()
+    
+        fig2, ax2 = plt.subplots(figsize=(11, 8))
+    
+        ax2.plot(range(epoch+1), avg_loss_per_epoch)
+        ax2.set_title("Average loss vs epochs")
+        ax2.set_xlabel("Epoch")
+        ax2.set_ylabel("Current loss")
+    
+        plt.savefig('loss_vs_epochs.png')
+    
+        plt.clf()
+    
+        fig3, ax3 = plt.subplots(figsize=(11, 8))
+    
+        ax3.plot(range(epoch+1), avg_iou_per_epoch)
+        ax3.set_title("Average IoU vs epochs")
+        ax3.set_xlabel("Epoch")
+        ax3.set_ylabel("Current IoU")
+
+        plt.savefig('iou_vs_epochs.png')
+            
+
     
 if __name__=='__main__': 
     main(None)

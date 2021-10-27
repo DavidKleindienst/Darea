@@ -1,15 +1,15 @@
 from __future__ import print_function, division
 import os,time,cv2, sys, math,argparse
-import tensorflow as tf
-slim=tf.contrib.slim
 import numpy as np
 import time, datetime
 import os, random
-from scipy.misc import imread
+from imageio import imread
 import ast
 from sklearn.metrics import precision_score, \
     recall_score, confusion_matrix, classification_report, \
     accuracy_score, f1_score
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 
 from utils import helpers
 NOT_ALLOWED_FILENAMES=['.DS_Store']
@@ -42,7 +42,7 @@ def prepare_class_data(dataset_dir,classes):
                         val_labels.append(i)
     return train_images, train_labels, val_images, val_labels
 
-def prepare_data(dataset_dir):
+def prepare_data(dataset_dir,image_suffix=''):
     train_input_names=[]
     train_output_names=[]
     val_input_names=[]
@@ -54,7 +54,7 @@ def prepare_data(dataset_dir):
     cwd = os.getcwd()
     for x,name_list in zip(imtypes, name_lists):
         for file in os.listdir(os.path.join(dataset_dir,x)):
-            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.'):
+            if file not in NOT_ALLOWED_FILENAMES and not file.startswith('.') and not os.path.isdir(file) and file.endswith(image_suffix):
                 name_list.append(os.path.join(cwd, dataset_dir, x, file))
     train_input_names.sort(),train_output_names.sort(), val_input_names.sort(), val_output_names.sort(), test_input_names.sort(), test_output_names.sort()
     return train_input_names,train_output_names, val_input_names, val_output_names, test_input_names, test_output_names
@@ -66,16 +66,22 @@ def load_image(path):
     assert os.path.exists(path)
     try:
         image = cv2.cvtColor(cv2.imread(path,-1), cv2.COLOR_BGR2RGB)
+        if image.dtype=='uint16':
+            image=(image/256).astype('uint8')
+        
     except:
         print(path)
         raise
-        
+    assert (image.dtype=='uint8'), "Image needs to be of type uint8 or uint16"
+    
     return image
 
 # Takes an absolute file path and returns the name of the file without th extension
-def filepath_to_name(full_name):
+def filepath_to_name(full_name,remove_Mod=False):
     file_name = os.path.basename(full_name)
     file_name = os.path.splitext(file_name)[0]
+    if remove_Mod and file_name.endswith('_mod'):
+        file_name=file_name[0:-4]
     return file_name
 
 # Print with time. To console or file
@@ -200,20 +206,56 @@ def lovasz_softmax(probas, labels, only_present=True, per_image=False, ignore=No
 
 
 # Randomly crop the image to a specific size. For data augmentation
-def random_crop(image, label, crop_height, crop_width):
+def random_crop(image, label, crop_height, crop_width,biased_crop=0,backgroundValue=None):
     if (image.shape[0] != label.shape[0]) or (image.shape[1] != label.shape[1]):
         raise Exception('Image and label must have the same dimensions!')
+    
+    if crop_width == image.shape[1] and crop_height == image.shape[0]:
+        #Nothing to crop, return inputs
+        return image, label    
         
-    if (crop_width <= image.shape[1]) and (crop_height <= image.shape[0]):
-        x = random.randint(0, image.shape[1]-crop_width)
-        y = random.randint(0, image.shape[0]-crop_height)
-        
-        if len(label.shape) == 3:
-            return image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
-        else:
-            return image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width]
-    else:
+    if crop_width > image.shape[1] or crop_height > image.shape[0]:
         raise Exception('Crop shape (%d, %d) exceeds image dimensions (%d, %d)!' % (crop_height, crop_width, image.shape[0], image.shape[1]))
+        
+        
+    if biased_crop and backgroundValue is not None and random.random()<biased_crop:
+        #Carry out biased cropping which should contain some foreground pixels
+        #First check whether image contains any foreground pixels
+        arr=label!=backgroundValue
+        if arr.any():
+            #Carry out biased cropping
+            foreground=np.transpose(np.nonzero(arr.any(axis=2)))
+            #foreground is a 2 by n list of foregroundpixels
+            #Select a random one of them
+            y,x=foreground[random.randint(0,foreground.shape[0]-1),:]
+            y=_get_crop_start_from_center(y,crop_height,image.shape[0])
+            x=_get_crop_start_from_center(x,crop_width,image.shape[1])
+            if len(label.shape) == 3:
+                cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
+            else:
+                cropped_im=image[y:y+crop_height, x:x+crop_width], label[y:y+crop_height, x:x+crop_width]
+            return cropped_im
+    
+    x = random.randint(0, image.shape[1]-crop_width)
+    y = random.randint(0, image.shape[0]-crop_height)
+
+    if len(label.shape) == 3:
+        cropped_im=image[y:y+crop_height, x:x+crop_width, :], label[y:y+crop_height, x:x+crop_width, :]
+    else:
+        cropped_im=image[y:y+crop_height, x:x+crop_width], label[y:y+crop_height, x:x+crop_width]
+    return cropped_im
+
+def _get_crop_start_from_center(a,crop_size,image_size):
+    #a should be coordinate of the center of the crop 
+    #a can be either x or y coordinate, but choose crop_size and image_size along same dimension
+    #returns b which is left or uppermost coordinate of the crop
+    #So final crop can then be b:b+crop_size
+    b=a-math.floor(crop_size/2)
+    if b<0:
+        b=0
+    if b+crop_size>image_size:
+        b=image_size-crop_size
+    return b
 
 # Compute the average segmentation accuracy across all classes
 def compute_global_accuracy(pred, label):
@@ -355,6 +397,31 @@ def compute_class_weights(labels_dir, label_values):
 
     return class_weights
 
+def getCoordsFromPrediction(image,foregroundcolors,downscale_factor=False,open_dim=4,close_dim=512,open2_dim=24):
+    
+    bw=np.zeros(image.shape,dtype=image.dtype)
+    for c in foregroundcolors:
+        bw[image==c]=1
+
+    if downscale_factor:
+        #If image was downscaled, also reduce number of pixels for morph operations
+        open_dim=round(open_dim*downscale_factor)
+        close_dim=round(close_dim*downscale_factor)
+        #Set pixels on the border to 0 to allow for opening away from the border
+        bw[[0,1,-1,-2],:]=0
+        bw[:,[0,1,-1,-2]]=0
+        open2_dim=round(open2_dim*downscale_factor)
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((open_dim,open_dim),np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_CLOSE,np.ones((close_dim,close_dim),np.uint8))
+    bw=cv2.morphologyEx(bw,cv2.MORPH_OPEN,np.ones((open2_dim,open2_dim),np.uint8))
+    
+    nr_labels,labels,stats,centroids=cv2.connectedComponentsWithStats(bw)
+    if downscale_factor:
+        centroids=[[x/downscale_factor for x in c] for c in centroids]
+    
+    targets=[list(c) for c,s in zip(centroids,stats) if s[0]!=0 and s[1]!=0]
+    return targets,bw
+
 # Compute the memory usage, for debugging
 def memory():
     import os
@@ -363,4 +430,3 @@ def memory():
     py = psutil.Process(pid)
     memoryUse = py.memory_info()[0]/2.**30  # Memory use in GB
     print('Memory usage in GBs:', memoryUse)
-
