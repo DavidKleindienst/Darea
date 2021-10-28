@@ -6,7 +6,7 @@ function toSimulate=doTheSimulation(toSimulate,simfct, area, mindistance, compar
     while any(isnan(toSimulate))
         simulated=simfct(toSimulate);  %simulated will have as many values as there are NaNs in toSimulate
         if any(area)
-            isOutside=boolean(area(sub2ind(size(area),simulated(:,2),simulated(:,1))));
+            isOutside=logical(area(sub2ind(size(area),simulated(:,2),simulated(:,1))));
             simulated(isOutside,:)=NaN;
         end
         simulated=simulated.*scale;

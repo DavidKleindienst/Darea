@@ -67,7 +67,13 @@ Data.names=settings.names;
 Data.nrsim=settings.nrsim;
 Data.settings=settings;
 Data.allName=settings.allName;
-Data.checksum=Simulink.getFileChecksum(datFile);
+if isToolkitAvailable('Simulink')
+    Data.checksum=Simulink.getFileChecksum(datFile);
+else
+    fprintf(['Warning: Simulink toolbox is not installed. Loading analysis results', ...
+        'after changing the images included in the project may lead to unforseen consequences']);
+    Data.checksum=false;    
+end
 
 if (settings.doColocalization || settings.nrsim>10) && getCurrentPoolSize()==0
     try

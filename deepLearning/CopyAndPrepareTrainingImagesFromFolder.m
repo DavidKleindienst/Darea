@@ -2,6 +2,12 @@
 function success=CopyAndPrepareTrainingImagesFromFolder(infolder,outfolder,settings)
 
 success=false;
+
+if ~isToolkitAvailable('Simulink')
+    fprintf(['Warning: Simulink Toolbox is not installed. Changed projects will not be updated ', ...
+            'when this function is run again']);
+end
+
 safeMkdir(outfolder);
 if nargin<3
     settings=readDefaults();
@@ -57,8 +63,11 @@ for f=1:numel(features)
            fprintf('Processing config %i of %i\n', c, numel(configs));
            conf=configs{c};
            sourceFolder=fullfile(infolder,feat);
-
-           hash=Simulink.getFileChecksum(fullfile(sourceFolder,conf));
+           if isToolkitAvailable('Simulink')
+               hash=Simulink.getFileChecksum(fullfile(sourceFolder,conf));
+           else
+               hash=0;
+           end
            if sum(strcmp(oldConfigs,conf))==0
                addConfig(cfid,conf,hash,targetfolder,sourceFolder);
            elseif ~isequal({hash},oldHashes(strcmp(oldConfigs,conf)))

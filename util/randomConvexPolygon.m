@@ -21,8 +21,8 @@ y=sort(y);
 xI=x(2:end-1);
 yI=y(2:end-1);
 
-idx=boolean(round(rand(nrPoints-2,1)));
-idy=boolean(round(rand(nrPoints-2,1)));
+idx=logical(round(rand(nrPoints-2,1)));
+idy=logical(round(rand(nrPoints-2,1)));
 
 xSet1=[x(1); xI(idx); x(end)];
 xSet2=[x(end); flip(xI(~idx)); x(1)];
