@@ -197,8 +197,9 @@ waitfor(mainFigure);
                 def=updateDefaults(getOptionsName(datFile),def);
                 hGroupSelection.Value=def.chosenGroups;
             end
-            if isToolkitAvailable('Simulink') && Simulink.getFileChecksum(datFile)~=Data.checksum
+            if isToolkitAvailable('Simulink') & Simulink.getFileChecksum(datFile)~=Data.checksum
                 set(hAllowGroupSelection, 'enable', 'off');
+                fprintf('Warning: %s has changed since the analysis was run');
                 set(hAllowGroupSelection,'Tooltipstring', ...
                     sprintf('%s has changed since the analysis was run\nRerun analysis to be able to select groups', datFile));
             end
