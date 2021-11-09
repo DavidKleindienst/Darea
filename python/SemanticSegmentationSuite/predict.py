@@ -30,7 +30,6 @@ def main(args=None):
     parser.add_argument('--darea_call', type=utils.str2bool, default=False, required=False, help='Set to true when you call it from Darea software')
     parser.add_argument('--save_predictionImage', type=utils.str2bool, default=True, required=False, help='Whether predictions should be saved as images')
     parser.add_argument('--save_coordinates', type=utils.str2bool, default=False, required=False, help='Whether coordinates of predicted structures should be saved')
-    print('wassup')
     if args is None:
         args=parser.parse_args()
     else:

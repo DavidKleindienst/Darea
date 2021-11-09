@@ -20,9 +20,12 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         fullimageName=[fullfile(pathImage,imageName) '.tif'];
         image = readAndConvertImage(fullimageName);
     end
-    modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
+    if isnan(selAngle)
+        modImageName=getModImagePath(fullfile(pathImage,imageName));
+    else
+        modImageName=getModImagePath(fullfile(pathImage,imageName),angle);
+    end
     modImage=NaN;
-    
     
     if ~isa(image, 'uint16')
         msgbox('This image is not 16 bit and cannot be processed');
@@ -235,7 +238,9 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
             filteredImages{2}.name='saved Component';
             filteredImages{2}.fct='select';
             filteredImages{2}.compImage=modComponents;
-            
+%             if nargout==1
+%                 return;
+%             end
             [~, n]=bwlabel(modComponents);
             if n ~= 1
                 %More than 1 selection, set to NaN
@@ -353,6 +358,14 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         image = readAndConvertImage(fullimageName,angle);
         if autocontrast
             image=imadjust(image);
+        end
+        newMod=getModImagePath(fullfile(pathImage,imageName),angle);
+        if newMod~=modImageName
+            modImageName=newMod;
+            if isfile(modImageName)
+                modImage=readAndConvertImage(modImageName);
+                filteredImages = loadSavedImage(image,modImage);
+            end
         end
         filteredImages{1}.image=image;
         for fil=2:numel(filteredImages)
@@ -806,6 +819,23 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         if rotated
             %If image has been rotated, rotate image files
             rotateSavedImage(fullfile(pathImage,imageName),scale,rotated,~save_Img,true);
+        end
+        if ~isfile(fullfile(pathImage,[imageName 'dots.csv'])) && ...
+                isfile(fullfile(pathImage,[imageName 'dots_' int2str(angle) '.csv']))
+            %Copy file of that angle to be main dots file
+            copyfile(fullfile(pathImage,[imageName 'dots_' int2str(angle) '.csv']), ...
+                    fullfile(pathImage,[imageName 'dots.csv']));
+        end
+        if defaults.deleteOtherAnglesWhenSaving && ...
+                    isfile(fullfile(pathImage, [imageName '_mod_1.tif']))
+            a=1;
+            while isfile(fullfile(pathImage, [imageName '_mod_' int2str(a) '.tif']))
+                delete(fullfile(pathImage, [imageName '_mod_' int2str(a) '.tif']));
+                if isfile(fullfile(pathImage,[imageName 'dots_' int2str(angle) '.csv']))
+                    delete(fullfile(pathImage,[imageName 'dots_' int2str(angle) '.csv']));
+                end
+                a=a+1;
+            end
         end
         updated=true;
     end % save

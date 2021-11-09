@@ -20,13 +20,27 @@ for img=1:numel(images)
         offset=offset+1;
         continue;
     end
+    outpath=fullfile(outputFolder, int2str(img-offset));
     if isnan(selAngles)
-        outpath=fullfile(outputFolder, int2str(img-offset));
         sizes{end+1} = prepareImageForPrediction(imName, NaN, imSize,outpath, adjustContrast);
     else
-        error('prepareForPrediction.m cannot handle serialEM images. Please file a bug report!');
-        %TODO!!
+        sizes{end+1} = prepareImageForPrediction(imName, selAngles(img), imSize,outpath, adjustContrast);
     end
+%     if isnan(selAngles) 
+%         outpath=fullfile(outputFolder, int2str(img-offset));
+%         sizes{end+1} = prepareImageForPrediction(imName, NaN, imSize,outpath, adjustContrast);
+%     elseif selAngles(img)>0
+%         %Angle has been selected, only predict that image
+%         outpath=fullfile(outputFolder, int2str(img-offset));
+%         sizes{end+1} = prepareImageForPrediction(imName, selAngles(img), imSize,outpath, adjustContrast);
+%     else
+%         %Angle has not been selected, predict all angles
+%         [~,angles]=readMdoc([imName '.mdoc']); 
+%         for a=1:numel(angles)
+%             outpath=fullfile(outputFolder, [int2str(img-offset) '_' int2str(a)]);
+%             sizes{end+1} = prepareImageForPrediction(imName, selAngles(a), imSize,outpath, adjustContrast);
+%         end
+%     end
 end
 
 end

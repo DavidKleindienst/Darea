@@ -2,9 +2,7 @@ function convertPredictionsToMod(predFolder,imList,targetSizes,overwrite)
 %% Converts demarcation predictions to _mod files
 
 imListNoDupl=imList(~endsWith(imList,'_dupl'));
-assert(numel(imListNoDupl)==numel(targetSizes))
 nrImg=numel(imList);
-
 %Duplicated images do not exist as prediction, but need to be copied to
 %So dupl_offset needs to be subtracted from targetSizes indes and
 %predFolder_filename, but not imList index
@@ -28,7 +26,7 @@ if isfile(fullfile(predFolder,  '1.tif')) || isfile(fullfile(predFolder, '1_1.ti
             while isfile(fullfile(predFolder, [int2str(img-dupl_offset) '_' int2str(i) '.tif']))
                 image=imread(fullfile(predFolder, [int2str(img-dupl_offset) '_' int2str(i) '.tif']));
                 image=convertPredtoMask(image,targetSizes{img-dupl_offset});
-                imwrite(image,[imList{img} '_mod_' str2int(i) '.tif']);
+                imwrite(image,[imList{img} '_mod_' int2str(i) '.tif']);
                 i = i + 1;
             end
             

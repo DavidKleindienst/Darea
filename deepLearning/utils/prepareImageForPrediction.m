@@ -23,13 +23,16 @@ function imageSize = prepareImageForPrediction(imName,angle, imSize, outpath, ad
             if adjustContrast
                 image=imadjust(image);
             end
+            if a==1 %Is same for all angles anyway
+                imageSize=[size(image,1),size(image,2)]; 
+            end
             image=prepareImage(image,imSize);
 
             %Images will be just numbered
             %So you'll need the original image list to backconvert
-            imwrite(image,[outpath '_' str2int(a) '.tif']);
+            imwrite(image,[outpath '_' int2str(a) '.tif']);
         end
-        imageSize=[size(image,1),size(image,2)]; %Is same for all angles anyway
+        
     end
 
 
