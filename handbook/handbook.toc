@@ -3,45 +3,41 @@
 \contentsline {section}{\numberline {2}Installation}{3}{section.2}
 \contentsline {subsection}{\numberline {2.1}Hardware Requirements}{3}{subsection.2.1}
 \contentsline {subsection}{\numberline {2.2}Software Prerequisites}{3}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Installation}{4}{subsection.2.3}
-\contentsline {subsubsection}{\numberline {2.3.1}Windows - CPU}{4}{subsubsection.2.3.1}
-\contentsline {subsubsection}{\numberline {2.3.2}Windows - GPU}{4}{subsubsection.2.3.2}
-\contentsline {subsubsection}{\numberline {2.3.3}MacOS - CPU}{4}{subsubsection.2.3.3}
-\contentsline {subsubsection}{\numberline {2.3.4}MacOS - GPU}{5}{subsubsection.2.3.4}
-\contentsline {subsubsection}{\numberline {2.3.5}Other operating systems or using other package managers than Anaconda}{5}{subsubsection.2.3.5}
-\contentsline {subsubsection}{\numberline {2.3.6}Using other versions of CUDA}{5}{subsubsection.2.3.6}
-\contentsline {section}{\numberline {3}Typical Workflow}{6}{section.3}
-\contentsline {section}{\numberline {4}The Main Menu}{6}{section.4}
-\contentsline {section}{\numberline {5}Projects and Groups}{8}{section.5}
-\contentsline {subsection}{\numberline {5.1}Creating projects and importing images}{8}{subsection.5.1}
-\contentsline {subsubsection}{\numberline {5.1.1}Image requirements and suggested folder structure}{8}{subsubsection.5.1.1}
-\contentsline {subsubsection}{\numberline {5.1.2}Creating Projects}{9}{subsubsection.5.1.2}
-\contentsline {subsubsection}{\numberline {5.1.3}Managing Images}{10}{subsubsection.5.1.3}
-\contentsline {subsection}{\numberline {5.2}Project settings}{11}{subsection.5.2}
-\contentsline {subsection}{\numberline {5.3}Groups}{11}{subsection.5.3}
-\contentsline {subsubsection}{\numberline {5.3.1}Assign group by image}{13}{subsubsection.5.3.1}
-\contentsline {subsection}{\numberline {5.4}Preprocessing}{15}{subsection.5.4}
-\contentsline {section}{\numberline {6}Manual Image Annotation}{15}{section.6}
-\contentsline {subsection}{\numberline {6.1}Opening images}{15}{subsection.6.1}
-\contentsline {subsection}{\numberline {6.2}Manual Demarcation}{16}{subsection.6.2}
-\contentsline {subsection}{\numberline {6.3}Manual particle detection}{20}{subsection.6.3}
-\contentsline {section}{\numberline {7}Automated demarcation and particle annotation}{21}{section.7}
-\contentsline {section}{\numberline {8}Analysis}{22}{section.8}
-\contentsline {subsection}{\numberline {8.1}Running Analysis}{22}{subsection.8.1}
-\contentsline {subsubsection}{\numberline {8.1.1}Monte-Carlo Simulations}{23}{subsubsection.8.1.1}
-\contentsline {subsubsection}{\numberline {8.1.2}Clusters}{24}{subsubsection.8.1.2}
-\contentsline {subsection}{\numberline {8.2}Making tables and figures}{25}{subsection.8.2}
-\contentsline {subsubsection}{\numberline {8.2.1}The Output files}{26}{subsubsection.8.2.1}
-\contentsline {subsection}{\numberline {8.3}Visualizing results}{27}{subsection.8.3}
-\contentsline {section}{\numberline {9}Training automated analysis}{29}{section.9}
-\contentsline {subsection}{\numberline {9.1}Training particle detection}{30}{subsection.9.1}
-\contentsline {subsection}{\numberline {9.2}Training demarcation}{30}{subsection.9.2}
-\contentsline {section}{\numberline {10}Advanced sections}{34}{section.10}
-\contentsline {subsection}{\numberline {10.1}How Darea stores data and modifying defaults}{34}{subsection.10.1}
-\contentsline {subsubsection}{\numberline {10.1.1}Project files}{34}{subsubsection.10.1.1}
-\contentsline {subsubsection}{\numberline {10.1.2}Project Settings and modifying defaults}{34}{subsubsection.10.1.2}
-\contentsline {subsubsection}{\numberline {10.1.3}Groups}{35}{subsubsection.10.1.3}
-\contentsline {subsubsection}{\numberline {10.1.4}Demarcations}{35}{subsubsection.10.1.4}
-\contentsline {subsubsection}{\numberline {10.1.5}Particle annotations}{35}{subsubsection.10.1.5}
-\contentsline {subsubsection}{\numberline {10.1.6}Analysis results}{35}{subsubsection.10.1.6}
-\contentsline {subsection}{\numberline {10.2}Deep learning using the command line}{36}{subsection.10.2}
+\contentsline {subsection}{\numberline {2.3}Installation}{3}{subsection.2.3}
+\contentsline {subsubsection}{\numberline {2.3.1}Windows/Linux with GPU support}{4}{subsubsection.2.3.1}
+\contentsline {subsubsection}{\numberline {2.3.2}Windows/MacOS/Linux - CPU only}{4}{subsubsection.2.3.2}
+\contentsline {section}{\numberline {3}Typical Workflow}{5}{section.3}
+\contentsline {section}{\numberline {4}The Main Menu}{5}{section.4}
+\contentsline {section}{\numberline {5}Projects and Groups}{7}{section.5}
+\contentsline {subsection}{\numberline {5.1}Creating projects and importing images}{7}{subsection.5.1}
+\contentsline {subsubsection}{\numberline {5.1.1}Image requirements and suggested folder structure}{7}{subsubsection.5.1.1}
+\contentsline {subsubsection}{\numberline {5.1.2}Creating Projects}{8}{subsubsection.5.1.2}
+\contentsline {subsubsection}{\numberline {5.1.3}Managing Images}{9}{subsubsection.5.1.3}
+\contentsline {subsection}{\numberline {5.2}Project settings}{10}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Groups}{10}{subsection.5.3}
+\contentsline {subsubsection}{\numberline {5.3.1}Assign group by image}{12}{subsubsection.5.3.1}
+\contentsline {subsection}{\numberline {5.4}Preprocessing}{14}{subsection.5.4}
+\contentsline {section}{\numberline {6}Manual Image Annotation}{14}{section.6}
+\contentsline {subsection}{\numberline {6.1}Opening images}{14}{subsection.6.1}
+\contentsline {subsection}{\numberline {6.2}Manual Demarcation}{15}{subsection.6.2}
+\contentsline {subsection}{\numberline {6.3}Manual particle detection}{19}{subsection.6.3}
+\contentsline {section}{\numberline {7}Automated demarcation and particle annotation}{20}{section.7}
+\contentsline {section}{\numberline {8}Analysis}{21}{section.8}
+\contentsline {subsection}{\numberline {8.1}Running Analysis}{21}{subsection.8.1}
+\contentsline {subsubsection}{\numberline {8.1.1}Monte-Carlo Simulations}{22}{subsubsection.8.1.1}
+\contentsline {subsubsection}{\numberline {8.1.2}Clusters}{23}{subsubsection.8.1.2}
+\contentsline {subsection}{\numberline {8.2}Making tables and figures}{24}{subsection.8.2}
+\contentsline {subsubsection}{\numberline {8.2.1}The Output files}{24}{subsubsection.8.2.1}
+\contentsline {subsection}{\numberline {8.3}Visualizing results}{26}{subsection.8.3}
+\contentsline {section}{\numberline {9}Training automated analysis}{28}{section.9}
+\contentsline {subsection}{\numberline {9.1}Training particle detection}{29}{subsection.9.1}
+\contentsline {subsection}{\numberline {9.2}Training demarcation}{29}{subsection.9.2}
+\contentsline {section}{\numberline {10}Advanced sections}{33}{section.10}
+\contentsline {subsection}{\numberline {10.1}How Darea stores data and modifying defaults}{33}{subsection.10.1}
+\contentsline {subsubsection}{\numberline {10.1.1}Project files}{33}{subsubsection.10.1.1}
+\contentsline {subsubsection}{\numberline {10.1.2}Project Settings and modifying defaults}{33}{subsubsection.10.1.2}
+\contentsline {subsubsection}{\numberline {10.1.3}Groups}{34}{subsubsection.10.1.3}
+\contentsline {subsubsection}{\numberline {10.1.4}Demarcations}{34}{subsubsection.10.1.4}
+\contentsline {subsubsection}{\numberline {10.1.5}Particle annotations}{34}{subsubsection.10.1.5}
+\contentsline {subsubsection}{\numberline {10.1.6}Analysis results}{34}{subsubsection.10.1.6}
+\contentsline {subsection}{\numberline {10.2}Deep learning using the command line}{34}{subsection.10.2}

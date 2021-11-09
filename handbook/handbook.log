@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.9.18)  10 JUL 2020 16:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.9.18)  9 NOV 2021 17:01
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -658,14 +658,14 @@ Package caption Info: End \AtBeginDocument code.
 * layout: <same size as paper>
 * layoutoffset:(h,v)=(0.0pt,0.0pt)
 * modes: 
-* h-part:(L,W,R)=(68.28644pt, 460.935pt, 68.28644pt)
+* h-part:(L,W,R)=(56.9055pt, 483.69687pt, 56.9055pt)
 * v-part:(T,H,B)=(81.94406pt, 663.51814pt, 99.58464pt)
 * \paperwidth=597.50787pt
 * \paperheight=845.04684pt
-* \textwidth=460.935pt
+* \textwidth=483.69687pt
 * \textheight=663.51814pt
-* \oddsidemargin=-3.98355pt
-* \evensidemargin=-3.98355pt
+* \oddsidemargin=-15.36449pt
+* \evensidemargin=-15.36449pt
 * \topmargin=-30.20093pt
 * \headheight=18.125pt
 * \headsep=21.75pt
@@ -744,218 +744,240 @@ LaTeX Font Info:    Try loading font information for T1+pcr on input line 45.
 (/usr/local/texlive/2018/texmf-dist/tex/latex/psnfss/t1pcr.fd
 File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
 )
-Overfull \hbox (21.763pt too wide) in paragraph at lines 45--46
-[]\T1/cmr/m/n/12 Python 3.6 (Ana-conda dis-tri-bu-tion is highly rec-om-mended:
- []$\T1/pcr/m/n/12 https : / / www . anaconda .
+Overfull \hbox (19.63504pt too wide) in paragraph at lines 46--47
+[]\T1/cmr/m/n/12 For GPU: CUDA ([]$\T1/pcr/m/n/12 https : / / developer . nvidi
+a . com / cuda-[]downloads$[]\T1/cmr/m/n/12 ) and CuDNN
  []
 
-[3] [4] [5]
-<screenshots/scr_mainmenu.png, id=320, 736.31085pt x 411.6981pt>
+
+Overfull \hbox (4.34596pt too wide) in paragraph at lines 46--47
+\T1/cmr/m/n/12 ([]$\T1/pcr/m/n/12 https : / / docs . nvidia . com / deeplearnin
+g / cudnn / install-[]guide / index .
+ []
+
+[3]
+Overfull \hbox (26.30832pt too wide) in paragraph at lines 59--60
+[][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+
+Overfull \hbox (2.30807pt too wide) in paragraph at lines 86--87
+[][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+[4]
+<screenshots/scr_mainmenu.png, id=289, 736.31085pt x 411.6981pt>
 File: screenshots/scr_mainmenu.png Graphic file (type png)
 <use screenshots/scr_mainmenu.png>
-Package pdftex.def Info: screenshots/scr_mainmenu.png  used on input line 146.
-(pdftex.def)             Requested size: 460.935pt x 257.73157pt.
- [6] [7 <./screenshots/scr_mainmenu.png>]
-<screenshots/scr_folderstructure.png, id=365, 460.72125pt x 468.75125pt>
+Package pdftex.def Info: screenshots/scr_mainmenu.png  used on input line 116.
+(pdftex.def)             Requested size: 483.69687pt x 270.4589pt.
+ [5] [6 <./screenshots/scr_mainmenu.png>]
+<screenshots/scr_folderstructure.png, id=332, 460.72125pt x 468.75125pt>
 File: screenshots/scr_folderstructure.png Graphic file (type png)
 <use screenshots/scr_folderstructure.png>
 Package pdftex.def Info: screenshots/scr_folderstructure.png  used on input lin
-e 177.
+e 147.
 (pdftex.def)             Requested size: 276.43488pt x 281.25291pt.
-<screenshots/scr_CreateProject.png, id=367, 422.89995pt x 416.5161pt>
+<screenshots/scr_CreateProject.png, id=334, 422.89995pt x 416.5161pt>
 File: screenshots/scr_CreateProject.png Graphic file (type png)
 <use screenshots/scr_CreateProject.png>
 Package pdftex.def Info: screenshots/scr_CreateProject.png  used on input line 
-185.
+155.
 (pdftex.def)             Requested size: 296.02794pt x 291.55928pt.
- [8 <./screenshots/scr_folderstructure.png>]
-<screenshots/scr_Manage.png, id=375, 708.84825pt x 513.96014pt>
+ [7 <./screenshots/scr_folderstructure.png>]
+<screenshots/scr_Manage.png, id=343, 708.84825pt x 513.96014pt>
 File: screenshots/scr_Manage.png Graphic file (type png)
 <use screenshots/scr_Manage.png>
-Package pdftex.def Info: screenshots/scr_Manage.png  used on input line 204.
+Package pdftex.def Info: screenshots/scr_Manage.png  used on input line 174.
 (pdftex.def)             Requested size: 354.42326pt x 256.97943pt.
- [9 <./screenshots/scr_CreateProject.png>]
-<screenshots/scr_Settings.png, id=393, 513.71925pt x 515.2851pt>
+ [8 <./screenshots/scr_CreateProject.png>]
+<screenshots/scr_Settings.png, id=361, 513.71925pt x 515.2851pt>
 File: screenshots/scr_Settings.png Graphic file (type png)
 <use screenshots/scr_Settings.png>
-Package pdftex.def Info: screenshots/scr_Settings.png  used on input line 218.
+Package pdftex.def Info: screenshots/scr_Settings.png  used on input line 188.
 (pdftex.def)             Requested size: 308.23392pt x 309.17345pt.
- [10 <./screenshots/scr_Manage.png>]
-<screenshots/scr_Groups.png, id=404, 863.26515pt x 519.98265pt>
+ [9 <./screenshots/scr_Manage.png>]
+<screenshots/scr_Groups.png, id=372, 863.26515pt x 519.98265pt>
 File: screenshots/scr_Groups.png Graphic file (type png)
 <use screenshots/scr_Groups.png>
-Package pdftex.def Info: screenshots/scr_Groups.png  used on input line 232.
-(pdftex.def)             Requested size: 460.935pt x 277.64447pt.
- [11 <./screenshots/scr_Settings.png>]
-<screenshots/scr_assign_1.png, id=417, 506.97404pt x 302.93175pt>
+Package pdftex.def Info: screenshots/scr_Groups.png  used on input line 202.
+(pdftex.def)             Requested size: 483.69687pt x 291.35492pt.
+ [10 <./screenshots/scr_Settings.png>]
+<screenshots/scr_assign_1.png, id=384, 506.97404pt x 302.93175pt>
 File: screenshots/scr_assign_1.png Graphic file (type png)
 <use screenshots/scr_assign_1.png>
-Package pdftex.def Info: screenshots/scr_assign_1.png  used on input line 245.
+Package pdftex.def Info: screenshots/scr_assign_1.png  used on input line 215.
 (pdftex.def)             Requested size: 334.6039pt x 199.93556pt.
- [12 <./screenshots/scr_Groups.png>]
-<screenshots/scr_assign_2.png, id=428, 504.08325pt x 302.44995pt>
+ [11 <./screenshots/scr_Groups.png>]
+<screenshots/scr_assign_2.png, id=395, 504.08325pt x 302.44995pt>
 File: screenshots/scr_assign_2.png Graphic file (type png)
 <use screenshots/scr_assign_2.png>
-Package pdftex.def Info: screenshots/scr_assign_2.png  used on input line 255.
+Package pdftex.def Info: screenshots/scr_assign_2.png  used on input line 225.
 (pdftex.def)             Requested size: 332.69597pt x 199.61757pt.
-<screenshots/scr_assign_3.png, id=429, 1326.51585pt x 832.67085pt>
+<screenshots/scr_assign_3.png, id=396, 1326.51585pt x 832.67085pt>
 File: screenshots/scr_assign_3.png Graphic file (type png)
 <use screenshots/scr_assign_3.png>
-Package pdftex.def Info: screenshots/scr_assign_3.png  used on input line 263.
-(pdftex.def)             Requested size: 460.935pt x 289.33005pt.
- [13 <./screenshots/scr_assign_1.png> <./screenshots/scr_assign_2.png>]
-<screenshots/scr_preprocessing.png, id=442, 355.3275pt x 309.7974pt>
+Package pdftex.def Info: screenshots/scr_assign_3.png  used on input line 233.
+(pdftex.def)             Requested size: 483.69687pt x 303.62375pt.
+ [12 <./screenshots/scr_assign_1.png> <./screenshots/scr_assign_2.png>]
+<screenshots/scr_preprocessing.png, id=408, 355.3275pt x 309.7974pt>
 File: screenshots/scr_preprocessing.png Graphic file (type png)
 <use screenshots/scr_preprocessing.png>
 Package pdftex.def Info: screenshots/scr_preprocessing.png  used on input line 
-274.
+244.
 (pdftex.def)             Requested size: 248.72754pt x 216.85669pt.
- [14 <./screenshots/scr_assign_3.png>]
-<screenshots/scr_openImages.png, id=451, 487.70206pt x 611.4042pt>
+
+[13 <./screenshots/scr_assign_3.png>]
+<screenshots/scr_openImages.png, id=418, 487.70206pt x 611.4042pt>
 File: screenshots/scr_openImages.png Graphic file (type png)
 <use screenshots/scr_openImages.png>
-Package pdftex.def Info: screenshots/scr_openImages.png  used on input line 288
+Package pdftex.def Info: screenshots/scr_openImages.png  used on input line 258
 .
 (pdftex.def)             Requested size: 292.62347pt x 366.84534pt.
- [15 <./screenshots/scr_preprocessing.png>]
-<screenshots/scr_Dem_Polygon.png, id=461, 1169.3286pt x 728.7225pt>
+ [14 <./screenshots/scr_preprocessing.png>]
+<screenshots/scr_Dem_Polygon.png, id=429, 1169.3286pt x 728.7225pt>
 File: screenshots/scr_Dem_Polygon.png Graphic file (type png)
 <use screenshots/scr_Dem_Polygon.png>
-Package pdftex.def Info: screenshots/scr_Dem_Polygon.png  used on input line 30
+Package pdftex.def Info: screenshots/scr_Dem_Polygon.png  used on input line 27
 2.
-(pdftex.def)             Requested size: 460.935pt x 287.24734pt.
+(pdftex.def)             Requested size: 483.69687pt x 301.43568pt.
  (/usr/local/texlive/2018/texmf-dist/tex/latex/ucs/data/uni-0.def
 File: uni-0.def 2013/05/13 UCS: Unicode data U+0000..U+00FF
 )
-<screenshots/scr_Dem_saved.png, id=463, 1169.3286pt x 728.7225pt>
+<screenshots/scr_Dem_saved.png, id=431, 1169.3286pt x 728.7225pt>
 File: screenshots/scr_Dem_saved.png Graphic file (type png)
 <use screenshots/scr_Dem_saved.png>
-Package pdftex.def Info: screenshots/scr_Dem_saved.png  used on input line 323.
+Package pdftex.def Info: screenshots/scr_Dem_saved.png  used on input line 293.
 
-(pdftex.def)             Requested size: 460.935pt x 287.24734pt.
-
-[16 <./screenshots/scr_openImages.png>]
-Overfull \vbox (4.07314pt too high) has occurred while \output is active []
-
-
-[17 <./screenshots/scr_Dem_Polygon.png>]
-<screenshots/scr_Dem_finalize.png, id=495, 1169.3286pt x 728.7225pt>
+(pdftex.def)             Requested size: 483.69687pt x 301.43568pt.
+ [15 <./screenshots/scr_openImages.png>]
+<screenshots/scr_Dem_finalize.png, id=442, 1169.3286pt x 728.7225pt>
 File: screenshots/scr_Dem_finalize.png Graphic file (type png)
 <use screenshots/scr_Dem_finalize.png>
 Package pdftex.def Info: screenshots/scr_Dem_finalize.png  used on input line 3
-39.
-(pdftex.def)             Requested size: 460.935pt x 287.24734pt.
- [18 <./screenshots/scr_Dem_saved.png>]
-<screenshots/scr_Particles.png, id=511, 1114.1625pt x 722.7pt>
+09.
+(pdftex.def)             Requested size: 483.69687pt x 301.43568pt.
+ [16 <./screenshots/scr_Dem_Polygon.png>] [17 <./screenshots/scr_Dem_saved.png>
+]
+<screenshots/scr_Particles.png, id=479, 1114.1625pt x 722.7pt>
 File: screenshots/scr_Particles.png Graphic file (type png)
 <use screenshots/scr_Particles.png>
-Package pdftex.def Info: screenshots/scr_Particles.png  used on input line 353.
+Package pdftex.def Info: screenshots/scr_Particles.png  used on input line 323.
 
-(pdftex.def)             Requested size: 460.935pt x 298.97757pt.
-[19 <./screenshots/scr_Dem_finalize.png>]
-<screenshots/scr_prediction.png, id=524, 670.54515pt x 521.90985pt>
+(pdftex.def)             Requested size: 483.69687pt x 313.7434pt.
+ [18 <./screenshots/scr_Dem_finalize.png>]
+<screenshots/scr_prediction.png, id=491, 670.54515pt x 521.90985pt>
 File: screenshots/scr_prediction.png Graphic file (type png)
 <use screenshots/scr_prediction.png>
-Package pdftex.def Info: screenshots/scr_prediction.png  used on input line 372
+Package pdftex.def Info: screenshots/scr_prediction.png  used on input line 342
 .
 (pdftex.def)             Requested size: 335.27176pt x 260.95428pt.
- [20 <./screenshots/scr_Particles.png>]
-<screenshots/scr_Analysis.png, id=543, 715.11165pt x 463.7325pt>
+
+[19 <./screenshots/scr_Particles.png>]
+<screenshots/scr_Analysis.png, id=511, 715.11165pt x 463.7325pt>
 File: screenshots/scr_Analysis.png Graphic file (type png)
 <use screenshots/scr_Analysis.png>
-Package pdftex.def Info: screenshots/scr_Analysis.png  used on input line 391.
+Package pdftex.def Info: screenshots/scr_Analysis.png  used on input line 361.
 (pdftex.def)             Requested size: 393.31262pt x 255.05365pt.
- [21 <./screenshots/scr_prediction.png>]
-<screenshots/scr_SimOptions.png, id=564, 533.71394pt x 343.5234pt>
+ [20 <./screenshots/scr_prediction.png>]
+<screenshots/scr_SimOptions.png, id=531, 533.71394pt x 343.5234pt>
 File: screenshots/scr_SimOptions.png Graphic file (type png)
 <use screenshots/scr_SimOptions.png>
-Package pdftex.def Info: screenshots/scr_SimOptions.png  used on input line 412
+Package pdftex.def Info: screenshots/scr_SimOptions.png  used on input line 382
 .
 (pdftex.def)             Requested size: 293.54358pt x 188.93845pt.
- [22 <./screenshots/scr_Analysis.png>]
-<screenshots/scr_ClusterOptions.png, id=583, 456.5055pt x 346.29375pt>
+
+[21 <./screenshots/scr_Analysis.png>]
+<screenshots/scr_ClusterOptions.png, id=551, 456.5055pt x 346.29375pt>
 File: screenshots/scr_ClusterOptions.png Graphic file (type png)
 <use screenshots/scr_ClusterOptions.png>
 Package pdftex.def Info: screenshots/scr_ClusterOptions.png  used on input line
- 427.
+ 397.
 (pdftex.def)             Requested size: 251.0788pt x 190.46214pt.
-[23 <./screenshots/scr_SimOptions.png>]
-<screenshots/scr_Figures.png, id=593, 664.6431pt x 573.22156pt>
+ [22 <./screenshots/scr_SimOptions.png>]
+<screenshots/scr_Figures.png, id=561, 664.6431pt x 573.22156pt>
 File: screenshots/scr_Figures.png Graphic file (type png)
 <use screenshots/scr_Figures.png>
-Package pdftex.def Info: screenshots/scr_Figures.png  used on input line 439.
+Package pdftex.def Info: screenshots/scr_Figures.png  used on input line 409.
 (pdftex.def)             Requested size: 332.32074pt x 286.61008pt.
- [24 <./screenshots/scr_ClusterOptions.png>]
-<screenshots/scr_output.png, id=601, 421.575pt x 230.8625pt>
+
+[23 <./screenshots/scr_ClusterOptions.png>]
+<screenshots/scr_output.png, id=569, 421.575pt x 230.8625pt>
 File: screenshots/scr_output.png Graphic file (type png)
 <use screenshots/scr_output.png>
-Package pdftex.def Info: screenshots/scr_output.png  used on input line 457.
+Package pdftex.def Info: screenshots/scr_output.png  used on input line 427.
 (pdftex.def)             Requested size: 295.10048pt x 161.60263pt.
- [25 <./screenshots/scr_Figures.png>] [26 <./screenshots/scr_output.png>]
-Overfull \hbox (22.99248pt too wide) in paragraph at lines 473--474
-\T1/cmr/m/n/12 For in-di-vid-ual_ClusterParameters the files are named <Group-n
-ame>_<SimulationType>.csv.
+ [24 <./screenshots/scr_Figures.png>]
+Overfull \hbox (111.25664pt too wide) in paragraph at lines 441--442
+\T1/cmr/m/n/12 neigh-bour dis-tance be-tween par-ti-cles. "nor-mal-ized_Distanc
+e_from_Center" - $[]$. 
  []
 
-<screenshots/scr_Visualize.png, id=625, 1179.2055pt x 743.53786pt>
+[25 <./screenshots/scr_output.png>]
+Overfull \hbox (2.40598pt too wide) in paragraph at lines 443--444
+\T1/cmr/m/n/12 in-di-vid-ual_ClusterParameters the files are named <Group-name>
+_<SimulationType>.csv. For
+ []
+
+<screenshots/scr_Visualize.png, id=593, 1179.2055pt x 743.53786pt>
 File: screenshots/scr_Visualize.png Graphic file (type png)
 <use screenshots/scr_Visualize.png>
-Package pdftex.def Info: screenshots/scr_Visualize.png  used on input line 480.
+Package pdftex.def Info: screenshots/scr_Visualize.png  used on input line 450.
 
-(pdftex.def)             Requested size: 460.935pt x 290.63663pt.
-<screenshots/scr_VisualizeOptions.png, id=628, 563.34465pt x 447.8331pt>
+(pdftex.def)             Requested size: 483.69687pt x 304.98863pt.
+<screenshots/scr_VisualizeOptions.png, id=596, 563.34465pt x 447.8331pt>
 File: screenshots/scr_VisualizeOptions.png Graphic file (type png)
 <use screenshots/scr_VisualizeOptions.png>
 Package pdftex.def Info: screenshots/scr_VisualizeOptions.png  used on input li
-ne 497.
+ne 467.
 (pdftex.def)             Requested size: 309.84052pt x 246.30896pt.
-[27] [28 <./screenshots/scr_Visualize.png>]
-<screenshots/scr_ParticleTraining.png, id=653, 672.47235pt x 523.9575pt>
+[26] [27 <./screenshots/scr_Visualize.png>]
+<screenshots/scr_ParticleTraining.png, id=621, 672.47235pt x 523.9575pt>
 File: screenshots/scr_ParticleTraining.png Graphic file (type png)
 <use screenshots/scr_ParticleTraining.png>
 Package pdftex.def Info: screenshots/scr_ParticleTraining.png  used on input li
-ne 519.
+ne 489.
 (pdftex.def)             Requested size: 369.86093pt x 288.17752pt.
- [29 <./screenshots/scr_VisualizeOptions.png>]
-<screenshots/scr_dataset.png, id=671, 389.455pt x 136.51pt>
+ [28 <./screenshots/scr_VisualizeOptions.png>]
+<screenshots/scr_dataset.png, id=638, 389.455pt x 136.51pt>
 File: screenshots/scr_dataset.png Graphic file (type png)
 <use screenshots/scr_dataset.png>
-Package pdftex.def Info: screenshots/scr_dataset.png  used on input line 536.
+Package pdftex.def Info: screenshots/scr_dataset.png  used on input line 506.
 (pdftex.def)             Requested size: 214.2009pt x 75.08072pt.
- [30 <./screenshots/scr_ParticleTraining.png>]
-<screenshots/scr_TrainDataset.png, id=683, 636.9396pt x 535.0389pt>
+ [29 <./screenshots/scr_ParticleTraining.png>]
+<screenshots/scr_TrainDataset.png, id=650, 636.9396pt x 535.0389pt>
 File: screenshots/scr_TrainDataset.png Graphic file (type png)
 <use screenshots/scr_TrainDataset.png>
 Package pdftex.def Info: screenshots/scr_TrainDataset.png  used on input line 5
-44.
+14.
 (pdftex.def)             Requested size: 350.31786pt x 294.2723pt.
- [31 <./screenshots/scr_dataset.png>]
-<screenshots/scr_DemTraining.png, id=691, 637.54185pt x 534.3162pt>
+ [30 <./screenshots/scr_dataset.png>]
+<screenshots/scr_DemTraining.png, id=657, 637.54185pt x 534.3162pt>
 File: screenshots/scr_DemTraining.png Graphic file (type png)
 <use screenshots/scr_DemTraining.png>
-Package pdftex.def Info: screenshots/scr_DemTraining.png  used on input line 55
+Package pdftex.def Info: screenshots/scr_DemTraining.png  used on input line 52
 8.
 (pdftex.def)             Requested size: 350.64911pt x 293.8748pt.
- [32 <./screenshots/scr_TrainDataset.png>] [33 <./screenshots/scr_DemTraining.p
-ng>] [34] [35]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 644.
- [36]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 644.
+ [31 <./screenshots/scr_TrainDataset.png>] [32 <./screenshots/scr_DemTraining.p
+ng>] [33] [34]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 614.
+ [35]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 614.
  (./handbook.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 644.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 644.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 614.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 614.
 Package rerunfilecheck Info: File `handbook.out' has not changed.
-(rerunfilecheck)             Checksum: E29911D8BD005B875D1E314BFD44998A;3367.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 644.
+(rerunfilecheck)             Checksum: FA17C43266749D42AF2BE54B55508840;3042.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 614.
  ) 
 Here is how much of TeX's memory you used:
- 14675 strings out of 492649
- 232432 string characters out of 6129622
- 437125 words of memory out of 5000000
- 18007 multiletter control sequences out of 15000+600000
- 26754 words of font info for 69 fonts, out of 8000000 for 9000
+ 14655 strings out of 492649
+ 232112 string characters out of 6129622
+ 438047 words of memory out of 5000000
+ 18000 multiletter control sequences out of 15000+600000
+ 25985 words of font info for 68 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,8n,51p,9087b,1063s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,8n,51p,9087b,1836s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}
 {/usr/local/texlive/2018/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/tex
 live/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/local/texli
@@ -975,10 +997,10 @@ ts/type1/public/cm-super/sfsx1728.pfb></usr/local/texlive/2018/texmf-dist/fonts
 ype1/public/cm-super/sfti1000.pfb></usr/local/texlive/2018/texmf-dist/fonts/typ
 e1/public/cm-super/sfti1200.pfb></usr/local/texlive/2018/texmf-dist/fonts/type1
 /urw/courier/ucrr8a.pfb>
-Output written on handbook.pdf (36 pages, 39347979 bytes).
+Output written on handbook.pdf (35 pages, 39349568 bytes).
 PDF statistics:
- 890 PDF objects out of 1000 (max. 8388607)
- 773 compressed objects within 8 object streams
- 324 named destinations out of 1000 (max. 500000)
- 512 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 856 PDF objects out of 1000 (max. 8388607)
+ 740 compressed objects within 8 object streams
+ 312 named destinations out of 1000 (max. 500000)
+ 480 words of extra memory for PDF output out of 10000 (max. 10000000)
 

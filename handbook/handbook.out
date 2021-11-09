@@ -4,44 +4,40 @@
 \BOOKMARK [2][-]{subsection.2.1}{Hardware Requirements}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.2}{Software Prerequisites}{section.2}% 5
 \BOOKMARK [2][-]{subsection.2.3}{Installation}{section.2}% 6
-\BOOKMARK [3][-]{subsubsection.2.3.1}{Windows - CPU}{subsection.2.3}% 7
-\BOOKMARK [3][-]{subsubsection.2.3.2}{Windows - GPU}{subsection.2.3}% 8
-\BOOKMARK [3][-]{subsubsection.2.3.3}{MacOS - CPU}{subsection.2.3}% 9
-\BOOKMARK [3][-]{subsubsection.2.3.4}{MacOS - GPU}{subsection.2.3}% 10
-\BOOKMARK [3][-]{subsubsection.2.3.5}{Other operating systems or using other package managers than Anaconda}{subsection.2.3}% 11
-\BOOKMARK [3][-]{subsubsection.2.3.6}{Using other versions of CUDA}{subsection.2.3}% 12
-\BOOKMARK [1][-]{section.3}{Typical Workflow}{}% 13
-\BOOKMARK [1][-]{section.4}{The Main Menu}{}% 14
-\BOOKMARK [1][-]{section.5}{Projects and Groups}{}% 15
-\BOOKMARK [2][-]{subsection.5.1}{Creating projects and importing images}{section.5}% 16
-\BOOKMARK [3][-]{subsubsection.5.1.1}{Image requirements and suggested folder structure}{subsection.5.1}% 17
-\BOOKMARK [3][-]{subsubsection.5.1.2}{Creating Projects}{subsection.5.1}% 18
-\BOOKMARK [3][-]{subsubsection.5.1.3}{Managing Images}{subsection.5.1}% 19
-\BOOKMARK [2][-]{subsection.5.2}{Project settings}{section.5}% 20
-\BOOKMARK [2][-]{subsection.5.3}{Groups}{section.5}% 21
-\BOOKMARK [3][-]{subsubsection.5.3.1}{Assign group by image}{subsection.5.3}% 22
-\BOOKMARK [2][-]{subsection.5.4}{Preprocessing}{section.5}% 23
-\BOOKMARK [1][-]{section.6}{Manual Image Annotation}{}% 24
-\BOOKMARK [2][-]{subsection.6.1}{Opening images}{section.6}% 25
-\BOOKMARK [2][-]{subsection.6.2}{Manual Demarcation}{section.6}% 26
-\BOOKMARK [2][-]{subsection.6.3}{Manual particle detection}{section.6}% 27
-\BOOKMARK [1][-]{section.7}{Automated demarcation and particle annotation}{}% 28
-\BOOKMARK [1][-]{section.8}{Analysis}{}% 29
-\BOOKMARK [2][-]{subsection.8.1}{Running Analysis}{section.8}% 30
-\BOOKMARK [3][-]{subsubsection.8.1.1}{Monte-Carlo Simulations}{subsection.8.1}% 31
-\BOOKMARK [3][-]{subsubsection.8.1.2}{Clusters}{subsection.8.1}% 32
-\BOOKMARK [2][-]{subsection.8.2}{Making tables and figures}{section.8}% 33
-\BOOKMARK [3][-]{subsubsection.8.2.1}{The Output files}{subsection.8.2}% 34
-\BOOKMARK [2][-]{subsection.8.3}{Visualizing results}{section.8}% 35
-\BOOKMARK [1][-]{section.9}{Training automated analysis}{}% 36
-\BOOKMARK [2][-]{subsection.9.1}{Training particle detection}{section.9}% 37
-\BOOKMARK [2][-]{subsection.9.2}{Training demarcation}{section.9}% 38
-\BOOKMARK [1][-]{section.10}{Advanced sections}{}% 39
-\BOOKMARK [2][-]{subsection.10.1}{How Darea stores data and modifying defaults}{section.10}% 40
-\BOOKMARK [3][-]{subsubsection.10.1.1}{Project files}{subsection.10.1}% 41
-\BOOKMARK [3][-]{subsubsection.10.1.2}{Project Settings and modifying defaults}{subsection.10.1}% 42
-\BOOKMARK [3][-]{subsubsection.10.1.3}{Groups}{subsection.10.1}% 43
-\BOOKMARK [3][-]{subsubsection.10.1.4}{Demarcations}{subsection.10.1}% 44
-\BOOKMARK [3][-]{subsubsection.10.1.5}{Particle annotations}{subsection.10.1}% 45
-\BOOKMARK [3][-]{subsubsection.10.1.6}{Analysis results}{subsection.10.1}% 46
-\BOOKMARK [2][-]{subsection.10.2}{Deep learning using the command line}{section.10}% 47
+\BOOKMARK [3][-]{subsubsection.2.3.1}{Windows/Linux with GPU support}{subsection.2.3}% 7
+\BOOKMARK [3][-]{subsubsection.2.3.2}{Windows/MacOS/Linux - CPU only}{subsection.2.3}% 8
+\BOOKMARK [1][-]{section.3}{Typical Workflow}{}% 9
+\BOOKMARK [1][-]{section.4}{The Main Menu}{}% 10
+\BOOKMARK [1][-]{section.5}{Projects and Groups}{}% 11
+\BOOKMARK [2][-]{subsection.5.1}{Creating projects and importing images}{section.5}% 12
+\BOOKMARK [3][-]{subsubsection.5.1.1}{Image requirements and suggested folder structure}{subsection.5.1}% 13
+\BOOKMARK [3][-]{subsubsection.5.1.2}{Creating Projects}{subsection.5.1}% 14
+\BOOKMARK [3][-]{subsubsection.5.1.3}{Managing Images}{subsection.5.1}% 15
+\BOOKMARK [2][-]{subsection.5.2}{Project settings}{section.5}% 16
+\BOOKMARK [2][-]{subsection.5.3}{Groups}{section.5}% 17
+\BOOKMARK [3][-]{subsubsection.5.3.1}{Assign group by image}{subsection.5.3}% 18
+\BOOKMARK [2][-]{subsection.5.4}{Preprocessing}{section.5}% 19
+\BOOKMARK [1][-]{section.6}{Manual Image Annotation}{}% 20
+\BOOKMARK [2][-]{subsection.6.1}{Opening images}{section.6}% 21
+\BOOKMARK [2][-]{subsection.6.2}{Manual Demarcation}{section.6}% 22
+\BOOKMARK [2][-]{subsection.6.3}{Manual particle detection}{section.6}% 23
+\BOOKMARK [1][-]{section.7}{Automated demarcation and particle annotation}{}% 24
+\BOOKMARK [1][-]{section.8}{Analysis}{}% 25
+\BOOKMARK [2][-]{subsection.8.1}{Running Analysis}{section.8}% 26
+\BOOKMARK [3][-]{subsubsection.8.1.1}{Monte-Carlo Simulations}{subsection.8.1}% 27
+\BOOKMARK [3][-]{subsubsection.8.1.2}{Clusters}{subsection.8.1}% 28
+\BOOKMARK [2][-]{subsection.8.2}{Making tables and figures}{section.8}% 29
+\BOOKMARK [3][-]{subsubsection.8.2.1}{The Output files}{subsection.8.2}% 30
+\BOOKMARK [2][-]{subsection.8.3}{Visualizing results}{section.8}% 31
+\BOOKMARK [1][-]{section.9}{Training automated analysis}{}% 32
+\BOOKMARK [2][-]{subsection.9.1}{Training particle detection}{section.9}% 33
+\BOOKMARK [2][-]{subsection.9.2}{Training demarcation}{section.9}% 34
+\BOOKMARK [1][-]{section.10}{Advanced sections}{}% 35
+\BOOKMARK [2][-]{subsection.10.1}{How Darea stores data and modifying defaults}{section.10}% 36
+\BOOKMARK [3][-]{subsubsection.10.1.1}{Project files}{subsection.10.1}% 37
+\BOOKMARK [3][-]{subsubsection.10.1.2}{Project Settings and modifying defaults}{subsection.10.1}% 38
+\BOOKMARK [3][-]{subsubsection.10.1.3}{Groups}{subsection.10.1}% 39
+\BOOKMARK [3][-]{subsubsection.10.1.4}{Demarcations}{subsection.10.1}% 40
+\BOOKMARK [3][-]{subsubsection.10.1.5}{Particle annotations}{subsection.10.1}% 41
+\BOOKMARK [3][-]{subsubsection.10.1.6}{Analysis results}{subsection.10.1}% 42
+\BOOKMARK [2][-]{subsection.10.2}{Deep learning using the command line}{section.10}% 43

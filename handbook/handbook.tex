@@ -20,13 +20,13 @@
 \subsectionfont{\large}
 
 \usepackage{geometry}
-\geometry{a4paper, top=2.88cm, bottom=3.5cm, left=2.4cm, right=2.4cm}
+\geometry{a4paper, top=2.88cm, bottom=3.5cm, left=2cm, right=2cm}
 
 \usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{courier}
 \usepackage{listings}
-\lstset{basicstyle=\small\ttfamily}
+\lstset{basicstyle=\footnotesize\ttfamily}
 
 \author{David Kleindienst}
 \title{Darea - Handbook}
@@ -38,100 +38,70 @@ Darea (\textbf{D}eep learning-\textbf{a}ssisted \textbf{re}plica image \textbf{a
 \tableofcontents
 \section{Installation}
 \subsection{Hardware Requirements}
-Most functions of DareIt (including deep-learning prediction of demarcation) should run on any reasonably modern computer. The only exception to this is training neural network for demarcation prediction, for which we highly recommend using a modern NVIDIA GPU (at least 8GB memory). It will also run on CPU, but may take very long time (weeks) to finish.
+Most functions of Darea (including deep-learning prediction of demarcation) should run on any reasonably modern computer. The only exception to this is training neural network for demarcation prediction, for which we highly recommend using a modern NVIDIA GPU (at least 8GB memory). It will also run on CPU, but may take very long time (weeks) to finish.
 \subsection{Software Prerequisites}
 \begin{itemize}
-\item Matlab R2018b or later with Simulink, Deep-learning toolbox and (optional but recommended) Parallel-processing toolbox
+\item Matlab R2018b or later with Simulink, Statistics and Machine Learning Toolbox, Image Processing Toolbox and (optional but recommended) Parallel Computing Toolbox.
 \item Python 3.6 (Anaconda distribution is highly recommended: \url{https://www.anaconda.com/distribution/})
-\item For GPU: CUDA 9 (see \ref{cuda_ver} when wanting to use a different version)
+\item For GPU: CUDA (\url{https://developer.nvidia.com/cuda-downloads}) and CuDNN (\url{https://docs.nvidia.com/deeplearning/cudnn/install-guide/index.html}, creating a free NVIDIA account is necessary)
 \end{itemize}
 \subsection{Installation}
 The installation guide assumes that python was installed by Anaconda Distribution.
-\subsubsection{Windows - CPU}
-\textit{(tested on windows 7 and 10)}
+\subsubsection{Windows/Linux with GPU support} 
+\textit{(tested on Windows 10 and Ubuntu 20.04)}
 
-In anaconda prompt run
+In anaconda prompt (Windows) or terminal (Linux) run
 \begin{lstlisting}[belowskip=0pt]
- conda env create -f <path to Darea>/envs/Darea_Windows.yml
-\end{lstlisting}
-It is now downloading and installing neccessary packages which may take some time. After it finished, run
-\begin{lstlisting}[belowskip=0pt]
- conda activate Darea
- where python
-\end{lstlisting}
-the last command will give you a path:
-now in matlab run: 
-\begin{lstlisting}[belowskip=0pt]
- pyversion <path> 
-\end{lstlisting}
+conda create -n Darea python=3.9 pip cython cudnn
 
-(replace <path> with the output you got from where python command)
-\subsubsection{Windows - GPU}
-\textit{(tested on windows 7)}
+conda activate Darea
 
-In anaconda prompt run
-\begin{lstlisting}[belowskip=0pt]
- conda env create -f <path to Darea>/envs/Darea_WindowsGPU.yml
+pip install tensorflow_gpu==2.5 opencv_python imageio tf_slim scikit-learn matplotlib
 \end{lstlisting}
-It is now downloading and installing neccessary packages which may take some time. After it finished, run
+This will cause it to install the necessary packages
+Then find out where the packages are installed by running\\
+Windows:
 \begin{lstlisting}[belowskip=0pt]
- conda activate Darea
- where python
+ where.exe python
 \end{lstlisting}
-the last command will give you a path:
-now in matlab run: 
+Mac/Linux:
 \begin{lstlisting}[belowskip=0pt]
- pyversion <path> 
-\end{lstlisting}
-(replace <path> with the output you got from where python command).
-Please refer to \ref{cuda_ver} to ensure your CUDA and cudatoolkit versions match.
-
-\subsubsection{MacOS - CPU}
-\textit{(tested on MacOS Mojave)}
-
-In terminal run
-\begin{lstlisting}[belowskip=0pt]
- conda env create -f <path to Darea>/envs/Darea_MacOS.yml
-\end{lstlisting}
-It is now downloading and installing neccessary packages which may take some time. After it finished, run
-\begin{lstlisting}[belowskip=0pt]
- conda activate Darea
  which python
 \end{lstlisting}
-the last command will give you a path:
-now in matlab run: 
+Which will return the path to this installation
+Now tell Matlab where it is by running the following command in Matlab: 
 \begin{lstlisting}[belowskip=0pt]
  pyversion <path> 
 \end{lstlisting}
 (replace <path> with the output you got from where python command)
-\subsubsection{MacOS - GPU}
-\textit{(not tested)}
+\subsubsection{Windows/MacOS/Linux - CPU only}
+\textit{(tested on Windows 10, MacOS Mojave and Ubuntu 20.04)}
 
-Follow the instructions for MacOS - CPU. Testing if it works is recommended at this step. Then, type in terminal:
+In anaconda prompt (Windows) or terminal (Mac/Linux) run
 \begin{lstlisting}[belowskip=0pt]
- conda activate Darea
- conda uninstall tensorflow tensorflow-base
- conda install tensorflow-GPU=1.12
+conda create -n Darea python=3.9 pip cython
+
+conda activate Darea
+
+pip install tensorflow==2.5 opencv_python imageio tf_slim scikit-learn matplotlib
 \end{lstlisting}
-Then follow \ref{cuda_ver} to make sure your CUDA and cudatoolkit versions match.
-\subsubsection{Other operating systems or using other package managers than Anaconda}
-Unfortunately, due to interplay between Matlab and python, this software is very sensitive to changes in package versions and it is a bit of a gamble if a version change in any of the packages will break the functionality. We recommend having a look at the package version information in any (or all) of the .yml files and trying to install a similar environment.
-First get it running with CPU, then (if wanted) try to follow the MacOS-GPU guide to get it running on GPU.
-\subsubsection{Using other versions of CUDA}
-\label{cuda_ver}
-in terminal run: 
+This will cause it to install the necessary packages
+Then find out where the packages are installed by running\\
+Windows:
 \begin{lstlisting}[belowskip=0pt]
- nvcc --version 
+ where.exe python
 \end{lstlisting}
-to get the version number of CUDA
-then (after installation) in anaconda prompt:
+Mac/Linux:
 \begin{lstlisting}[belowskip=0pt]
- conda install cudatoolkit=<version>
+ which python
 \end{lstlisting}
-Replace <version> by major version number returned by nvcc command, e.g. when using CUDA 10, run:
+Which will return the path to this installation
+Now tell Matlab where it is by running the following command in Matlab: 
 \begin{lstlisting}[belowskip=0pt]
- conda install cudatoolkit=10 
+ pyversion <path> 
 \end{lstlisting}
+(replace <path> with the output you got from where python command)
+
 \section{Typical Workflow}
 In a typical analysis workflow, first a project is created and images are imported (see \ref{m:create}). Typically labelings for different proteins are imported into different projects, while different experimental conditions (genotypes, brain regions, ...) are pooled into the same project. If images are provided as 8-bit, they should then be converted to 16-bit (see Fig. \ref{fig:MM} (6) ).
 Images are then assigned into different groups (genotypes, brain regions, ...) (see \ref{m:groups}) and general project settings (e.g. which particle sizes, whether particles should be detected on ROI only) are set (see \ref{m:settings}). 
