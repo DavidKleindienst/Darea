@@ -222,7 +222,7 @@ waitfor(mainFigure);
         % On Training, if a network is selected to continue from
         % imageSize has to be same then for that network
         switch bg.SelectedObject
-            case {hTrainFromConfig, hTrainFromDataset}
+            case {hTrainFromConfig, hTrainFromDataset, hTestFromConfig}
                 if hOb.Value==1
                     %No network selected
                     enableImageEdits()
