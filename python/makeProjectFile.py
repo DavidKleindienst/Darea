@@ -174,6 +174,12 @@ def changeScale(configFile,index,newValue):
     images['PIXELSIZE'][index]=str(newValue)
     file_utils.dict2file(configFile,images,',\t')
     
+def changeScales(configFile,indeces,newValues):
+    images=file_utils.file2dict(configFile,',\t')
+    for index,newValue in zip(indeces,newValues):
+        images['PIXELSIZE'][index]=str(newValue)
+    file_utils.dict2file(configFile,images,',\t')
+    
 def changeSelectedAngle(configFile,index,newValue):
     images=file_utils.file2dict(configFile,',\t')
     images['SELECTED'][index]=str(newValue)
