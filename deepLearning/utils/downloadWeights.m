@@ -1,9 +1,16 @@
-function  retValue=downloadWeights()
+function  retValue=downloadWeights(force)
 %% Downloads pretrained weights
 %retValue 1->Weights exist or have been succesfully downloaded
 %retValue 0->Weights don't exist and couldn't be downloaded
+%force-> download files even though some or all already exist
+
+if nargin==0
+    force=false;
+end
+
 retValue=0;
-if isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt')
+if ~force && isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt') && ...
+                ~isempty(getTrainedNetworks())
     retValue=1;
     return;
     %Weights already exist, no need to download
@@ -30,8 +37,14 @@ catch
 end
 
 localpath='deepLearning/checkpoints/';
-
-preTrained={'AZ.ckpt.data-00000-of-00001', 'AZ.ckpt.index', 'AZ.ckpt.meta','PSD.ckpt.data-00000-of-00001', 'PSD.ckpt.index', 'PSD.ckpt.meta'};
+networks={'AZ','PSD'};
+extensions={'.ckpt.data-00000-of-00001', '.ckpt.index', '.ckpt.meta','.info'};
+preTrained={};
+for n=1:numel(networks)
+    for e=1:numel(fileext)
+        preTrained{end+1}=[networks{n} extensions{e}];
+    end
+end
 
 try
     for i=1:numel(preTrained)
