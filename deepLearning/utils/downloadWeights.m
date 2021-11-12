@@ -41,7 +41,7 @@ networks={'AZ','PSD'};
 extensions={'.ckpt.data-00000-of-00001', '.ckpt.index', '.ckpt.meta','.info'};
 preTrained={};
 for n=1:numel(networks)
-    for e=1:numel(fileext)
+    for e=1:numel(extensions)
         preTrained{end+1}=[networks{n} extensions{e}];
     end
 end
