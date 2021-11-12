@@ -39,7 +39,7 @@ for f=1:numel(datFiles)
     elseif f==1
         marginNm=margin;
     end
-    [routes, scales]=readConfig(datFiles{f});
+    [routes, scales, selAngles]=readConfig(datFiles{f});
     numImages=numel(routes);
     dilate=settings.dilate;
     %For Storing results:
@@ -58,9 +58,15 @@ for f=1:numel(datFiles)
         scale = scales(imgIndex);
         fullImageName = fullfile(path,imageName);
          %% Reads the image and the mask.
-        imageFullName = [fullImageName '.tif'];
+        if isnan(selAngles)
+            angle=NaN;
+            imageFullName = [fullImageName '.tif'];
+        else
+            angle=selAngles(imgIndex);
+            imageFullName=fullImageName;
+        end
         imageSelFullName= [fullImageName '_mod.tif'];
-        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName,NaN, round(dilate/scale));
+        [maskSection, image] = getBaseImages(imageFullName,imageSelFullName,angle, round(dilate/scale));
 
         maskSection = ~maskSection;
         imR=imref2d(size(image),scale,scale);
