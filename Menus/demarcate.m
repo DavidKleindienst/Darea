@@ -366,15 +366,17 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                 modImage=readAndConvertImage(modImageName);
                 filteredImages = loadSavedImage(image,modImage);
             end
+        else
+            filteredImages{1}.image=image;
+            for fil=2:numel(filteredImages)
+                if isfield(filteredImages{fil}, 'compImage')
+                    filteredImages{fil}.image=image;
+                    c=filteredImages{fil}.compImage;
+                    filteredImages{fil}.image(c==0)=filteredImages{fil}.image(c==0)*defaults.BackgroundBrightness;
+                end
+            end
         end
-%         filteredImages{1}.image=image;
-%         for fil=2:numel(filteredImages)
-%             if isfield(filteredImages{fil}, 'compImage')
-%                 filteredImages{fil}.image=image;
-%                 c=filteredImages{fil}.compImage;
-%                 filteredImages{fil}.image(c==0)=filteredImages{fil}.image(c==0)*defaults.BackgroundBrightness;
-%             end
-%         end
+
         redrawImage();
     end
 
