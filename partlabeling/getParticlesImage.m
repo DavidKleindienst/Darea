@@ -1,8 +1,12 @@
 function getParticlesImage(route,selAngle,scale,dotFile,useDemarcation,useClassifier,settings)
-    
+    if isnan(selAngle)
+        imName=[route '.tif'];
+    else
+        imName=route;
+    end
     if useDemarcation
         maskName=[route '_mod.tif'];
-        [mask, image]=getBaseImages(imName, maskName,selAngle, round(dilate/scale));
+        [mask, image]=getBaseImages(imName, maskName,selAngle, round(settings.dilate/scale));
         mask = ~mask;
     else
         image=readAndConvertImage(imName,selAngle);
@@ -11,7 +15,7 @@ function getParticlesImage(route,selAngle,scale,dotFile,useDemarcation,useClassi
     imR=imref2d(size(image),scale,scale);
     fid=fopen(dotFile,'w');
     for p=1:numel(settings.particleTypes)
-        radius=particleTypes(p)/2;
+        radius=settings.particleTypes(p)/2;
         [c, r]=detectParticles(image,mask,imR,scale,settings.sensitivity,radius,settings.marginNm,false,useClassifier);
         %print to file!
         sprintf('Found %f %f particles', numel(r), radius);

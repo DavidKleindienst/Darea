@@ -360,21 +360,21 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
             image=imadjust(image);
         end
         newMod=getModImagePath(fullfile(pathImage,imageName),angle);
-        if newMod~=modImageName
+        if ~strcmp(newMod,modImageName)
             modImageName=newMod;
             if isfile(modImageName)
                 modImage=readAndConvertImage(modImageName);
                 filteredImages = loadSavedImage(image,modImage);
             end
         end
-        filteredImages{1}.image=image;
-        for fil=2:numel(filteredImages)
-            if isfield(filteredImages{fil}, 'compImage')
-                filteredImages{fil}.image=image;
-                c=filteredImages{fil}.compImage;
-                filteredImages{fil}.image(c==0)=filteredImages{fil}.image(c==0)*defaults.BackgroundBrightness;
-            end
-        end
+%         filteredImages{1}.image=image;
+%         for fil=2:numel(filteredImages)
+%             if isfield(filteredImages{fil}, 'compImage')
+%                 filteredImages{fil}.image=image;
+%                 c=filteredImages{fil}.compImage;
+%                 filteredImages{fil}.image(c==0)=filteredImages{fil}.image(c==0)*defaults.BackgroundBrightness;
+%             end
+%         end
         redrawImage();
     end
 
