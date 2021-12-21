@@ -55,7 +55,7 @@ if nargin<5
     defaultSelIsBackground=0;
 end
 
-if nargin>1 && exist(imageSelName,'file')==2
+if nargin>1 && isfile(imageSelName) 
     imageSel = readAndConvertImage(imageSelName);
     discardedAreas=zeros(size(imageSel));
     if ~isa(imageSel, 'uint16')

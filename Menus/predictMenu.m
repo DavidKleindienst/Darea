@@ -32,8 +32,10 @@ hOverwrite=uicontrol('Style','checkbox', 'String', 'Overwrite existing demarcati
 hPredParticles=uicontrol('Style', 'checkbox', 'String', 'Predict Particles', 'Position', [35 250 150 25]);
 hOverwriteP=uicontrol('Style', 'checkbox', 'String', 'Overwrite existing particles', 'Position', [50 230 200 25]);
 
-demTT=sprintf('Tick to limit particle prediction to demarcation only (much faster)\nOtherwise particles will be predicted on complete image (recommended when done at same time as demarcation prediction)');
-hUseDemarc=uicontrol('Style', 'checkbox', 'String', 'Predict on Demarcation only', 'Position', [50 205 200 25], 'Tooltipstring', demTT);
+demTT=sprintf(['Tick to limit particle prediction to demarcation only (much faster)\n', ...
+               'Otherwise particles will be predicted on complete image.']);
+hUseDemarc=uicontrol('Style', 'checkbox', 'String', 'Predict on Demarcation only',...
+                    'Position', [50 205 200 25], 'Tooltipstring', demTT,'Value', 1);
     
 
 uicontrol('Style', 'Text', 'String', 'Sensitivity', 'Position', [240 250 80 25]);
@@ -54,10 +56,13 @@ if numel(classifiers)<2
     set(hClassifier, 'Visible', 'off');
 end
 
-hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220 100 180 35], 'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'center');
+hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220 100 180 35],...
+                    'FontWeight', 'bold', 'FontSize', 13, 'HorizontalAlignment', 'center');
 
-hStart=uicontrol('Style', 'pushbutton', 'String', 'Start', 'Tooltipstring', 'Start Prediction', 'Position', [300 60 90 30], 'Callback', @start);
-hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 60 90 30], 'Callback', @close);
+hStart=uicontrol('Style', 'pushbutton', 'String', 'Start', 'Tooltipstring', 'Start Prediction',...
+                'Position', [300 60 90 30], 'Callback', @start);
+hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', ...
+                'Position', [430 60 90 30], 'Callback', @close);
 
 waitfor(mainFigure);
 
@@ -90,9 +95,12 @@ function start(~,~)
         useClassifier=classifiers{get(hClassifier, 'Value')};
         set(hProgress, 'String', 'Predicting Particles');
         drawnow();
-        getParticlesAllImages(datFile,get(hUseDemarc, 'Value'),get(hOverwriteP, 'Value'),useClassifier,settings);
+        fprintf('Predicting Particles...\n');
+        getParticlesAllImages(datFile,hUseDemarc.Value,hOverwriteP.Value,useClassifier,settings);
+        fprintf('Finished particle prediction.\n');
     end
     set(hProgress, 'String', 'Finished Predictions');
+    
 end
 
 function close(~,~)

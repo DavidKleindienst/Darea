@@ -1,5 +1,4 @@
 function getParticlesAllImages(datFile,useDemarcation, overwrite, useClassifier, settings)
-
 [routes, scales,selAngles]=readConfig(datFile);
 routes=getFullRoutes(routes,datFile);
 
@@ -7,6 +6,8 @@ routes=getFullRoutes(routes,datFile);
 
 %for i=1:numel(routes)
 parfor (i=1:numel(routes), getCurrentPoolSize())
+    
+    tic;
     if isnan(selAngles) | selAngles(i)>0
         dotFile=[routes{i} 'dots.csv'];
         if ~overwrite && isfile(dotFile)
@@ -30,6 +31,8 @@ parfor (i=1:numel(routes), getCurrentPoolSize())
                                useDemarcation,useClassifier,settings)
         end
     end
+    time_taken=toc;
+    fprintf(['Predicted particles on image ' routes{i} ' in ' num2str(time_taken) ' seconds.\n']);
 end
 
 end

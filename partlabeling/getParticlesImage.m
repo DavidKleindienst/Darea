@@ -6,6 +6,9 @@ function getParticlesImage(route,selAngle,scale,dotFile,useDemarcation,useClassi
     end
     if useDemarcation
         maskName=[route '_mod.tif'];
+        if ~isnan(selAngle) && ~isfile(maskName) 
+            maskName = [route '_mod_' num2str(selAngle) '.tif'];
+        end
         [mask, image]=getBaseImages(imName, maskName,selAngle, round(settings.dilate/scale));
         mask = ~mask;
     else
