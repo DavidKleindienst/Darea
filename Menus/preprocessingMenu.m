@@ -53,6 +53,8 @@ waitfor(mainFigure);
         end
     end
     function start(~,~)
+        hProgress.String='Starting preprocessing...';
+        drawnow();
         try
             preprocess(datFile,hConvert.Value,hInvert.Value,hContrast.Value,hDownscale.Value,downscalePx,hProgress);
             hProgress.String='Finished preprocessing';

@@ -70,11 +70,13 @@ if downscale
     newScales=scales;
 end
 fprintf('Processing Images:\n');
-drawnow();
 for imgIndex=1:numel(routes)
-    if nargin==5
+    if nargin>=7
         hProgress.String=sprintf('Processing image %g of %g', imgIndex, numel(routes));
         drawnow();
+    end
+    if mod(numIndex,5)==1
+        fprintf('.');
     end
     for type=1:2
         %Type 1 - Original image; type 2 - demarcation
