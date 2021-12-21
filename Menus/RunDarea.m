@@ -79,19 +79,22 @@ if nargin>0
     set(hImageLPathEdit,'String',datFile);
 end
 
-needsPythonDeepLearning={hPredict};
-needsPython=[{hMakeConfig}, needsPythonDeepLearning(:)'];
+needsPythonDeepLearning={hPredict,hTrain};
+needsPython=[{hMakeConfig,hImages}, needsPythonDeepLearning(:)'];
 if ~pythonAvailable
     for i=1:numel(needsPython)
-        set(needsPython{i}, 'tooltipstring', 'This functionality requires python to be installed and properly configured.');
-        jButton= findjobj(needsPython{i});
+        set(needsPython{i}, 'tooltipstring', ...
+            sprintf(['This functionality requires python to be installed and properly configured.\n', ...
+                    'Please consult the handbook']));
+        jButton = findjobj(needsPython{i});
         set(jButton,'Enabled',false);
     end
 elseif deepLearningAvailable()
     for i=1:numel(needsPythonDeepLearning)
         set(needsPythonDeepLearning{i}, 'tooltipstring', ...
-        'This functionality requires certain python packages such as tensorflow to be installed.');
-        jButton= findjobj(needsPythonDeepLearning{i});
+            sprintf(['This functionality requires certain python packages such as tensorflow to be installed.\n',...
+                'Please consult the handbook']));
+        jButton = findjobj(needsPythonDeepLearning{i});
         set(jButton,'Enabled',false);
     end
 end
