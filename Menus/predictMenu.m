@@ -2,7 +2,7 @@ function predictMenu(datFile)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-if ~downloadWeights()
+if ~downloadWeightsIfNecessary()    %Returns false if no weights exist and user declines download
     return;
     %This function needs pre-trained weights
 end
@@ -19,8 +19,12 @@ features=getTrainedNetworks();
 
 
 positionFigure =  [25, 50, 650, 505];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Automated Demarcation'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name','Automated Demarcation'); 
 set(mainFigure, 'CloseRequestFcn', @close);
+
+hDownload=uicontrol('Style', 'pushbutton', 'String', 'Download Networks', 'Position', [430 430 170 25],...
+                'Tooltipstring', sprintf('Check for new available networks and download them'),...
+                'Callback', @weightDownload);
 
 featureTT='Select which feature should be predicted';
 hPredDemarc=uicontrol('Style','checkbox', 'String', 'Predict Demarcation', 'Position', [35 430 150 25]);
@@ -66,6 +70,13 @@ hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exi
 
 waitfor(mainFigure);
 
+function weightDownload(~,~)
+    ret = downloadWeights();
+    if ret
+        features=getTrainedNetworks();
+        hFeatureDD.String=features;
+    end
+end
 
 function start(~,~)
     set(hProgress, 'String', 'Starting Predictions...');

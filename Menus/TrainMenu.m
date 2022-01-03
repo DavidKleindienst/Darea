@@ -2,7 +2,7 @@ function TrainMenu(datFile)
 %TRAINMENU Summary of this function goes here
 %   Detailed explanation goes here
 
-if ~downloadWeights()
+if ~downloadWeightsIfNecessary()    %Returns false if no weights exist and user declines download
     return;
     %This function needs pre-trained weights
 end
@@ -14,6 +14,7 @@ end
 positionFigure =  [25, 50, 650, 565];
 mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Train Demarcation Prediction'); 
 set(mainFigure, 'CloseRequestFcn', @close);
+
 
 bg=uibuttongroup('SelectionChangedFcn', @changeInterface);
 
@@ -151,8 +152,21 @@ allHandles=unique([visOnFolder,visOnPrepare,visOnTest,visOnDat,visOnDatTest, vis
 set(allHandles,'Visible', 'off');
 set(visOnFolder,'Visible', 'on');
 
+
+uicontrol('Style', 'pushbutton', 'String', 'Download Networks', 'Position', [450 500 170 25],...
+                'Tooltipstring', sprintf('Check for new available networks and download them'),...
+                'Callback', @weightDownload);
+
 waitfor(mainFigure);
 
+    function weightDownload(~,~)
+        ret = downloadWeights();
+        if ret
+            trained_networks=getTrainedNetworks();
+            trained_networks=[{'None'}, trained_networks];
+            hContinueDD.String=trained_networks;
+        end
+    end
     function start(~,~)
         if ~checkUserInputs()
             return;
