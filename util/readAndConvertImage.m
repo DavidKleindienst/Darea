@@ -5,11 +5,16 @@ function image = readAndConvertImage(filename,imNr)
 
 if ~isfile(filename)
     % Duplicated image doesn't need to be stored, so remove _dupls and find original filename
-    [a,n,e]=fileparts(filename);
-    while endsWith(n,'_dupl')
-        n=n(1:end-5);
+    if endsWith(filename,'.tif')
+    
+        [a,n,e]=fileparts(filename);
+        while endsWith(n,'_dupl')
+            n=n(1:end-5);
+        end
+        filename=fullfile(a,[n e]);
+    elseif endsWith(filename,'_dupl')
+        filename=filename(1:end-numel('_dupl'));
     end
-    filename=fullfile(a,[n e]);
 end
 
 

@@ -77,7 +77,7 @@ transparencyRim	0.85
 closeRadius	7.5	#Radius (in Nm) for close Structure
 showFilters	false
 changeLeftImage	false
-deleteOtherAnglesWhenSaving	true
+deleteOtherAnglesWhenSaving	false
 
 #DeepLearning
 imageSize	[512,512] 	#Size to which images are converted before training/prediction. Needs to be multiple of 32.

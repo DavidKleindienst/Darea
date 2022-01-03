@@ -1,6 +1,11 @@
 function [pixelsize,angles] = readMdoc(file)
 %% Reads relevant values from a serialEM .mdoc file
 
+if ~isfile(file) && endsWith(file,'_dupl.mdoc')
+    file = strrep(file,'_dupl','');
+end
+
+
 function num = getNum(line)
     %Gets the value after the = sign, and converts to double
     line = split(line,'=');
