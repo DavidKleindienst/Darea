@@ -44,6 +44,7 @@ function preprocess(datFile, convert, invert, contrast, downscale,downscalePx, h
             elseif ~isa(image, 'uint16')
                 fprintf('Image is of type %s, no conversion has been implemented for this type', class(image));
             end
+            
         end
 
         if invert && type==1
@@ -55,6 +56,7 @@ function preprocess(datFile, convert, invert, contrast, downscale,downscalePx, h
             image=imadjust(image);
             flag=1;
         end
+        
     end
 
 if ~convert && ~invert && ~contrast && ~downscale
@@ -75,7 +77,7 @@ for imgIndex=1:numel(routes)
         hProgress.String=sprintf('Processing image %g of %g', imgIndex, numel(routes));
         drawnow();
     end
-    if mod(numIndex,5)==1
+    if mod(imgIndex,5)==1
         fprintf('.');
     end
     for type=1:2
@@ -106,17 +108,21 @@ for imgIndex=1:numel(routes)
         
         if type==1 && isSerEM
             flag=0;
+            if convert
+                imageClass = 'uint16';
+            else
+                imageClass = class(images);
+            end
             if downscale
                 newImages=zeros(min(downscalePx(1), size(images,1)), ...
                                 min(downscalePx(2), size(images,2)), ...
-                                size(images,3), class(images));
+                                size(images,3), imageClass);
             else
-                newImages=zeros(size(images), class(images));
+                newImages=zeros(size(images), imageClass);
             end
+            
             for i=1:size(images,3)
-                [image, fl,newScale] = doConversion(images(:,:,i),scales(imgIndex),route,0,invert,contrast,downscale,downscalePx,type);
-                % There is some issue with saving or reading uint16 MRC images, leading to strange
-                % contrast. Thus convert is always 0
+                [image, fl,newScale] = doConversion(images(:,:,i),scales(imgIndex),route,convert,invert,contrast,downscale,downscalePx,type);
                 flag=flag|fl;
                 newImages(:,:,i) = image;
             end
