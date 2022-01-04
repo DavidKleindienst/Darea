@@ -60,6 +60,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
 
     %% Gui measures and points
     title='Darea - Area demarcation';
+    
 
     [mainFigure, axesImage,axesZoom, hZoomText, hZoom, gridXPx, gridYPx,hPosX,hPosY] = ...
             make2PanelWindow(title,image,imageName,scale,0.72,0.8,1, defaults, @createZoom, @moveZoomToPos,'off');
@@ -72,6 +73,28 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     
 
     %% Create buttons
+    
+    if ~endsWith(imageName,'.tif') && contains(imageName,'Section_')
+        % For serialEM images, overview sections may exist in the same Folder.
+        % If so make a button to show them
+        nr_digits = 4; %change this val if serEM uses more than 4 digits
+        section = regexp(imageName,'Section_\d+','match');
+        section_nr = str2double(regexp(section{end},'\d+','match'));    %section should be 1x1 array, but use end just in case
+        
+        section_str = sprintf(['%0' num2str(nr_digits) 'd.tif'],section_nr);
+        
+        imFolder = fullfile(pathImage,fileparts(imageName)); % last folder is contained in imageName
+        
+        overview_files = findFilesinFolder(imFolder, section_str);
+        if ~isempty(overview_files)
+            uicontrol('Style', 'pushbutton', 'String', 'Show overview section',...
+                        'Position', [gridXPx(4)-130 gridYPx(2)+15 120 25], ...
+                        'Callback', @(~,~)showOverviewSection(imFolder,overview_files));
+        end
+        
+    end
+        
+    
     
     filterTT=sprintf('Select displayed component\nYou can also use up and down arrow keys');
     uicontrol('Style','text','String', 'Select Component', 'FontWeight', 'bold', 'Position', [gridXPx(1)+5 125 80 25],'Tooltipstring', filterTT);
