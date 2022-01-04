@@ -1,6 +1,7 @@
 function InstallOrUpdateDarea()
-%UNTITLED2 Summary of this function goes here
-%   Detailed explanation goes here
+%% Clones or Updates Darea from the Github repository
+% Designed as a comfortable update script for users
+% Not designed for usage by developers using git themselves.
 
 if isfile('Run.m')
     %already installed, update

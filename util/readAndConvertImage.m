@@ -1,7 +1,7 @@
 function image = readAndConvertImage(filename,imNr)
 %% Reads image from pathname and converts it to proper bitdepth
 % If it is a duplicated image (ending with '_dupl' suffix)
-% Original image without that suffx is found
+% Original image without that suffix is found
 
 if ~isfile(filename)
     % Duplicated image doesn't need to be stored, so remove _dupls and find original filename
@@ -23,7 +23,7 @@ if endsWith(filename,'.tif')
 else
     if imNr == 0
         %No image has been selected, use the first one
-        %This should not happen, functions calling this function should ideally already
+        %This should not happen, functions calling this function should already
         %correct for it, so issue warning
         warning('No angle has been selected for image %s, using first image', filename);
         imNr=1;

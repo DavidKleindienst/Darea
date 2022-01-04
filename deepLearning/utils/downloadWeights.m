@@ -121,6 +121,7 @@ waitfor(dlWindow);
                 end
 
                 hProgress.String='Download failed!';
+                drawnow();
                 rethrow(excpt);
             end
         end

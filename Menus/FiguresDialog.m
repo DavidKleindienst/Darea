@@ -82,7 +82,7 @@ settings.makeHist=false;
 Defaultsettings=settings;
 
 positionFigure =  [25, 50, 650, 555];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Make Figures'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Make Figures & Tables'); 
 
 figureColor = get(mainFigure, 'color'); % Gets the color.
 
@@ -199,7 +199,7 @@ waitfor(mainFigure);
             end
             if isToolkitAvailable('Simulink') & Simulink.getFileChecksum(datFile)~=Data.checksum
                 set(hAllowGroupSelection, 'enable', 'off');
-                fprintf('Warning: %s has changed since the analysis was run');
+                fprintf('Warning: %s has changed since the analysis was run', datFile);
                 set(hAllowGroupSelection,'Tooltipstring', ...
                     sprintf('%s has changed since the analysis was run\nRerun analysis to be able to select groups', datFile));
             end
