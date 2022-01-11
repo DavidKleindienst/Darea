@@ -34,7 +34,14 @@ function [settings, Data, position,selAngle]=visualize(pathImage, imageName, sca
         fullImageName=[fullfile(pathImage,imageName) '.tif'];
     end
     modImageName=[fullfile(pathImage,imageName) '_mod.tif'];
-    image = readAndConvertImage(fullImageName,selAngle);
+    try
+        image = readAndConvertImage(fullImageName,selAngle);
+        catch e
+        msgbox(sprintf('Image %s could not be opended', fullImageName));
+        fprintf(2,getReport(e,'extended'))
+        fprintf(2,'\nThere was an error: \n%s',e.message);
+        return
+    end
     if autocontrast
         image=imadjust(image);
     end

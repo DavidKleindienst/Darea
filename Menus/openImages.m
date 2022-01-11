@@ -180,12 +180,13 @@ waitfor(mainFigure);
             return;
         end
         
-        openedFigure = true;
+        
         if isnan(selAngles)
             selAngle = NaN;
         else
             selAngle = selAngles(imgIndex);
         end
+        openedFigure = true;
         [defaults, data, Position,newAngle]=downstreamFunction(path, route, scale, selAngle, imgIndex, hAutoContrast.Value, defaults, datFile, data, Position);
         openedFigure = false;
 

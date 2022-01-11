@@ -65,8 +65,10 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     imageSelFullName= [fullImageName '_mod.tif'];
     try
         [maskSection, image] = getBaseImages(imageFullName,imageSelFullName,selAngle, round(defaults.dilate/scale));
-    catch
-        fprintf('Image or demarcated Image not found');
+    catch e
+        msgbox(sprintf('Image %s could not be opended', imageFullName));
+        fprintf(2,getReport(e,'extended'))
+        fprintf(2,'\nThere was an error: \n%s',e.message);
         return
     end
     if ~isa(image, 'uint16')

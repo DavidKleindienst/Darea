@@ -7,18 +7,33 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         [~,angles]=readMdoc([fullfile(pathImage,imageName) '.mdoc']);
         fullimageName=fullfile(pathImage,imageName);
         
-        if selAngle
-            angle = selAngle;
-            image = readAndConvertImage(fullimageName,angle);
-        else
-            % selAngle is 0, indicating that no angle has yet been selected
-            % so pick a middle one for display
-            angle = round(numel(angles)/2);
-            image = readAndConvertImage(fullimageName,angle);
+        try
+            if selAngle
+                angle = selAngle;
+                image = readAndConvertImage(fullimageName,angle);
+            else
+                % selAngle is 0, indicating that no angle has yet been selected
+                % so pick a middle one for display
+                angle = round(numel(angles)/2);
+                image = readAndConvertImage(fullimageName,angle);
+            end
+        catch e
+            msgbox(sprintf('Image %s could not be opended', fullimageName));
+            fprintf(2,getReport(e,'extended'))
+            fprintf(2,'\nThere was an error: \n%s',e.message);
+            return;
         end
     else
         fullimageName=[fullfile(pathImage,imageName) '.tif'];
-        image = readAndConvertImage(fullimageName);
+        try
+            image = readAndConvertImage(fullimageName);
+        catch e
+            msgbox(sprintf('Image %s could not be opended', fullimageName));
+            
+            fprintf(2,getReport(e,'extended'))
+            fprintf(2,'\nThere was an error: \n%s',e.message);
+            return
+        end
     end
     if isnan(selAngle)
         modImageName=getModImagePath(fullfile(pathImage,imageName));
@@ -36,7 +51,14 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
     imR=imref2d(size(image),scale,scale);
     if isfile(modImageName)
-        modImage=readAndConvertImage(modImageName);
+        try
+            modImage=readAndConvertImage(modImageName);
+        catch e
+            msgbox(sprintf('Image %s could not be opended', modImageName));
+            fprintf(2,getReport(e,'extended'))
+            fprintf(2,'\nThere was an error: \n%s',e.message);
+            return
+        end
     end
     [filteredImages, compCenter] = loadSavedImage(image,modImage);
     if ~isnan(compCenter)
