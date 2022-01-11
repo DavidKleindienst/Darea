@@ -2,6 +2,7 @@ function InstallOrUpdateDarea()
 %% Clones or Updates Darea from the Github repository
 % Designed as a comfortable update script for users
 % Not designed for usage by developers using git themselves.
+% If you use it when some files were modified, they will be stashed automatically
 
 if isfile('Run.m')
     %already installed, update
@@ -9,6 +10,7 @@ if isfile('Run.m')
 [~,r] = system('git remote -v');
 
     if contains(r, 'https://github.com/DavidKleindienst/Darea.git')
+        !git stash
         !git pull origin master
         fprintf('Updated Darea.')
     elseif contains(r, 'fatal: not a git repository')
