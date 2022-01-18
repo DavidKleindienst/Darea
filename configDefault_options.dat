@@ -19,7 +19,8 @@ SimOptions.twoStep	0
 SimOptions.minReceptorDistance	6
 SimOptions.ReceptorParticleDistance	[0, -1]  #-1 means same as dilate
 SimOptions.indivsave	true
-SimOptions.bounds	{6, 0.1; 6, 1}       #Simulations fit Kolmogorov-Smirnov p-Value of comparison of all pairwise Distances to be between 0.1 and 1
+SimOptions.boundName	'KS'
+SimOptions.bounds	{0.1; 1}       #Simulations fit Kolmogorov-Smirnov p-Value of comparison of all pairwise Distances to be between 0.1 and 1
 SimOptions.fitdisttype	'all Distances'
 SimOptions.exclZones	false
 SimOptions.partExcl	{'random','random','random'}

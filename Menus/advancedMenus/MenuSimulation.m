@@ -13,17 +13,21 @@ function Options=MenuSimulation(Default,particleTypes)
 
    hSimFitBoundText=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'Fit', 'Position', [25 280 13 25], 'Tooltipstring', boundTooltip);
    hSimFitBoundText2=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'to be between', 'Position', [100 280 100 25], 'Tooltipstring', boundTooltip);
-   hSimFitDistType=uicontrol('Parent', Menu, 'Style', 'popup', 'Position', [40 280 80 25], 'String', {'NNDs', 'all Distances'}, 'Tooltipstring', 'Select Type of Distance that should be fitted');
-   hSimFitLowerEdit=uicontrol('Parent', Menu, 'Style', 'Edit', 'Position', [305 287 30 21], 'String', num2str(Default.bounds{1,2}), 'Tooltipstring', boundTooltip, 'Callback', @checkIsNumber);
-   hSimFitLowerPopup=uicontrol('Parent', Menu, 'Style', 'popup', 'Position', [190 280 115 25], 'String', {'nm', 'mean + x*SD', 'mean + x*SEM', 'xth Percentile', 'None', 'KS'}, 'Value', Default.bounds{1,1}, 'Tooltipstring', boundTooltip, 'Callback', @(hObj, ~)selectBound(hObj, hSimFitLowerEdit));
+   hSimFitDistType=uicontrol('Parent', Menu, 'Style', 'popup', 'Position', [40 280 80 25], 'String',...
+                            {'NNDs', 'all Distances'}, 'Tooltipstring', 'Select Type of Distance that should be fitted');
+   hSimFitLowerEdit=uicontrol('Parent', Menu, 'Style', 'Edit', 'Position', [305 287 30 21], 'String', num2str(Default.bounds{1}), ...
+                            'Tooltipstring', boundTooltip, 'Callback', @checkIsNumber);
+   hSimFitPopup=uicontrol('Parent', Menu, 'Style', 'popup', 'Position', [190 280 115 25], 'String', ...
+                        {'nm', 'mean + x*SD', 'mean + x*SEM', 'xth Percentile', 'KS'}, ...
+                        'Tooltipstring', boundTooltip);
    hSimFitBoundText3=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [335 280 30 25], 'String', 'and', 'Tooltipstring', boundTooltip);
-   hSimFitUpperEdit=uicontrol('Parent', Menu, 'Style', 'Edit', 'Position', [475 287 30 21], 'String', num2str(Default.bounds{2,2}), 'Tooltipstring', boundTooltip, 'Callback', @checkIsNumber);
-   hSimFitUpperPopup=uicontrol('Parent', Menu, 'Style', 'popup', 'Position', [360 280 115 25], 'String', {'nm', 'mean + x*SD', 'mean + x*SEM', 'xth Percentile', 'None', 'KS'}, 'Value', Default.bounds{2,1}, 'Tooltipstring', boundTooltip, 'Callback', @(hObj, ~)selectBound(hObj, hSimFitUpperEdit));
+   hSimFitUpperEdit=uicontrol('Parent', Menu, 'Style', 'Edit', 'Position', [360 287 30 21], 'String', num2str(Default.bounds{2}), ...
+                            'Tooltipstring', boundTooltip, 'Callback', @checkIsNumber);
+                        
+   hSimFitPopup.Value = find(cellfun(@(x)strcmp(x,Default.boundName),hSimFitPopup.String));
 
    set(hSimFitDistType, 'Value', find(cellfun(@(cell) isequaln(cell, Default.fitdisttype), get(hSimFitDistType, 'String'))));
    
-   if Default.bounds{1,1}==5; set(hSimFitLowerEdit, 'Visible', 'off'); end
-   if Default.bounds{2,1}==5; set(hSimFitUpperEdit, 'Visible', 'off'); end
    
    hSimulateOnText=uicontrol('Style','Text', 'String', 'Simulate on', 'Position', [25 240 80 25]);
    hSimulateOnDD=uicontrol('Style','popup','String',{'Demarcation','Demarcation and Rim'}, 'Position', [110 240 180 25],'Value', Default.simOnDilation+1);
@@ -119,17 +123,17 @@ function Options=MenuSimulation(Default,particleTypes)
            case hRPDistEdit
                Options.ReceptorParticleDistance(2)=shouldBeNumber(Options.ReceptorParticleDistance(2),hObj,1,[0,inf]);
            case hSimFitLowerEdit
-               switch hSimFitLowerPopup.Value
+               switch hSimFitPopup.Value
                    case 4
                        nrRange=[0,100];
-                   case 6
+                   case 5
                        nrRange=[0,1];
                    otherwise
                        nrRange=[0,inf];
                end
-               Options.bounds{1,2}=shouldBeNumber(Options.bounds{1,2},hObj,1,nrRange);
+               Options.bounds{1}=shouldBeNumber(Options.bounds{1},hObj,1,nrRange);
            case hSimFitUpperEdit
-               switch hSimFitUpperPopup.Value
+               switch hSimFitPopup.Value
                    case 4
                        nrRange=[0,100];
                    case 6
@@ -137,16 +141,10 @@ function Options=MenuSimulation(Default,particleTypes)
                    otherwise
                        nrRange=[0,inf];
                end
-               Options.bounds{2,2}=shouldBeNumber(Options.bounds{2,2},hObj,1,nrRange);
+               Options.bounds{2}=shouldBeNumber(Options.bounds{2},hObj,1,nrRange);
        end
     end
-    function selectBound(hObj, hEdit)
-        if get(hObj, 'Value')==5
-            set(hEdit, 'Visible', 'off');
-        else
-            set(hEdit, 'Visible', 'on');
-        end
-    end
+
     function changeVisibility(hOb,~)
         switch hOb
             case hExclusionZones
@@ -166,13 +164,12 @@ function Options=MenuSimulation(Default,particleTypes)
     function updateOptions(~,~)
         set(hEndlessLoop, 'Visible', 'off');
         Options.mindistance=str2double(hMinDistEdit.String);
-        Options.bounds{1,1}=get(hSimFitLowerPopup, 'Value');
-        Options.bounds{2,1}=get(hSimFitUpperPopup, 'Value');
-        Options.bounds{1,2}=str2double(get(hSimFitLowerEdit, 'String'));
-        Options.bounds{2,2}=str2double(get(hSimFitUpperEdit, 'String'));
+        Options.boundName=hSimFitPopup.String{hSimFitPopup.Value};
+        Options.bounds{1}=str2double(get(hSimFitLowerEdit, 'String'));
+        Options.bounds{2}=str2double(get(hSimFitUpperEdit, 'String'));
         Options.fitdisttype=get(hSimFitDistType,'String');
         Options.fitdisttype=Options.fitdisttype{get(hSimFitDistType, 'Value')};
-        if Options.bounds{1,1}==Options.bounds{2,1} && Options.bounds{1,2}>=Options.bounds{2,2}
+        if Options.bounds{1}>=Options.bounds{2}
             set(hEndlessLoop, 'Visible', 'on');
             return
         end

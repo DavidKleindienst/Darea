@@ -1,4 +1,4 @@
-function infoDistances = nearestParticleImage(infoImage, radius, radius2)
+function infoDistances = nearestParticleImage(infoImage, radius, radius2, onlyThisField)
 %% For each particle in the image with radius, returns the distance to the nearest particle radius2.
 
 %   infoImage:     Struct containing the information relative to each image.
@@ -23,20 +23,27 @@ function infoDistances = nearestParticleImage(infoImage, radius, radius2)
 %   infoDistances.stats:                    Stats: Maximum, minimum, average, standard deviation, sum, and elements considered (distinct to NaN)
 %   infoDistances.allDistances:             Contains all distances from each particle to each other particle
 %   infoDistances.allDistStats:             Contains the statistics for the allDistances
- 
+
+%   onlyThisField can be specified as "distances" or "allDistances" to only compute this distance,
+%   and leave out the other as well as distances from center or edge.
+%   This can be used during fitted simulations for faster execution
+
+if nargin<4
+    onlyThisField=NaN;
+end
 
 infoDistances.radius = radius;
 infoDistances.radius2=radius2;
 
 %% Compares all the particles if radius is all
 if strcmp(radius,'all')
-    infoDistances=getallDistances(infoDistances,infoImage.centers,infoImage.boundary);
+    infoDistances=getallDistances(infoDistances,infoImage.centers,infoImage.boundary,onlyThisField);
     
 else
     % Extracts the locations of the points with the given radius.
     consideredParticles = infoImage.centers(infoImage.teorRadii==radius,:);
     if isnan(radius2)
-        infoDistances=getallDistances(infoDistances,consideredParticles,infoImage.boundary);
+        infoDistances=getallDistances(infoDistances,consideredParticles,infoImage.boundary,onlyThisField);
     else
         comparedParticles=infoImage.centers(infoImage.teorRadii==radius2,:);
         infoDistances.distances = distToNearestPoint2Sets(consideredParticles,comparedParticles);
@@ -47,15 +54,26 @@ else
 
     end
 end
-infoDistances.stats = sixStats(infoDistances.distances);
-infoDistances.allDistStats=sixStats(infoDistances.allDistances);
+if isnan(onlyThisField)
+    %Not needed when fitting simulation
+    infoDistances.stats = sixStats(infoDistances.distances);
+    infoDistances.allDistStats=sixStats(infoDistances.allDistances);
+end
     
-    function info=getallDistances(info,centers,boundary)
-        info.distances = distToNearestPoint(centers);   %NND
-        info.allDistances=allDistances(centers);        %All Distances
-        info.distanceFromEdge=distanceFromEdge(centers,boundary);     
-        info.distanceFromCenter=distanceFromCenter(centers,boundary);
-        info.relativeDistanceFromCenter=info.distanceFromCenter./(info.distanceFromEdge+info.distanceFromCenter);
+    function info=getallDistances(info,centers,boundary,onlyThisField)
+        %onlyThisField can be a string with following values
+        % "distances", "allDistances"
+        if isnan(onlyThisField)
+            info.distances = distToNearestPoint(centers);   %NND
+            info.allDistances=allDistances(centers);        %All Distances
+            info.distanceFromEdge=distanceFromEdge(centers,boundary);     
+            info.distanceFromCenter=distanceFromCenter(centers,boundary);
+            info.relativeDistanceFromCenter=info.distanceFromCenter./(info.distanceFromEdge+info.distanceFromCenter);
+        elseif strcmp(onlyThisField, 'distances')
+            info.distances = distToNearestPoint(centers);   %NND
+        elseif strcmp(onlyThisField, 'allDistances')
+            info.allDistances=allDistances(centers);        %All Distances
+        end
     end
 end
 
