@@ -2,10 +2,11 @@ function toSimulate=doTheSimulation(toSimulate,simfct, area, mindistance, compar
     if nargin<6
         scale=1;
     end
+    
     %Set 0 for area to ignore area
     while any(isnan(toSimulate))
         simulated=simfct(toSimulate);  %simulated will have as many values as there are NaNs in toSimulate
-        if any(area)
+        if any(any(area))
             isOutside=logical(area(sub2ind(size(area),simulated(:,2),simulated(:,1))));
             simulated(isOutside,:)=NaN;
         end
@@ -16,4 +17,5 @@ function toSimulate=doTheSimulation(toSimulate,simfct, area, mindistance, compar
         simulated(isTooClose,:)=NaN;
         toSimulate(isnan(toSimulate))=simulated;
     end
+    
 end
