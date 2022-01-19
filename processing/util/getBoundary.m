@@ -15,8 +15,7 @@ if size(area,3)==3
     area=area(:,:,1);
 end
 if sum(area,'all')>0 && sum(~area,'all')>10
-    boundaries=bwboundaries(area');    % Gives coordinates of 0s on edge of area
-    boundaries(1)=[];
+    boundaries=bwboundaries(~area');    % Gives coordinates of 0s on edge of area
     boundaries(cellfun('length',boundaries)<=10)=[]; %Delete all regions smaller than 10 px, because they are likely false detections
 
     if isempty(boundaries)
