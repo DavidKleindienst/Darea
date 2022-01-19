@@ -1,9 +1,9 @@
-function simImageInfo = fittedSimulation(infoImage,simImageInfo, area, radius, partnr, Options,vm, hm, hProgress)
+function simImageInfo = fittedSimulation(infoImage,simImageInfo, area, radius, Options,vm, hm, hProgress)
 %FITTEDSIMULATION Summary of this function goes here
 %   Detailed explanation goes her
 
 %First generate random simulation
-[simImageInfo, receptors]=randomSimulation(infoImage, simImageInfo, area, radius, partnr, Options,vm,hm);
+[simImageInfo, receptors]=randomSimulation(infoImage, simImageInfo, area, radius, Options,vm,hm);
 mindistance=Options.mindistance;
 minLength=Options.ReceptorParticleDistance(1);
 maxLength=Options.ReceptorParticleDistance(2);
@@ -207,7 +207,7 @@ while UpperTruth || LowerTruth   %As long as fitting is neccessary
             if Options.twoStep; receptors(randIn,:)=oldR; end
             
             if mod(count,50000)==0     %If after 50000 tries no improvement could be found, reroll all particles
-                simImageInfo=randomSimulation(infoImage, simImageInfo, area, radius, partnr, Options,vm,hm);
+                simImageInfo=randomSimulation(infoImage, simImageInfo, area, radius,Options,vm,hm);
                 previous = getFittedValue(real_distances,sim_distances,Options.boundName);
                 [LowerTruth, UpperTruth]=isFittingNecessary(previous, upper, lower); %Check whether fitting is necessary
                 TrialCounter=TrialCounter+1;     %Increase Trial counter by 1 and display a message

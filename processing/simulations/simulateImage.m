@@ -31,8 +31,6 @@ function simImageInfo = simulateImage(infoImage,radius,simtype, Options,methodA,
 
 simImageInfo=infoImage;
 
-partnr=infoImage.numParticles;          %number of particles in the image
-
 if Options.simOnDilation
     area=infoImage.discardedAreas;
 else
@@ -69,12 +67,13 @@ switch simtype
         simImageInfo.teorRadii=simImageInfo.teorRadii(randperm(numel(simImageInfo.teorRadii)));
     case 'Sim'
         %random simulation
-        simImageInfo=randomSimulation(infoImage, simImageInfo, area, radius, partnr, Options,vm,hm);
+        simImageInfo=randomSimulation(infoImage, simImageInfo, area, radius,Options,vm,hm);
     case 'SimFit'
-        simImageInfo=fittedSimulation(infoImage, simImageInfo, area, radius, partnr, Options, vm,hm, hProgress);
+        simImageInfo=fittedSimulation(infoImage, simImageInfo, area, radius,Options, vm,hm, hProgress);
     otherwise
         fprintf('Unknown Simulation type %s', simtype);
 end
+
 %fprintf(['Image ' num2str(infoImage.id) ' finished\n']);
 end
 
