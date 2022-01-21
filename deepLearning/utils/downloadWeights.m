@@ -5,8 +5,14 @@ function retValue = downloadWeights()
 serverpath='https://pub.ist.ac.at/~dkleindienst/weights/';
 indexFile = 'networkList.csv';
 
+    function path=getFullWebpath(path,file)
+        %% Like fullfile, but for the webpaths and with only two arguments        
+        path=fullfile(path,file);
+        path=replace(path,'\', '/');
+    end
+
 try
-    listedNetworks = webread(fullfile(serverpath, indexFile));
+    listedNetworks = webread(getFullWebpath(serverpath, indexFile));
     names = listedNetworks.Name;
     descriptions = listedNetworks.Description;
 catch
@@ -93,7 +99,7 @@ waitfor(dlWindow);
             drawnow();
             try
                 websave('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt', ... 
-                        fullfile(serverpath, 'resnet_v2_101.ckpt'));
+                        getFullWebpath(serverpath, 'resnet_v2_101.ckpt'));
             catch excpt
                 if isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt')
                     delete('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt');
@@ -111,7 +117,7 @@ waitfor(dlWindow);
             try
                 for ex=1:numel(extensions)
                     websave(fullfile(localpath, [names{net} extensions{ex}]),...
-                            fullfile(serverpath, [names{net} extensions{ex}]));
+                            getFullWebpath(serverpath, [names{net} extensions{ex}]));
                 end
             catch excpt
                 for ex=1:numel(extensions)
