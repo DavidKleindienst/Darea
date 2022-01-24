@@ -2,7 +2,7 @@ function success=testInstallation()
     fprintf('Testing installation...\n');
     addpath('./Menus/');
     setPath();
-    if isunix
+    if isunix && ~ismac     %Linux
         [~,pyExe]=pyversion;
         [retVal,~]=system([pyExe ' python/manyUtils.py --function packages_available']);
         test = ~ retVal; %retVal will be 0 when successful
