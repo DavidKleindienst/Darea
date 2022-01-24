@@ -211,8 +211,15 @@ install_note_file = '.install_note.txt';
                 success=false;
                 return
             end
+            
             darea_env=r{index+1};
-            [a,r] = system([fullfile(darea_env, '/bin/pip') command2 ' --progress-bar off'], '-echo');
+            if ispc     %windows
+                pip_path=replace(fullfile(darea_env, 'Scripts/pip.exe'),'\','/');
+            else
+                pip_path=fullfile(darea_env, 'bin/pip');
+            end
+            
+            [a,r] = system([pip_path command2 ' --progress-bar off'], '-echo');
             if a~=0
                 fprintf('A problem occured during installation of required python packages by pip:\n');
                 fprintf(r);
@@ -236,9 +243,13 @@ install_note_file = '.install_note.txt';
 
     function success=linkPythonToMatlab(darea_env)
         fprintf('Linking python environment to matlab...\n');
-        darea_env=[darea_env '/bin/python'];
+        if ispc     %windows
+            darea_env=replace(fullfile(darea_env, 'python.exe'),'\','/');
+        else
+            darea_env=fullfile(darea_env, 'bin/python');
+        end
         [~, exec, isLoaded]=pyversion();
-        if strcmp(exec,darea_env)
+        if strcmp(replace(exec,'\','/'),darea_env)
             fprintf('Python environment was already linked.\n Installation was successful!\');
         elseif isLoaded
             fprintf('Python environment could not be linked, because python was already loaded in matlab\n');
@@ -248,7 +259,7 @@ install_note_file = '.install_note.txt';
         else
             pyversion(darea_env);
             [~, exec, ~]=pyversion();
-            if ~strcmp(exec,darea_env)
+            if ~strcmp(replace(exec,'\','/'),darea_env)
                 fprintf('Unknown Error: python environment could not be linked to matlab.\n')
                 success=false;
                 return
@@ -284,23 +295,9 @@ else
         fclose(fid);
         delete(install_note_file);
         
-        if ~strcmp(note,'cudnn')    
-            fprintf('Installation has not been completed successfully the last time this script ran\n')
-            fprintf('Darea will now first be updated, then completion of the installation will be attempted.\n');
-        end
+        fprintf('Installation has not been completed successfully the last time this script ran\n')
+        fprintf('Darea will now first be updated, then completion of the installation will be attempted.\n');
         %updateDarea();
-        if strcmp(note, 'cudnn')
-            addpath('./util/');
-            [success,cudnnFailed]=testInstallation();
-            if ~success
-                writeInstallNote('test');
-                return
-            end
-            if cudnnFailed
-                writeInstallNote('cudnn');
-            end
-            return
-        end
     end
     
     if ~strcmp(note, 'test') && ~strcmp(note, 'link')
@@ -334,7 +331,7 @@ else
     end
     addpath('./util/');
     try
-        [success,cudnnFailed]=testInstallation();
+        success=testInstallation();
     catch e
         writeInstallNote('test');
         rethrow(e);
@@ -343,10 +340,7 @@ else
         writeInstallNote('test');
         return
     end
-    if cudnnFailed
-        writeInstallNote('cudnn');
-        return
-    end
+
         
 end
 end
