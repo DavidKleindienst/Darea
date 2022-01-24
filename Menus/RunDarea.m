@@ -89,7 +89,7 @@ if ~pythonAvailable
         jButton = findjobj(needsPython{i});
         set(jButton,'Enabled',false);
     end
-elseif deepLearningAvailable()
+elseif ~deepLearningAvailable()
     for i=1:numel(needsPythonDeepLearning)
         set(needsPythonDeepLearning{i}, 'tooltipstring', ...
             sprintf(['This functionality requires certain python packages such as tensorflow to be installed.\n',...
