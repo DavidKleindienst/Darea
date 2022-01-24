@@ -154,15 +154,17 @@ install_note_file = '.install_note.txt';
         success=true;
     end
     
-    function downloadDarea()
+    function success=downloadDarea()
         fprintf('Downloading Darea...\n');
         [s,r]=system(['git clone ' GIT_REPOSITORY]);
         if s~=0
             if contains(r, 'is not recognized as an internal or external command\n')
                 fprintf('Git is not installed. Please install git, restart MATLAB and try again\n')
+                success=false;
                 return
             else
                 fprintf('The following error occured when trying to Download Darea:\n%s\n',r);
+                success=false;
                 return
             end
         end
@@ -173,6 +175,7 @@ install_note_file = '.install_note.txt';
         end
         rmdir('Darea');
         fprintf('Successfully downloaded Darea!\n');
+        success=true;
     end
 
     function [success,darea_env]=installPythonDependencies()
