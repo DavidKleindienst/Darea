@@ -11,11 +11,11 @@ function success=testInstallation()
         success=false; c
     elseif ~gpu
         fprintf('Darea was successfully installed without GPU support!\n');
-        fprintf('All deep-learning computations will be performed on the CPU (slow),\n')
-        fprintf('because either no appropriate graphic card is available, or CUDA was not installed.\n')
+        fprintf('All deep learning computations will be performed on the CPU (slow).\n')
+        fprintf('This can be either because no appropriate graphics card is available, or CUDA and/or CUDNN have not been installed prior to running this installation.\n')
         success=true; 
     else
-        fprintf('Darea was sucessfully installed with GPU support\n');
+        fprintf('Darea was sucessfully installed with GPU support!\n');
         success=true; 
     end
 end

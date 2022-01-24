@@ -125,16 +125,15 @@ install_note_file = '.install_note.txt';
             case 'mac'
                 setenv('PATH', [getenv('PATH') ':' fullfile(anaconda_path,'condabin')])
             case 'win'
-                pyRoot = fileparts(anaconda_path);
                 p = getenv('PATH');
                 p = strsplit(p, ';');
                 addToPath = {
-                   pyRoot
-                   fullfile(pyRoot, 'Library', 'mingw-w64', 'bin')
-                   fullfile(pyRoot, 'Library', 'usr', 'bin')
-                   fullfile(pyRoot, 'Library', 'bin')
-                   fullfile(pyRoot, 'Scripts')
-                   fullfile(pyRoot, 'bin')
+                   anaconda_path
+                   fullfile(anaconda_path, 'Library', 'mingw-w64', 'bin')
+                   fullfile(anaconda_path, 'Library', 'usr', 'bin')
+                   fullfile(anaconda_path, 'Library', 'bin')
+                   fullfile(anaconda_path, 'Scripts')
+                   fullfile(anaconda_path, 'bin')
                 };
                 p = [addToPath(:); p(:)];
                 p = unique(p, 'stable');
