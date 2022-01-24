@@ -105,7 +105,7 @@ install_note_file = '.install_note.txt';
             success=false;
             return
         end
-        if strcmp(os, 'linux')  %Not necessary for linux
+        if ~strcmp(os, 'linux')  %Not necessary for linux
             for p = 1:numel(anaconda_path)
                 if isCondaPath(anaconda_path{p})
                     anaconda_path=anaconda_path{p};
