@@ -14,7 +14,6 @@ home_folder=getenv('HOME');
 
 ANACONDA_PATH_MAC = {'/Applications/anaconda/', fullfile(home_folder, 'Anaconda3')};
 ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anaconda3')};  
-ANACONDA_PATH_LINUX = {fullfile(home_folder,'anaconda3')};
 
 install_note_file = '.install_note.txt';
 
@@ -96,9 +95,8 @@ install_note_file = '.install_note.txt';
             anaconda_path=ANACONDA_PATH_MAC;
         elseif isunix
             os='linux';
-            anaconda_path=ANACONDA_PATH_LINUX;
-            fprintf('Linux not yet supported!\n');
-            return
+            %On linux conda command should work out of the box without
+            %setting path
         elseif ispc
             anaconda_path=ANACONDA_PATH_WIN;
             os='win';
@@ -107,17 +105,19 @@ install_note_file = '.install_note.txt';
             success=false;
             return
         end
-        for p = 1:numel(anaconda_path)
-            if isCondaPath(anaconda_path{p})
-                anaconda_path=anaconda_path{p};
-                break;
+        if ~isunix  %Not necessary for linux
+            for p = 1:numel(anaconda_path)
+                if isCondaPath(anaconda_path{p})
+                    anaconda_path=anaconda_path{p};
+                    break;
+                end
             end
-        end
-        if iscell(anaconda_path) % No valid path was found during for loop
-            [isPath, anaconda_path]=userGetAnacondaPath(os);
-            if ~isPath
-                success=false;
-                return
+            if iscell(anaconda_path) % No valid path was found during for loop
+                [isPath, anaconda_path]=userGetAnacondaPath(os);
+                if ~isPath
+                    success=false;
+                    return
+                end
             end
         end
 
@@ -139,8 +139,6 @@ install_note_file = '.install_note.txt';
                 p = unique(p, 'stable');
                 p = strjoin(p, ';');
                 setenv('PATH', p);
-            case 'linux'
-                return  % ToDo
         end
 
         [a, ~]=system('conda --version');

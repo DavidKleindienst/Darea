@@ -115,4 +115,8 @@ if __name__=='__main__':
     args=parser.parse_args()
     if args.function=='packages_available':
         print(all_packages_available())
+	
+    if args.function=='test_install':
+    	print('ASDf')
+    	print(test_tensorflow_installation())
     
