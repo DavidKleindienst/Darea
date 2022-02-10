@@ -8,7 +8,7 @@ if retVal~=0    % python threw some error
     bool=false;
     return
 end
-if startsWith(output, 'True')
+if endsWith(strip(output), 'True')
     bool=true;
 else
     bool=false;
