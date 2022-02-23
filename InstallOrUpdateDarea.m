@@ -10,6 +10,11 @@ ENVIRONMENT_NAME = 'Darea'; %Name of the conda environment in which the required
 GIT_REPOSITORY = 'https://github.com/DavidKleindienst/Darea.git';
 
 home_folder=getenv('HOME');
+if isempty(home_folder) && ispc
+    % On Windows, HOME env variable may not be set
+    home_folder=fullfile('C:/Users', getenv('USERNAME'));
+end
+    
 %Possible default paths where anaconda installation might be
 
 ANACONDA_PATH_MAC = {'/Applications/anaconda/', fullfile(home_folder, 'Anaconda3')};
@@ -46,7 +51,7 @@ install_note_file = '.install_note.txt';
         end
         question=[question 'Pressing "No" will abort the installation procedure'];
 
-        answer = questdlg(sprintf(question),'Anaconda not found.', 'Yes','No');
+        answer = questdlg(sprintf(question),'Anaconda not found.', 'Yes','No', 'No');
         if ~strcmp(answer,'Yes')
             isPath=false; path=NaN;
             fprintf('Aborting installation...\n');
