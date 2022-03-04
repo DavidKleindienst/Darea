@@ -3,7 +3,7 @@ function [groupings, results]=chooseGroupByImage(groupnames, datFile)
     results=NaN;
     showDem=0;
     groupings=[];
-    choicefig=figure('OuterPosition', [80 100 500 300], 'menubar', 'none', 'resize','off', 'Name', 'Select Groups', 'CloseRequestFcn', @close);
+    choicefig=figure('OuterPosition', [80 100 500 300], 'menubar', 'none', 'Name', 'Select Groups', 'CloseRequestFcn', @close);
     
     uicontrol('Style', 'Text', 'String', 'Please select Grouping for which you would to choose by going through images', 'Position', [25 240 250 35], 'FontWeight','bold');
        
@@ -13,10 +13,11 @@ function [groupings, results]=chooseGroupByImage(groupnames, datFile)
     
     uicontrol('Style', 'pushbutton', 'String', 'Ok', 'Tooltipstring', 'Save', 'Position', [180 40 90 30], 'Callback', @proceed);
     uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [290 40 90 30], 'Callback', @close);
+    set(findall(choicefig, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
     waitfor(choicefig);
     if ~stop
-        groupfig=figure('OuterPosition', [80 100 500 300], 'menubar', 'none', 'resize','off', 'Name', 'Select Groups');
+        groupfig=figure('OuterPosition', [80 100 500 300], 'menubar', 'none', 'Name', 'Select Groups');
         uicontrol('Style', 'Text', 'String', sprintf('Please name all possible groups you would like to assing for each groupings\nSeperate Groups by ";"'), 'Position', [25 190 330 80],'FontWeight','bold');
         hGrpNameText=gobjects(1,numel(groupings));
         hGrpNameEdit=gobjects(1,numel(groupings));
@@ -27,6 +28,7 @@ function [groupings, results]=chooseGroupByImage(groupnames, datFile)
         end
         uicontrol('Style', 'pushbutton', 'String', 'Ok', 'Tooltipstring', 'Save', 'Position', [180 40 90 30], 'Callback', @proceedToChooser);
         uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [290 40 90 30], 'Callback', @close);
+        set(findall(groupfig, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
         waitfor(groupfig);
     end

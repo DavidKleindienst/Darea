@@ -12,7 +12,7 @@ if nargin>0
     defaults=updateDefaults(getOptionsName(datFile), defaults);
 end
 positionFigure =  [25, 50, 650, 565];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Train Demarcation Prediction'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Train Demarcation Prediction'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 
@@ -156,6 +156,7 @@ set(visOnFolder,'Visible', 'on');
 uicontrol('Style', 'pushbutton', 'String', 'Download Networks', 'Position', [450 500 170 25],...
                 'Tooltipstring', sprintf('Check for new available networks and download them'),...
                 'Callback', @weightDownload);
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
 waitfor(mainFigure);
 

@@ -19,7 +19,7 @@ end
 
 %% Darea Main Menu
 %any 0 in position indicates that this value will be computed later using align
-mainMenu=figure('OuterPosition',[65, 155, 730, 405],'menubar', 'none', 'resize','off', 'Name', 'Darea');
+mainMenu=figure('OuterPosition',[65, 155, 730, 405],'menubar', 'none', 'Name', 'Darea');
 
 % Loading dat file
 hImageLPathText = uicontrol('Style', 'Text', 'String', 'Image list file:','HorizontalAlignment','left','Position', [25 335 100 25]);     
@@ -98,7 +98,7 @@ elseif ~deepLearningAvailable()
         set(jButton,'Enabled',false);
     end
 end
-
+set(findall(mainMenu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 waitfor(mainMenu);
 
 

@@ -3,7 +3,7 @@ function Options=MenuStatistics(Default, Data, settings)
 % Opens advanced option menu for simulations
    Options=Default;
    positionMenu=[225 250 430 450];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Statistics Options', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Statistics Options', 'menubar', 'None', 'CloseRequestFcn', @close);
    
    hMakeStatsText=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'Make Statistics for:', 'Position', [25 380 100 25]);
    hMakeNNDAnalysis=uicontrol('Parent', Menu, 'Style', 'Checkbox', 'String', 'NNDs', 'Value', Default.makeNND, 'Position', [35 360 50 25], 'Tooltipstring', 'Check if Statistics for Nearest Neighbour Distances should be generated');
@@ -44,7 +44,8 @@ function Options=MenuStatistics(Default, Data, settings)
    hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
    hErrorPresent=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [175 50 265 15], 'ForegroundColor', 'red', 'FontWeight', 'bold', 'String', 'Cannot continue because Errors are present', 'Visible', 'Off');
 
-   
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
    % Waits for the figure to close to end the function.
     waitfor(Menu);
     

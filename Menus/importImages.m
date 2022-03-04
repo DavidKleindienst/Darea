@@ -37,7 +37,7 @@ folder='';
 deliminator='_';
 defaultMag=-1;  % -1 means skip image if no Mag found.
 
-ConfigMenu=figure('OuterPosition',[365, 255, 410, 405],'menubar', 'none', 'resize','off', 'Name', 'Import Images into Configuration File', 'CloseRequestFcn', @cancel);
+ConfigMenu=figure('OuterPosition',[365, 255, 410, 405],'menubar', 'none', 'Name', 'Import Images into Configuration File', 'CloseRequestFcn', @cancel);
 
 hSelectFolder=uicontrol('Style', 'pushbutton', 'String', 'Select Image Folder', 'Position', [20 340 280 25], ...
                     'Tooltipstring', 'Press help for details on the folderstructure', 'Callback', @userSelectFolder);
@@ -59,6 +59,7 @@ hMagnifications=uicontrol('Style', 'pushbutton', 'String', 'Choose Magnification
 
 hMake=uicontrol('Style', 'pushbutton', 'String', 'Create Project', 'Position', [80 50 100 25], 'Callback', @(~,~)makeConfig(true));
 hCancel=uicontrol('Style', 'pushbutton', 'String', 'Cancel', 'Position', [220 50 80 25], 'Callback', @cancel);
+set(findall(ConfigMenu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
 mags=readMags(defaultMagFile);
 waitfor(ConfigMenu);
@@ -163,7 +164,14 @@ function makeConfig(fromButton)
     end
 end
 function userSelectFolder(~,~)
-    folder = uigetdir();
+    global lastfolder
+    if isempty(lastfolder)
+        lastfolder=cd;
+    end
+    folder = uigetdir(lastfolder, 'Select image folder');
+    if ischar(folder)
+        lastfolder=folder;
+    end
     set(hSelectFolder, 'String', folder);
 end
 function cancel(~,~)

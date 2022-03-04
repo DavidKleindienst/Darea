@@ -11,7 +11,7 @@ classifiers=[{'None'}; classifiers(:)];
 algorithms={'naiveBayes', 'randomForest'};
 
 positionFigure =  [25, 50, 650, 505];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Train Particle Prediction'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Train Particle Prediction'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 filesTT='';
@@ -50,9 +50,8 @@ hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [220
 hStart=uicontrol('Style', 'pushbutton', 'String', 'Train', 'Tooltipstring', 'Start Training', 'Position', [300 60 90 30], 'Callback', @start);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [430 60 90 30], 'Callback', @close);
 
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 waitfor(mainFigure);
-
-
 
 function close(~,~)
     delete(gcf);

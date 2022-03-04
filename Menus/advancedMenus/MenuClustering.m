@@ -3,7 +3,7 @@ function Options=MenuClustering(settings, groupnames)
 % Opens advanced option menu for Clustering
    Options=settings;
    positionMenu=[225 250 450 340];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Clustering Options', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Clustering Options', 'menubar', 'None', 'CloseRequestFcn', @close);
     
    ClustDistTooltip=sprintf('Select whether the Distance between two Clusters will be calculated from Outline to Outline or as distance between the two nearest Particles.\nIn any case, if one particle of one Cluster is within the outline of the other Cluster, the distance is 0!');
    hClusterDistanceText=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'Distance between two Clusters', 'Position', [25 272 150 25], 'Tooltipstring', ClustDistTooltip);
@@ -30,9 +30,10 @@ function Options=MenuClustering(settings, groupnames)
    hOkMenu=uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @updateOptions, 'Position', [250 25 40 25]);
    hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
 
-   
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
    % Waits for the figure to close to end the function.
-    waitfor(Menu);
+   waitfor(Menu);
    
     function clustCalcChange(~,~)
         if numel(groupnames)==1 || hClusteringPopup.Value<3  

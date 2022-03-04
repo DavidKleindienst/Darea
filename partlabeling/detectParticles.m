@@ -65,7 +65,6 @@ function [centers, radii, metrics, particleFeatures] = detectParticles(image, ma
                             'name',title,'keyRelease',@hotkeys);
         set(mainFigure, 'menubar', 'none'); % No menu bar.
         set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).
-        set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).                             
         panelImage = uipanel('Units','pixels','Position',[10 60 dispImageWidthPx dispImageHeightPx]);
         axesImage = axes('parent', panelImage, 'Position', [0 0 1 1]);                 
         imshow(resImage, imR, 'Parent', axesImage);   

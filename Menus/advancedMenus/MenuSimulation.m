@@ -3,7 +3,7 @@ function Options=MenuSimulation(Default,particleTypes)
 % Opens advanced option menu for simulations
    Options=Default;
    positionMenu=[225 250 525 400];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Options for Simulation', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Options for Simulation','menubar', 'None', 'CloseRequestFcn', @close);
    
    
    hMinDistText=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'Minimum Distance', 'Position', [25 325 110 25], 'Tooltipstring', 'Minimum Distance between two particles in nm');
@@ -98,6 +98,7 @@ function Options=MenuSimulation(Default,particleTypes)
    % Show or hide two-step and exclZone settings
    changeVisibility(hExclusionZones);
    changeVisibility(hTwoStep);
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
    waitfor(Menu);
     
     function checkIsNumber(hObj, ~)

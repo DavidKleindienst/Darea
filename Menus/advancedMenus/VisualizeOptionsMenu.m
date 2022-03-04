@@ -30,7 +30,7 @@ function Options = VisualizeOptionsMenu(Default, particleList, showExclusion)
 
    Options=Default;
    positionMenu=[225 250 550 440];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Options', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Options', 'menubar', 'None', 'CloseRequestFcn', @close);
    
    %Particle Appearance
    uicontrol('Style', 'Text', 'FontWeight','bold','Position',[15 370 180 20], 'String', 'Particle appearance','HorizontalAlignment', 'left');
@@ -134,8 +134,10 @@ function Options = VisualizeOptionsMenu(Default, particleList, showExclusion)
    hOkMenu=uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @updateOptions, 'Position', [250 25 40 25]);
    hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
    styleVisibility(0,0);
+   set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
    % Waits for the figure to close to end the function.
-    waitfor(Menu);
+   waitfor(Menu);
     
     function styleVisibility(~,~)
         bright='off'; lineDem='off'; lineRim='off'; lineExcl='off'; colorDem='off'; colorRim='off';

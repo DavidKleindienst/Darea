@@ -31,7 +31,7 @@ function Options=MenuClusterNaming(Data,Default)
    allParameters=fieldnames(Data.Orig.ClusterInteraction{1});
    allParameters=allParameters(3:end);
    positionMenu=[225 250 400 400];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Cluster Parameter Menu', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Cluster Parameter Menu', 'menubar', 'None', 'CloseRequestFcn', @close);
    hCheckbox=cell(numel(allParameters));
    hEdit=cell(numel(allParameters));
    %Make checkboxes and namefields for all the parameters
@@ -50,7 +50,8 @@ function Options=MenuClusterNaming(Data,Default)
    hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
    hNotUniqueError=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [125 50 260 25], 'ForegroundColor', 'red', 'FontWeight', 'bold', 'String', 'Cluster Parameter names have to be unique, because they are used as filenames as well!', 'Visible', 'Off');
 
-   
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
    % Waits for the figure to close to end the function.
     waitfor(Menu);
     

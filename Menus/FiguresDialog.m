@@ -82,7 +82,7 @@ settings.makeHist=false;
 Defaultsettings=settings;
 
 positionFigure =  [25, 50, 650, 555];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Make Figures & Tables'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Make Figures & Tables'); 
 
 figureColor = get(mainFigure, 'color'); % Gets the color.
 
@@ -141,6 +141,8 @@ hNoOutpathError=uicontrol('Style', 'Text', 'Position', [100 80 100 30], 'foregro
 
 
 applyData();
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
 
 % Waits for the figure to close to end the function.
 waitfor(mainFigure);

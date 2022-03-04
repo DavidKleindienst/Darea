@@ -3,7 +3,7 @@ function Options=MenuCumProb(Default, Data, settings)
 % Opens advanced option menu for simulations
    
    positionMenu=[225 250 650 450];
-   Menu=figure('OuterPosition', positionMenu, 'Name', 'Cumulative Probability Options', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+   Menu=figure('OuterPosition', positionMenu, 'Name', 'Cumulative Probability Options', 'menubar', 'None', 'CloseRequestFcn', @close);
    
    hMakePlotsText=uicontrol('Parent', Menu, 'Style', 'Text', 'String', 'Make Plots for:', 'Position', [25 380 100 25]);
    hMakeNNDAnalysis=uicontrol('Parent', Menu, 'Style', 'Checkbox', 'String', 'NNDs', 'Value', Default.makeNND, 'Position', [50 360 50 25], 'Tooltipstring', 'Check if Cumulative Probability plots of Nearest Neighbour Distances should be generated');
@@ -190,9 +190,10 @@ function Options=MenuCumProb(Default, Data, settings)
    hErrorPresent=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [175 50 265 15], 'ForegroundColor', 'red', 'FontWeight', 'bold', 'String', 'Cannot continue because Errors are present', 'Visible', 'Off');
 
    Options=Default;
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
    % Waits for the figure to close to end the function.
-    waitfor(Menu);
+   waitfor(Menu);
  
 %%%%%%
 %% Functions start here

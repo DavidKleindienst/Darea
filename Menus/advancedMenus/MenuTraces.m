@@ -37,7 +37,7 @@ else        %Adjust figure height if too many particles exist
 end
     
 
-TraceMenu=figure('OuterPosition', figurePos, 'Name', 'Select Traces', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+TraceMenu=figure('OuterPosition', figurePos, 'Name', 'Select Traces', 'menubar', 'None', 'CloseRequestFcn', @close);
 
 hGroupTracesText=uicontrol('Parent', TraceMenu, 'Style', 'Text', 'Position', [25 heightBase+245 80 25], 'String', 'Groups', 'FontWeight', 'bold', 'HorizontalAlignment', 'left');
 hGroupTraces=cell(Data.Groups.number+1,1);
@@ -81,7 +81,7 @@ end
 
 hAlright=uicontrol('Parent', TraceMenu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @alright, 'Position', [250 25 40 25]);
 hCancel= uicontrol('Parent', TraceMenu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
-
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
 waitfor(TraceMenu);
 %% Functions

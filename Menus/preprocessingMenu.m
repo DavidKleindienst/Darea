@@ -4,7 +4,7 @@ function preprocessingMenu(datFile)
 
 
 positionFigure =  [150, 150, 350, 305];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Preprocessing'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Preprocessing'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 hWarning=uicontrol('Style', 'Text', 'String', 'Warning: Running this function will irreversibly change your images', ...
@@ -32,6 +32,7 @@ hProgress=uicontrol('Style', 'Text', 'foregroundcolor', 'blue', 'Position', [75 
 hStart=uicontrol('Style', 'pushbutton', 'String', 'Start', 'Position', [75 25 60 25], 'Callback', @start);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Position', [215 25 60 25], 'Callback', @close);
 
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 waitfor(mainFigure);
 
     function close(~,~)

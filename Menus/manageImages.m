@@ -15,7 +15,7 @@ newConfig=fullfile('tmpI', [n e]);
 copyfile(datFile,newConfig);
 
 positionFigure =  [25, 50, 700, 505];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Manage Images'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Manage Images'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 %'ColumnWidth', {220, 80},
@@ -31,6 +31,7 @@ selectedCell=NaN;
 
 hSave=uicontrol('Style', 'pushbutton', 'String', 'Save', 'Callback', @save, 'Position', [250 25 50 25]);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Callback', @close, 'Position', [325 25 50 25]);
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
 waitfor(mainFigure);
     

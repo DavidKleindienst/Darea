@@ -11,7 +11,7 @@ groupnames=groupnames';
 
 
 positionFigure =  [25, 50, 850, 505];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name', 'Assign Groups'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none','Name', 'Assign Groups'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 

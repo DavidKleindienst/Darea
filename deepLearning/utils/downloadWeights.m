@@ -47,7 +47,7 @@ ySpacingTop = 80;
 ySpacingBetween = 20;
 outerPosition = [150 200 600 220+(ySpacingBetween*nrNetworks)];
 
-dlWindow = figure('OuterPosition',outerPosition , 'menubar', 'none', 'resize','off', ...
+dlWindow = figure('OuterPosition',outerPosition , 'menubar', 'none', ...
                   'Name','Download Networks','CloseRequestFcn', @cancel); 
 
 

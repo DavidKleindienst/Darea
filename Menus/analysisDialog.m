@@ -69,10 +69,7 @@ Defaultsettings=settings;
 
 positionFigure = [25, 50, 700+(positive(numel(settings.particleTypes)-2))*165, 450];
 
-mainFigure = figure('OuterPosition', positionFigure); 
-set(mainFigure, 'menubar', 'none'); % No menu bar.
-set(mainFigure,'resize','off'); % Prevents the figure for resizing (it is almost maximized).
-set(mainFigure, 'Name', 'Perform analysis'); % Title. 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name', 'Perform analysis'); 
 figureColor = get(mainFigure, 'color'); % Gets the color.
 
 
@@ -184,6 +181,8 @@ if nargin>0
 end
 enableAdvancedMenus();
 % Waits for the figure to close to end the function.
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
 waitfor(mainFigure);
 
 %% Loads the information of the file.

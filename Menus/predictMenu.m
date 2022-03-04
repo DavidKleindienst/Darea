@@ -19,7 +19,7 @@ features=getTrainedNetworks();
 
 
 positionFigure =  [25, 50, 650, 505];
-mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'resize','off', 'Name','Automated Demarcation'); 
+mainFigure = figure('OuterPosition', positionFigure, 'menubar', 'none', 'Name','Automated Demarcation'); 
 set(mainFigure, 'CloseRequestFcn', @close);
 
 hDownload=uicontrol('Style', 'pushbutton', 'String', 'Download Networks', 'Position', [430 430 170 25],...
@@ -67,7 +67,7 @@ hStart=uicontrol('Style', 'pushbutton', 'String', 'Start', 'Tooltipstring', 'Sta
                 'Position', [300 60 90 30], 'Callback', @start);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', ...
                 'Position', [430 60 90 30], 'Callback', @close);
-
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 waitfor(mainFigure);
 
 function weightDownload(~,~)

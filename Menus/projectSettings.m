@@ -15,34 +15,35 @@ userDefaults=updateDefaults(settingsFile);
 
 diameter=defaults.particleTypes;
 newDiameter=diameter;
-positionMenu=[225 250 500 500];
-Menu=figure('OuterPosition', positionMenu, 'Name', 'Particle Options', 'resize', 'Off', 'menubar', 'None', 'CloseRequestFcn', @close);
+positionMenu=[225 250 500 300];
+Menu=figure('OuterPosition', positionMenu, 'Name', 'Particle Options', 'menubar', 'None', 'CloseRequestFcn', @close);
 
-hNrText=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'Number of particle sizes', 'Position', [25 440 85 25], 'Tooltipstring', 'Choose number of particle kinds');
+hNrText=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'Number of particle sizes', 'Position', [25 240 85 25], 'Tooltipstring', 'Choose number of particle kinds');
 hNrPart=uicontrol('Style', 'Edit','Parent', Menu, 'String', num2str(numel(diameter)), 'Tooltipstring', 'Choose number of Particles', 'Callback', @nrChange, ...
-                'Position', [110, 440, 30, 21]);
+                'Position', [110, 240, 30, 21]);
 
-hParticlesText=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'Diameters', 'Tooltipstring', 'Please enter the Diameter (in nm) of each Particle', 'Position', [25 395 80 25]);
+hParticlesText=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'Diameters', 'Tooltipstring', 'Please enter the Diameter (in nm) of each Particle', 'Position', [25 195 80 25]);
 hParticles=cell(1, numel(diameter));
 for d=1:numel(diameter)
-  hParticles{d}=uicontrol('Parent', Menu, 'Style', 'Edit', 'String', num2str(diameter(d)), 'Position', [105+(d-1)*45, 400 35 21], 'Callback', @(hObj, ~)changeNm(hObj, d), 'Tooltipstring', ['Please enter the Diamter of the ' num2str(d) 'th particle in nm']);
+  hParticles{d}=uicontrol('Parent', Menu, 'Style', 'Edit', 'String', num2str(diameter(d)), 'Position', [105+(d-1)*45, 200 35 21], 'Callback', @(hObj, ~)changeNm(hObj, d), 'Tooltipstring', ['Please enter the Diamter of the ' num2str(d) 'th particle in nm']);
 end
 rimTT='Enter thickness of outer tim that should be included for detecting particles in nm. 0 means to not include any outer rim';
 hOuterRimText=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'include Outer Rim of', 'Tooltipstring', rimTT, ...
-                'Position', [25 360 110 15]);
+                'Position', [25 160 110 15]);
 hOuterRimEdit=uicontrol('Style', 'Edit', 'Parent', Menu, 'String', num2str(defaults.dilate), 'Tooltipstring', rimTT, ...
-                'Position', [135 360 30 15],'Callback',@changeRim);
+                'Position', [135 160 30 15],'Callback',@changeRim);
 hOuterRimText2=uicontrol('Style', 'Text', 'Parent', Menu, 'String', 'nm', 'Tooltipstring', rimTT, ...
-                'Position', [165 360 20 15]);           
+                'Position', [165 160 20 15]);           
 hOnlyWithin=uicontrol('Style','checkbox', 'Parent', Menu, 'String', 'Strictly limit analysis to particles within area of interest (incl. outer rim)', ...
-                    'Value', defaults.onlyParticlesWithin, 'Position', [25 330 380 20], 'Tooltipstring', ...
+                    'Value', defaults.onlyParticlesWithin, 'Position', [25 130 380 20], 'Tooltipstring', ...
                     sprintf('If checked all particles where the center is outside of the area of interest will be discarded during analysis.\n They will still be visible in particle labeling screen'));
             
-hOkMenu=uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @updateOptions, 'Position', [250 25 40 25]);
-hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
+hOkMenu=uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @updateOptions, 'Position', [200 25 40 25]);
+hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [300 25 40 25]);
 hErrorPresent=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [175 50 265 15], 'ForegroundColor', 'red', 'FontWeight', 'bold', 'String', 'Cannot continue because Errors are present', 'Visible', 'Off');
 hUniqueError=uicontrol('Parent', Menu, 'Style', 'Text', 'Position', [85 30 120 25], 'String', 'Particle Diameters must be unique!', 'ForegroundColor', 'red', 'FontWeight', 'bold', 'Visible', 'Off');
 
+set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 % Waits for the figure to close to end the function.
 waitfor(Menu);
 %%%%%%%%%%%%%%%%%%%%%%%%%%
