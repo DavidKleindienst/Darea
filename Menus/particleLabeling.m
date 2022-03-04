@@ -114,7 +114,7 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     
     %% Image measures 
     % Zoom image
-    particleImageSideNm = max(defaults.particleTypes)*2;
+    particleImageSideNm = max(defaults.particleTypes)*2.5;
     
     %% GUI
     title='Darea - Particle Detection';
@@ -173,17 +173,18 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
     
     %  Diameter selection
     uicontrol('Style', 'Text', 'String', 'Diameter: ','HorizontalAlignment','left','backgroundcolor',figureColor,'Position', [gridXPx(3) gridYPx(1)+101 150 25]);
-    diameterPopup = uicontrol('Style', 'popup', 'Position', [gridXPx(3)+125 gridYPx(1)+105 90 25],'String',' ','backgroundcolor','white','Callback',@editDiameter);                      
-    set(diameterPopup,'String',createDiameterPopupOptions());
-    set(diameterPopup,'Value',currentParticleType);
+    hDiameterPopup = uicontrol('Style', 'popup', 'Position', [gridXPx(3)+125 gridYPx(1)+105 90 25],...
+                        'String',createDiameterPopupOptions(),'backgroundcolor','white','Callback',@editDiameter);                      
+    set(hDiameterPopup,'Value',currentParticleType);
     
     ttexact=sprintf('If checked, particle center will be exactly where you click\nOtherwise, particle will be found near click');
     hExact=uicontrol('Style', 'checkbox', 'String','Click exact position [x]', 'Position', [gridXPx(3)+255 gridYPx(1)+46 150 25], ...
                 'Tooltipstring', ttexact);
     
-    allowHotkeys=[hExact,hClear,hAutoDetect,saveButton,hBrightness,hBrightnessText,diameterPopup];
+    allowHotkeys=[hExact,hClear,hAutoDetect,saveButton,hBrightness,hBrightnessText,hDiameterPopup, ...
+                  hPosX,hPosY,hZoom];
     set(allowHotkeys, 'KeyReleaseFcn', @keyRelease);
-            
+    
     %% Loads the main image
     maskedImage = []; %dummy, will be filled by showImage
     showImage();
@@ -578,9 +579,9 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
 
    
     %% Edits the diameter
-    function editDiameter(objectHandle , ~)
+    function editDiameter(~ , ~)
         oldDiameterNm = diameterNm;
-        currentParticleType = objectHandle.Value;
+        currentParticleType = hDiameterPopup.Value;
         particleColor =  particleTypes(currentParticleType).color;
         diameterNm = particleTypes(currentParticleType).diameter;
         updateDiameter();
@@ -640,7 +641,12 @@ function [defaults,useless,positionFigure,selAngle] = particleLabeling(pathImage
                 rotateImg(0,0);
             case 'x'
                 hExact.Value=abs(hExact.Value-1);
-            
+            case 'downarrow'
+                hDiameterPopup.Value = min(hDiameterPopup.Value + 1, numel(hDiameterPopup.String));
+                editDiameter(0,0);
+            case 'uparrow'
+                hDiameterPopup.Value = max(hDiameterPopup.Value - 1, 1);
+                editDiameter(0,0);
         end
         
     end
