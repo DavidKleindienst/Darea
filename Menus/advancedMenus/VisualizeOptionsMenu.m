@@ -134,7 +134,7 @@ function Options = VisualizeOptionsMenu(Default, particleList, showExclusion)
    hOkMenu=uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Ok', 'Callback', @updateOptions, 'Position', [250 25 40 25]);
    hCancelMenu= uicontrol('Parent', Menu, 'Style', 'pushbutton', 'String', 'Cancel', 'Callback', @close, 'Position', [325 25 40 25]);
    styleVisibility(0,0);
-   set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+   set(findall(Menu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 
    % Waits for the figure to close to end the function.
    waitfor(Menu);
