@@ -9,6 +9,9 @@ ENVIRONMENT_NAME = 'Darea'; %Name of the conda environment in which the required
                             %environment
 GIT_REPOSITORY = 'https://github.com/DavidKleindienst/Darea.git';
 
+%These files can be changed by user, so changes need to be kept when updating
+usermodified_files = {'Mags.txt', 'configDefault_options.dat'};
+
 home_folder=getenv('HOME');
 if isempty(home_folder) && ispc
     % On Windows, HOME env variable may not be set
@@ -19,6 +22,7 @@ end
 
 ANACONDA_PATH_MAC = {'/Applications/anaconda/', fullfile(home_folder, 'Anaconda3')};
 ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anaconda3')};  
+%No path is necessary for linux
 
 install_note_file = '.install_note.txt';
 
@@ -73,6 +77,9 @@ install_note_file = '.install_note.txt';
         if contains(r, GIT_REPOSITORY)
             !git stash
             !git pull origin master
+            for f = 1:numel(usermodified_files)
+                system(['git checkout stash@{0} -- ' usermodified_files{f}]);
+            end
             fprintf('Updated Darea.\n')
         elseif contains(r, 'fatal: not a git repository')
             fprintf(['Darea was not installed using this script and can thus not be updated automatically.\n' ...
