@@ -158,7 +158,7 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                     
     
     
-    hClose=uicontrol('Style','pushbutton','String','Close Structure', 'Position', [gridXPx(2)-150 105 90 25], 'Callback', @closeStructure);
+    hClose=uicontrol('Style','pushbutton','String','Close Structure [u]', 'Position', [gridXPx(2)-150 105 90 25], 'Callback', @closeStructure);
     hHoles=uicontrol('Style','pushbutton','String','Fill Holes', 'Position', [gridXPx(2)-55 105 60 25], 'Callback', @fillHoles,...
         'Tooltipstring',sprintf('Close holes in the structure'));
     
@@ -190,10 +190,9 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     visibleOnFinalize=[hHoles,hClose,hBrightnessText,hBrightness, hNewComponent];
     allowHotkeys=[hFilterDropdown,hHoles,hClose,hdelLastPoint,hNewComponent,hBrightness,hTrim, ...
         hConnect,hAdd,hRemove,saveButton,hFreehand,hMeasure,hChangeOriginal,hRectangle];
-    for i=1:numel(allowHotkeys)
-        set(allowHotkeys(i),'KeyReleaseFcn', @keyRelease);
-    end
-    
+    textFieldHotkeys=[hPosX,hPosY,hZoom];
+    set(allowHotkeys,'KeyReleaseFcn', @keyRelease);
+    set(textFieldHotkeys, 'KeyReleaseFcn', @textfield_keyRelease);
     
     % Whether the information in the file has been updated.
     updated = true;
@@ -300,6 +299,9 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
         end
     end
     function closeStructure(~,~)
+        if ~strcmp(filteredImages{currentImage}.fct,'finalize')
+            return
+        end
         close_radius=round(defaults.closeRadius/scale);
         filteredImages{currentImage}.compImage=imclose(filteredImages{currentImage}.compImage,strel('disk',close_radius));
         filteredImages{currentImage}.image=image;
@@ -747,7 +749,15 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                 hold(axesZoom, 'off');
         end        
     end
-    
+    function textfield_keyRelease(~,key)
+        % Some hotkeys should not work in textfields
+        % If it is one of these, ignore it, otherwise call keyRelease
+        % function
+        if isequal(key.Key, 'backspace')
+            return
+        end
+        keyRelease(0,key)
+    end
     function keyRelease(~,key)
         switch key.Key
             case 'backspace'
@@ -762,6 +772,8 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
                     hOb.Value=abs(hOb.Value-1);
                     freehand(hOb);
                 end
+            case 'u'
+                closeStructure(0,0);
             case 's'
                 save();
             case 'c'
@@ -805,7 +817,6 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
 
     function deleteLastPoint(~,~)
-        
         if strcmp(filteredImages{currentImage}.fct,'polygon') && numel(polygonPoints)>0
             polygonPoints=polygonPoints(1:end-1,:);
             drawPolygon();
