@@ -8,8 +8,7 @@ if nargin==0
     force=false;
 end
 
-if ~force && isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt') && ...
-                ~isempty(getTrainedNetworks())
+if ~force && ~isempty(getTrainedNetworks())
     retValue=1;
     return;
     %Weights already exist, no need to download

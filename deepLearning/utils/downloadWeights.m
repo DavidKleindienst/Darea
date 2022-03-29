@@ -50,20 +50,6 @@ outerPosition = [150 200 600 220+(ySpacingBetween*nrNetworks)];
 dlWindow = figure('OuterPosition',outerPosition , 'menubar', 'none', ...
                   'Name','Download Networks','CloseRequestFcn', @cancel); 
 
-
-
-hResnet = uicontrol('Style', 'checkbox', 'Position', [gridX(1), outerPosition(4)-ySpacingTop, gridX(2), 25],...
-          'String', 'Resnet101', 'Enable', 'off');
-uicontrol('Style', 'text', 'Position', [gridX(3), outerPosition(4)-ySpacingTop, gridX(4), 20], ...
-          'String', 'Weights necessary for all networks.','HorizontalAlignment', 'left')
-hResnetComment = uicontrol('Style', 'text', 'FontWeight', 'bold','HorizontalAlignment', 'left',  ...
-                          'Position', [gridX(5), outerPosition(4)-ySpacingTop, gridX(6), 20]);
-if isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt')
-    hResnetComment.String = 'Installed';
-else
-    hResnet.Value = 1;
-    hResnetComment.String = 'Required';
-end
 hCheckboxes = gobjects(1,nrNetworks);
 for n = 1:nrNetworks
     yPosition = outerPosition(4)-ySpacingTop-(ySpacingBetween*n);
@@ -94,20 +80,6 @@ waitfor(dlWindow);
         end
         hProgress.String = 'Starting Downloads...';
         drawnow();
-        if hResnet.Value
-            hProgress.String = 'Downloading Resnet101...';
-            drawnow();
-            try
-                websave('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt', ... 
-                        getFullWebpath(serverpath, 'resnet_v2_101.ckpt'));
-            catch excpt
-                if isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt')
-                    delete('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt');
-                end
-                hProgress.String='Download failed!';
-                rethrow(excpt);
-            end
-        end
         for net = 1:nrNetworks
             hProgress.String = sprintf(['Downloading ' names{net} '...']);
             drawnow();

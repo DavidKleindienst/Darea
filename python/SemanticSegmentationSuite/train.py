@@ -84,7 +84,7 @@ def main(args=None):
     parser.add_argument('--rotation', type=float, default=None, help='DOES NOT WORK! Whether to randomly rotate the image for data augmentation. Specifies the max rotation angle in degrees.')
     parser.add_argument('--rotation_perpendicular', type=utils.str2bool, default=False, help='Randomly rotates by 0, 90, 180 or 270 degrees')
     parser.add_argument('--model', type=str, default="FC-DenseNet103", help='The model you are using. See model_builder.py for supported models')
-    parser.add_argument('--frontend', type=str, default="ResNet101", help='The frontend you are using. See frontend_builder.py for supported models')
+    parser.add_argument('--frontend', type=str, default="None", help='The frontend you are using. See frontend_builder.py for supported models')
     parser.add_argument('--save_best', type=utils.str2bool, default=False, help='Saves model with smallest loss rather than last model')
     parser.add_argument('--learn_rate', type=float, default=0.0001, help='The learning rate')
     parser.add_argument('--chkpt_prefix', type=str, default='', help='Prefix in front of checkpoint (intended for distinguishing same models ran with different parameters)')
