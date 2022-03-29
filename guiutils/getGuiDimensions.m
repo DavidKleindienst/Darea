@@ -1,4 +1,6 @@
-function [posXWindow,posYWindow,figureWidthPx,figureHeightPx,dispImageWidthPx,dispImageHeightPx,zoomImageSidePx,imsizechange,zoomsizechange,gridXPx,gridYPx] = getGuiDimensions(imSize,percentScreenUsed,imshrinkfactor,zoomshrinkfactor)
+function [posXWindow,posYWindow,figureWidthPx,figureHeightPx,dispImageWidthPx,dispImageHeightPx,...
+            zoomImageSidePx,imsizechange,zoomsizechange,gridXPx,gridYPx] = ...
+            getGuiDimensions(imSize,percentScreenUsed,imshrinkfactor,zoomshrinkfactor)
 %GETGUIDIMENSIONS Summary of this function goes here
 %   Detailed explanation goes here
 

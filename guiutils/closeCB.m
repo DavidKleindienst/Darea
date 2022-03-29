@@ -1,6 +1,7 @@
 function closeCB(updated, saveFct)
-% If updated is false, asks if stuff should be saved then closes figure;
-% Otherwise closes figure right away
+%% Standard closing function
+% if updated is true, closes the figure
+% If updated is false, asks if the data should be saved. If so, uses saveFct to save the data.
 
 % If everything is updated does not show the dialog.
 if updated
@@ -8,10 +9,11 @@ if updated
     return
 end
 % Construct a questdlg with three options
-choice = questdlg('Do you want to close the figure without saving?', ' Warning', 'Cancel', 'Close without saving','Save and close','Save and close');
+choice = questdlg('Do you want to close the figure without saving?', ' Warning',...
+                'Cancel', 'Close without saving','Save and close','Save and close');
 % Handle response
 switch choice
-    case 'Cancel' % Do not close.
+    case {'','Cancel'} % Do not close.
         return;
     case 'Close without saving' 
         delete(gcf);

@@ -1,6 +1,16 @@
 function [zoomSize, positionZoom] = calcZoom(oldZoomSize,hZoom,hZoomText,zoomRectangle,maxZoom)
-%CALCZOOM Summary of this function goes here
-%   Detailed explanation goes here
+%% Calculates the new size and position of the zoom rectangle
+% Ensures that the rectangle is not larger than allowed
+% Input arguments
+% oldZoomSize - The current size of the zoom (in nm)
+% hZoom - The uicontrol handle for the Edit showing the zoom size
+% hZoomText - The uicontrol handle for the Text showing info about the zoom
+% zoomRectangle - the handle of the rectangle shown on the image
+% maxZoom - The maximum size of the zoom rectangle in nm
+% Output arguments:
+% zoomSize - the new size of the zoom (in nm)
+% positionZoom - the new position of the zoom rectangle
+
 zoomSize=round(str2double(get(hZoom,'String')));
 if isnan(zoomSize)
     positionZoom = zoomRectangle.Position;

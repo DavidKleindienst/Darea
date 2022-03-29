@@ -37,7 +37,6 @@ function [groupings, results]=chooseGroupByImage(groupnames, datFile)
         stop=1;
         delete(choicefig);
         delete(groupfig);
-        
         return
     end
 

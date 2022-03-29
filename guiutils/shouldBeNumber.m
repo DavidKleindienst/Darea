@@ -24,15 +24,15 @@ end
 
 if ~floatAllowed && mod(number,1)~=0
     %User entered a float, but floats are not allowed
-    hOb.String=num2str(variableOld);
-    return;
+    %so convert to int
+    number = round(number);
+    hOb.String=num2str(number);
 end
 if ~any(isnan(range)) && (range(1)>number || range(2)<number)
     %Number is outside of allowed range
     hOb.String=num2str(variableOld);
     return;
 end
-
 
 variable=number;    %User input was valid
 

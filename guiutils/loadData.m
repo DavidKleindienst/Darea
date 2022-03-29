@@ -1,5 +1,6 @@
 function Data = loadData(fileName)
-%Returns NaN if doesn't work
+%% Load analysis data saved in a .mat file
+% Returns NaN if the loading fails
 try
     Data=load(fileName);
 catch

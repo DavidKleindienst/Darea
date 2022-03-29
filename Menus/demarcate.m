@@ -372,7 +372,8 @@ function [defaults,useless,position,selAngle]=demarcate(pathImage, imageName, sc
     end
 
     function createZoom(~,~)
-        [defaults.zoomImageSizeNm, positionZoomNm] = calcZoom(defaults.zoomImageSizeNm,hZoom,hZoomText,zoomRectangleMov,min(size(image))*scale);
+        [defaults.zoomImageSizeNm, positionZoomNm] = calcZoom(defaults.zoomImageSizeNm,hZoom,...
+                                            hZoomText,zoomRectangleMov,min(size(image))*scale);
         set(hZoom, 'String', int2str(defaults.zoomImageSizeNm))
         redrawImage();
     end
