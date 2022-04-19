@@ -38,7 +38,7 @@ hOk=uicontrol('Style', 'pushbutton', 'String', 'Ok', 'Position', [233 50 80 25],
 hCancel=uicontrol('Style', 'pushbutton', 'String', 'Cancel', 'Position', [318 50 80 25], 'Callback', @cancel);
 
 set(hTable,'Data',mags)
-set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+set(findall(MagMenu, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
 waitfor(MagMenu);
 
 function selectMagDefault(hObj,hOther)
