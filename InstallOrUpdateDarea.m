@@ -20,7 +20,9 @@ end
     
 %Possible default paths where anaconda installation might be
 
-ANACONDA_PATH_MAC = {'/Applications/anaconda/', fullfile(home_folder, 'Anaconda3')};
+ANACONDA_PATH_MAC = {'/Applications/anaconda/', ...
+                    fullfile(home_folder, 'Anaconda3'), ...
+                    fullfile(home_folder, 'opt/anaconda3')};
 ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anaconda3')};  
 %No path is necessary for linux
 
@@ -33,7 +35,7 @@ install_note_file = '.install_note.txt';
         end    
 
         if isfolder(fullfile(path, 'bin')) && isfolder(fullfile(path, 'condabin')) && ...
-                isfolder(fullfile(path, 'lib')) && isfolder(fullfile(path, 'envs'))
+                isfolder(fullfile(path, 'lib')) 
             % This folders should exist in anaconda path
             % Although there existance doesn't neccessarily mean that connection to conda will work
             % (but usually it will).
