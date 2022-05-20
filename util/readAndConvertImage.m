@@ -19,7 +19,13 @@ end
 
 
 if endsWith(filename,'.tif')
-    image=imread(filename);
+    try
+        image=imread(filename);
+    catch exc
+        fprintf(['Failed reading image ' filename ' with following error']);
+        rethrow(exc);
+    end
+    
 else
     if imNr == 0
         %No image has been selected, use the first one
