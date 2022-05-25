@@ -28,6 +28,8 @@ uicontrol('Style', 'pushbutton', 'String', 'Assign group(s) by image', 'Tooltips
 hSave=uicontrol('Style', 'pushbutton', 'String', 'Save', 'Tooltipstring', 'Save', 'Position', [380 60 90 30], 'Callback', @save);
 hClose=uicontrol('Style', 'pushbutton', 'String', 'Close', 'Tooltipstring', 'Exit without saving', 'Position', [490 60 90 30], 'Callback', @close);
 
+set(findall(mainFigure, '-property', 'Units'), 'Units', 'Normalized');    %Make objects resizable
+
 waitfor(mainFigure);
 
 function changeGrpName(hOb,~)
