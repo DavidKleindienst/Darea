@@ -40,7 +40,7 @@ end
 
 function choiceByImage(~,~)
     [groupings,results]=chooseGroupByImage(groupnames, datFile);
-    if isnan(results)
+    if ~iscell(results)
         %Was cancelled
         return;
     end
