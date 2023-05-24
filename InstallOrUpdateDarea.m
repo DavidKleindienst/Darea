@@ -28,22 +28,17 @@ ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anacond
 
 install_note_file = '.install_note.txt';
 
-    function bool=isCondaPath(path)
+    function bool=isCondaPath(path, os)
         if ~isfolder(path)
             bool=false;
             return;
         end    
-
-        if isfolder(fullfile(path, 'bin')) && isfolder(fullfile(path, 'condabin')) && ...
-                isfolder(fullfile(path, 'lib')) 
-            % This folders should exist in anaconda path
-            % Although there existance doesn't neccessarily mean that connection to conda will work
-            % (but usually it will).
-            bool=true;
-            return
+        switch os
+            case 'mac'
+                bool = isfolder(fullfile(path, 'bin')) && isfolder(fullfile(path, 'condabin'));
+            case 'win'
+                bool = isfolder(fullfile(path, 'condabin')) && isfolder(fullfile(path, "Library"));
         end
-        bool=false;
-
     end
 
     function [isPath,path]=userGetAnacondaPath(os)
@@ -65,12 +60,7 @@ install_note_file = '.install_note.txt';
         end
         path = uigetdir('','Please select anaconda folder');
 
-        if ~isCondaPath(path)
-            fprintf('The selected folder did not contain the anaconda installation. Aborting installation...\n');
-            isPath=false;
-        else
-            isPath=true;
-        end
+        isPath=isfolder(path);
     end
 
     function updateDarea()
@@ -121,7 +111,7 @@ install_note_file = '.install_note.txt';
         end
         if ~strcmp(os, 'linux')  %Not necessary for linux
             for p = 1:numel(anaconda_path)
-                if isCondaPath(anaconda_path{p})
+                if isCondaPath(anaconda_path{p},os)
                     anaconda_path=anaconda_path{p};
                     break;
                 end
@@ -201,7 +191,7 @@ install_note_file = '.install_note.txt';
             if a==0
                 fprintf('CUDA found, installing python packages with GPU support (this may take a while)...\n');
                 command1=['conda create -y -n ' ENVIRONMENT_NAME ' python=3.9 pip cython cudnn'];
-                command2=' install tensorflow_gpu opencv-python==4.5.3.56 imageio tf_slim scikit-learn matplotlib pyqt5';
+                command2=' install tensorflow==2.10 opencv-python==4.5.3.56 imageio tf_slim scikit-learn matplotlib pyqt5';
             else
                 command1=['conda create -y -n ' ENVIRONMENT_NAME ' python=3.9 pip cython'];
                 command2=' install tensorflow opencv-python==4.5.3.56 imageio tf_slim scikit-learn matplotlib';
