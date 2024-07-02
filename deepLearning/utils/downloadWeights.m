@@ -37,7 +37,7 @@ for n = 1:nrNetworks
         networksInstalled(n) = 1;
     end
 end
-if all(networksInstalled) && isfile('python/SemanticSegmentationSuite/models/resnet_v2_101.ckpt')
+if all(networksInstalled)
    msgbox('All available networks are already installed');
    retValue = 1;
    return
