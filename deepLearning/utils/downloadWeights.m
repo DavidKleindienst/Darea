@@ -2,17 +2,16 @@ function retValue = downloadWeights()
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
-serverpath='https://pub.ist.ac.at/~dkleindienst/weights/';
+serverpath='https://seafile.ist.ac.at/d/264c0e39ecfa4cd5ace5/files/?p=%2FDareaDarem%2FDarea';
 indexFile = 'networkList.csv';
 
     function path=getFullWebpath(path,file)
-        %% Like fullfile, but for the webpaths and with only two arguments        
-        path=fullfile(path,file);
-        path=replace(path,'\', '/');
+        %% Like fullfile, but for the webpaths on seafile and with only two arguments        
+        path = strcat(path, "%2F", file, "&raw=1");
     end
 
 try
-    listedNetworks = webread(getFullWebpath(serverpath, indexFile));
+    listedNetworks = webread(getFullWebpath(serverpath, indexFile),weboptions("ContentType","table"));
     names = listedNetworks.Name;
     descriptions = listedNetworks.Description;
 catch
