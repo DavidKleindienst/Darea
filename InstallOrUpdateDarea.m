@@ -222,7 +222,7 @@ install_note_file = '.install_note.txt';
                 pip_path=fullfile(darea_env, 'bin/pip');
             end
             
-            [a,r] = system([pip_path 'install -r requirements.txt --progress-bar off'], '-echo');
+            [a,r] = system([pip_path ' install -r requirements.txt --progress-bar off'], '-echo');
             if a~=0
                 fprintf('A problem occured during installation of required python packages by pip:\n');
                 fprintf(r);
