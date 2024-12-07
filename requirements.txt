@@ -1,0 +1,7 @@
+tensorflow==2.10
+opencv-python==4.5.3.56
+imageio
+tf_slim
+scikit-learn
+matplotlib
+numpy<2.0

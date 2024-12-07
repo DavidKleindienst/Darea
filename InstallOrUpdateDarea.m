@@ -192,10 +192,8 @@ install_note_file = '.install_note.txt';
             if a==0
                 fprintf('CUDA found, installing python packages with GPU support (this may take a while)...\n');
                 command1=['conda create -y -n ' ENVIRONMENT_NAME ' python=3.9 pip cython cudnn'];
-                command2=' install tensorflow==2.10 opencv-python==4.5.3.56 imageio tf_slim scikit-learn matplotlib pyqt5';
             else
                 command1=['conda create -y -n ' ENVIRONMENT_NAME ' python=3.9 pip cython'];
-                command2=' install tensorflow opencv-python==4.5.3.56 imageio tf_slim scikit-learn matplotlib';
                 fprintf('CUDA was not found, installing python packages with CPU support only (this may take a while)...\n');
             end
 
@@ -224,7 +222,7 @@ install_note_file = '.install_note.txt';
                 pip_path=fullfile(darea_env, 'bin/pip');
             end
             
-            [a,r] = system([pip_path command2 ' --progress-bar off'], '-echo');
+            [a,r] = system([pip_path 'install -r requirements.txt --progress-bar off'], '-echo');
             if a~=0
                 fprintf('A problem occured during installation of required python packages by pip:\n');
                 fprintf(r);
