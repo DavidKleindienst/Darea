@@ -42,23 +42,24 @@ install_note_file = '.install_note.txt';
     end
 
     function [isPath,path]=userGetAnacondaPath(os)
-        question=['Anaconda installation could not be found automatically.\n' ...
-                    'Would you like to manually select the anaconda folder?\n'];
+        question=['Conda installation could not be found automatically.\n' ...
+                    'Conda can be installed by Anaconda, Miniconda or MiniForge\n' ...
+                    'Would you like to manually select the Anaconda/MiniConda/MiniForge folder?\n'];
         switch os
             case {'mac', 'linux'}
-                question = [question 'You may find the location of the anaconda folder by opening the terminal and typing "which conda" <enter>\n'];
+                question = [question 'You may find the location of the conda folder by opening the terminal and typing "which conda" <enter>\n'];
             case 'win'
-                question = [question 'You may find the location of the anaconda folder by opening the terminal and typing "where.exe conda" <enter>\n'];
+                question = [question 'You may find the location of the conda folder by opening the terminal and typing "where.exe conda" <enter>\n'];
         end
         question=[question 'Pressing "No" will abort the installation procedure'];
 
-        answer = questdlg(sprintf(question),'Anaconda not found.', 'Yes','No', 'No');
+        answer = questdlg(sprintf(question),'Conda not found.', 'Yes','No', 'No');
         if ~strcmp(answer,'Yes')
             isPath=false; path=NaN;
             fprintf('Aborting installation...\n');
             return
         end
-        path = uigetdir('','Please select anaconda folder');
+        path = uigetdir('','Please select conda folder');
 
         isPath=isfolder(path);
     end
@@ -93,7 +94,7 @@ install_note_file = '.install_note.txt';
             return
         end
         fprintf('Found Git!\n');
-        fprintf('Looking for Anaconda...\n');
+        fprintf('Looking for conda...\n');
         if ismac
             os='mac';
             anaconda_path=ANACONDA_PATH_MAC;
@@ -147,11 +148,11 @@ install_note_file = '.install_note.txt';
 
         [a, ~]=system('conda --version');
         if a~=0
-            fprintf('Installation failed as Anaconda was not available.\n');
+            fprintf('Installation failed as Conda was not available.\n');
             success=false;
             return
         end
-        fprintf('Found Anaconda!\n')
+        fprintf('Found Conda!\n')
         success=true;
     end
     
@@ -185,7 +186,7 @@ install_note_file = '.install_note.txt';
         r=split(r);
         index = find(cellfun(@(x)isequal(x,ENVIRONMENT_NAME), r));
         if isempty(index)
-            fprintf('Preparing anaconda environment "%s" ...\n', ENVIRONMENT_NAME)
+            fprintf('Preparing conda environment "%s" ...\n', ENVIRONMENT_NAME)
             fprintf('Checking for existing CUDA installation...\n')
             [a,~] = system('nvcc --version');
             if a==0
@@ -211,7 +212,7 @@ install_note_file = '.install_note.txt';
             index = find(cellfun(@(x)isequal(x,ENVIRONMENT_NAME), r));
 
             if isempty(index)
-                fprintf('An unknown issue occured. Python packages seemingly were installed correctly, but Darea Anaconda environment was not found.\n');
+                fprintf('An unknown issue occured. Python packages seemingly were installed correctly, but Darea conda environment was not found.\n');
                 success=false;
                 return
             end
