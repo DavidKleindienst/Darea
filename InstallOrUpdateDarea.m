@@ -23,7 +23,7 @@ end
 ANACONDA_PATH_MAC = {'/Applications/anaconda/', ...
                     fullfile(home_folder, 'Anaconda3'), ...
                     fullfile(home_folder, 'opt/anaconda3')};
-ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anaconda3')};  
+ANACONDA_PATH_WIN = {'C:/ProgramData/Anaconda3/', fullfile(home_folder, 'anaconda3'), 'C:/ProgramData/miniforge3/'};  
 %No path is necessary for linux
 
 install_note_file = '.install_note.txt';
