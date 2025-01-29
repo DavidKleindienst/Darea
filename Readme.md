@@ -2,7 +2,7 @@
 Darea (**D**eep learning-**a**ssisted **re**plica image **a**nalysis suite) is a software for high-throughput analysis of freeze-fracture replica electron microscopy images.
 
 ### Quick Installation
-Install [git](https://git-scm.com/), Conda (through [anaconda/miniconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge/releases)) and Matlab R2018b or later. Download [InstallOrUpdateDarea.m](https://github.com/DavidKleindienst/Darea/raw/master/InstallOrUpdateDarea.m) (rightclick -> "Save Link As") and place it in an empty folder. Open Matlab, navigate to that folder rightclick on InstallOrUpdateDarea.m and select "Run". All other dependencies will be installed automatically.
+Install [git](https://git-scm.com/), Conda (through [anaconda/miniconda](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) or [miniforge](https://github.com/conda-forge/miniforge/releases)) and Matlab R2018b or later. Download [InstallOrUpdateDarea.m](https://github.com/DavidKleindienst/Darea/raw/master/InstallOrUpdateDarea.m) (rightclick -> "Save Link As") and place it in an empty folder. Open Matlab, navigate to that folder, rightclick on InstallOrUpdateDarea.m and select "Run". All other dependencies will be installed automatically.
 
 Please refer to the handbook.pdf file for other installation options.
 
