@@ -28,6 +28,8 @@ addpath('./3rdParty/Douglas Peucker');
 addpath('./3rdParty/EMIODist2');
 addpath('./deepLearning/');
 addpath('./deepLearning/utils/');
+addpath('./tests/')
+addpath('./tests/TestDataSet/')
 
 try
     P=py.sys.path;
