@@ -226,12 +226,24 @@ def duplicateImage(configFile,index,copyMod=False, duplicate_suffix='_dupl'):
     impath = imbasepath if isSerEM else imbasepath+'.tif'
     assert os.path.isfile(impath)
     
-    #Find a path to copy the image to, by appending duplicat_suffix until it is not already taken
-    cppath=imbasepath+duplicate_suffix
-    while os.path.relpath(cppath,os.path.dirname(configFile)) in images['ROUTE']:
-        cppath+=duplicate_suffix
-    cproute=os.path.relpath(cppath,os.path.dirname(configFile)) #Will be written to config
-    cproute=cproute.replace('\\','/') #Deal with windows issues
+    #Find a path to copy the image to, by appending duplicate_suffix until it is not already taken
+#     cppath=imbasepath+duplicate_suffix
+#     while os.path.relpath(cppath,os.path.dirname(configFile)) in images['ROUTE']:
+#         cppath+=duplicate_suffix
+#     cproute=os.path.relpath(cppath,os.path.dirname(configFile)) #Will be written to config
+#     cproute=cproute.replace('\\','/') #Deal with windows issues
+
+    base_cppath = imbasepath
+    dup_count = 0
+    while True:
+        suffix = duplicate_suffix * (dup_count + 1)
+        cppath = base_cppath + suffix
+        cproute = os.path.relpath(cppath,
+        os.path.dirname(configFile)).replace('\\', '/')
+        if cproute not in images['ROUTE']:
+            break
+        dup_count += 1
+
     if copyMod and os.path.isfile(modbasepath+'_mod.tif'):
         #Also duplicate _mod image if wanted and exists.
         copyfile(modbasepath+'_mod.tif',cppath+'_mod.tif')
@@ -259,4 +271,3 @@ def duplicateImage(configFile,index,copyMod=False, duplicate_suffix='_dupl'):
         lst+=images[k][index+1:]
         images[k]=lst
     file_utils.dict2file(configFile,images,',\t')
-    
