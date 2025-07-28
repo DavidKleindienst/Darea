@@ -47,7 +47,7 @@ end
                 testCase.hProgress, testCase.outpath, testCase.analysisName); % runs StartAnalysis
 
             % check if output file was created
-            testCase.assertTrue(isfile(testCase.outpath), 'StartAnalysis output file not found.'); % define hProgress to be used in StartAnalysis and makeFigures
+            testCase.assertTrue(isfile(testCase.outpath), 'StartAnalysis output file not found.');
 
             loaded = load(testCase.outpath);
             testCase.assertTrue(isfield(loaded, 'Data'), 'No Data struct in StartAnalysis output.'); % check if Data has been loaded from outpath
@@ -56,7 +56,7 @@ end
             try
                 Data = hlp_deserialize(Data);
             catch
-                warning('Could not deserialize Data.');
+                error('Could not deserialize Data.');
             end
 
             testCase.assertTrue(isfield(testCase.figure_settings, 'SimNames'), ...
