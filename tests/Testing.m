@@ -100,7 +100,7 @@ end
                 simImage = simulateImage(Data.Orig.Images{imgIdx}, radius, ...
                     Data.simnames{1}, testCase.analysis_settings.SimOptions, ...
                     Data.methodA, testCase.hProgress);
-                disp(simImage)
+%                 disp(simImage)
                 mask = simImage.demarcatedAreas;
             
                 % check that all centers are within the mask
