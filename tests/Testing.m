@@ -1,4 +1,4 @@
-% unit test for StartAnalysis and makeFigures functions
+% unit test for StartAnalysis, makeFigures and simulateImage functions.
 
 classdef Testing < matlab.unittest.TestCase
     properties
@@ -9,7 +9,7 @@ classdef Testing < matlab.unittest.TestCase
         analysisName = 'TestAnalysis1';
         figure_settings
         analysis_settings
-
+        
     end
 
     methods (TestMethodSetup)
@@ -92,6 +92,45 @@ end
             if testCase.figure_settings.StatisticsOptions.maketSNE
                 tsnePath = fullfile(testCase.figuresOutpath, 'Stats_and_Metrics', 'plots', 'tSNE');
                 testCase.assertTrue(isfolder(tsnePath), 'tSNE output folder not created.');
+            end
+
+            % run getInfoImages. to be used in simulateImage
+            try
+                infoImage = getInfoImages(testCase.datFile, ...
+                    testCase.analysis_settings.dilate, testCase.analysis_settings.onlyParticlesWithin);
+            catch
+                error('error running getInfoImages')
+            end
+
+            % run simulateImage for each image in TestDataSet
+            radius = Data.methodA{1};
+            for imgIdx = 1:numel(infoImage)
+                simImage = simulateImage(infoImage{imgIdx}, radius, ...
+                    Data.simnames{1}, testCase.analysis_settings.SimOptions, ...
+                    Data.methodA, testCase.hProgress);
+            
+                mask = simImage.demarcatedAreas;
+            
+                % check that all centers are within the mask
+                centers = simImage.centers;
+                scale = simImage.scale;
+                centerPx = round(centers ./ scale);
+                isInside = arrayfun(@(i) ...
+                    centerPx(i,2) > 0 && centerPx(i,2) <= size(mask,1) && ...
+                    centerPx(i,1) > 0 && centerPx(i,1) <= size(mask,2) && ...
+                    mask(centerPx(i,2), centerPx(i,1)) == 0, ...
+                    1:size(centerPx,1));
+            
+                testCase.assertTrue(all(isInside), ...
+                    sprintf('Image %d of %d: Some simulated particles lie outside demarcated area.', imgIdx, numel(infoImage)));
+            
+                % Check inter-particle distances
+                mindistance = testCase.analysis_settings.SimOptions.mindistance; % in nm
+                if size(centers, 1) > 1
+                    dists = pdist(centers); % distances in nm
+                    testCase.assertGreaterThanOrEqual(min(dists), mindistance, ...
+                        sprintf('Image %d: Some simulated particles are closer than %g nm.', imgIdx, mindistance));
+                end
             end
         end
     end
