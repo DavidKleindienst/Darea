@@ -94,21 +94,13 @@ end
                 testCase.assertTrue(isfolder(tsnePath), 'tSNE output folder not created.');
             end
 
-            % run getInfoImages. to be used in simulateImage
-            try
-                infoImage = getInfoImages(testCase.datFile, ...
-                    testCase.analysis_settings.dilate, testCase.analysis_settings.onlyParticlesWithin);
-            catch
-                error('error running getInfoImages')
-            end
-
             % run simulateImage for each image in TestDataSet
             radius = Data.methodA{1};
             for imgIdx = 1:numel(infoImage)
-                simImage = simulateImage(infoImage{imgIdx}, radius, ...
+                simImage = simulateImage(Data.Orig.Images{imgIdx}, radius, ...
                     Data.simnames{1}, testCase.analysis_settings.SimOptions, ...
                     Data.methodA, testCase.hProgress);
-            
+                disp(simImage)
                 mask = simImage.demarcatedAreas;
             
                 % check that all centers are within the mask
